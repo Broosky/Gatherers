@@ -1,0 +1,58 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Win64 - Build resources.",
+            "command": "C:\\msys64\\mingw64\\bin\\windres.exe",
+            "args": [
+                "-J",
+                "rc",
+                "-O",
+                "coff",
+                "-i",
+                "${workspaceRoot}\\main.rc",
+                "-o",
+                "${workspaceRoot}\\main.res"
+            ],
+            "options": {
+                "cwd": "C:\\msys64\\mingw64\\bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "Task to build the resources."
+        },
+        {
+            "type": "shell",
+            "label": "Win64 - Build application.",
+            "command": "C:\\msys64\\mingw64\\bin\\x86_64-w64-mingw32-gcc.exe",
+            "args": [
+                "-g",
+                "-Wall",
+                "-O3",
+                "-mwindows",
+                "${workspaceRoot}\\*.c",
+                "${workspaceRoot}\\*.h",
+                "${workspaceRoot}\\main.res",
+                "-o",
+                "${workspaceRoot}\\bin\\Debug\\Gatherers.exe"
+            ],
+            "options": {
+                "cwd": "C:\\msys64\\mingw64\\bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Win64 - Build resources."
+            ],
+            "detail": "Task to build the application. Will build prerequisite resources."
+        }
+    ],
+    "version": "2.0.0"
+}

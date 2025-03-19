@@ -1,0 +1,61 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Linux Win64 - Build resources.",
+            "command": "/usr/bin/x86_64-w64-mingw32-windres",
+            "args": [
+                "-J",
+                "rc",
+                "-O",
+                "coff",
+                "-i",
+                "${workspaceRoot}/main.rc",
+                "-o",
+                "${workspaceRoot}/main.res"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Task to build the resources."
+        },
+        {
+            "type": "shell",
+            "label": "Linux Win64 - Build application.",
+            "command": "/usr/bin/x86_64-w64-mingw32-gcc",
+            "args": [
+                "-g",
+                "-Wall",
+                "-O3",
+                "-mwindows",
+                "${workspaceRoot}/*.c",
+                "${workspaceRoot}/*.h",
+                "${workspaceRoot}/main.res",
+                "-o",
+                "${workspaceRoot}/Gatherers.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Linux Win64 - Build resources."
+            ],
+            "detail": "Task to build the application. Will build prerequisite resources."
+        }
+    ],
+    "version": "2.0.0"
+}
