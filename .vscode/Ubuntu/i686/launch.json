@@ -2,15 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Linux Win32 - Launch application.",
+            "name": "Linux i686 - Launch Debug Application (Wine32).",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/Gatherers.exe",
-            "args": [],
+            "program": "/usr/bin/wine32",
+            "args": [
+                "${workspaceRoot}/bin/Debug/Gatherers.exe"
+            ],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceRoot}/bin/Debug/",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -19,7 +21,30 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Linux Win32 - Build application.",
+            "preLaunchTask": "Linux i686 - Build Application (Debug).",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Linux i686 - Launch Release Application (Wine32).",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/wine32",
+            "args": [
+                "${workspaceRoot}/bin/Release/Gatherers.exe"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/bin/Debug/",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb.",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Linux i686 - Build Application (Release).",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]

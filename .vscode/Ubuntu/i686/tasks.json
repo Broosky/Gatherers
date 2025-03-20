@@ -1,18 +1,18 @@
 {
     "tasks": [
         {
+            "label": "Linux i686 - Build Resources (Debug).",
             "type": "shell",
-            "label": "Linux Win32 - Build resources.",
             "command": "/usr/bin/i686-w64-mingw32-windres",
             "args": [
-                "-J",
+                "-J", 
                 "rc",
-                "-O",
+                "-O", 
                 "coff",
-                "-i",
-                "${workspaceRoot}/main.rc",
-                "-o",
-                "${workspaceRoot}/main.res"
+                "-i", 
+                "${workspaceRoot}/Resources/main.rc",
+                "-o", 
+                "${workspaceRoot}/Resources/main.res"
             ],
             "options": {
                 "cwd": "${fileDirname}"
@@ -24,22 +24,52 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Task to build the resources."
+            "detail": "Linux i686 - Build Resources (Debug)."
+        },
+        {
+            "label": "Linux i686 - Build Resources (Release).",
+            "type": "shell",
+            "command": "/usr/bin/i686-w64-mingw32-windres",
+            "args": [
+                "-J", 
+                "rc",
+                "-O", 
+                "coff",
+                "-i", 
+                "${workspaceRoot}/Resources/main.rc",
+                "-o", 
+                "${workspaceRoot}/Resources/main.res"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Linux i686 - Build Resources (Release)."
         },
         {
             "type": "shell",
-            "label": "Linux Win32 - Build application.",
+            "label": "Linux i686 - Build Application (Debug).",
             "command": "/usr/bin/i686-w64-mingw32-gcc",
             "args": [
                 "-g",
+                "-O0",
+                "-ggdb",
+                "-fno-inline",
+                "-fno-omit-frame-pointer",
+                "-DDEBUG",
                 "-Wall",
-                "-O3",
                 "-mwindows",
-                "${workspaceRoot}/*.c",
-                "${workspaceRoot}/*.h",
-                "${workspaceRoot}/main.res",
+                "${workspaceRoot}/Source/*.c",
+                "${workspaceRoot}/Headers/*.h",
+                "${workspaceRoot}/Resources/main.res",
                 "-o",
-                "${workspaceRoot}/Gatherers.exe"
+                "${workspaceRoot}/bin/Debug/Gatherers.exe"
             ],
             "options": {
                 "cwd": "${fileDirname}"
@@ -52,9 +82,48 @@
                 "isDefault": true
             },
             "dependsOn": [
-                "Linux Win32 - Build resources."
+                "Linux i686 - Build Resources (Debug)."
             ],
-            "detail": "Task to build the application. Will build prerequisite resources."
+            "detail": "Linux i686 - Build Application (Debug)."
+        },
+        {
+            "type": "shell",
+            "label": "Linux i686 - Build Application (Release).",
+            "command": "/usr/bin/i686-w64-mingw32-gcc",
+            "args": [
+                "-O3",
+                "-march=native",
+                "-flto",
+                "-funroll-loops",
+                "-fomit-frame-pointer",
+                "-fstrict-aliasing",
+                "-ffast-math",
+                "-funroll-all-loops",
+                "-fno-exceptions",
+                "-fno-rtti",
+                "-DNDEBUG",
+                "-Wall",
+                "-mwindows",
+                "${workspaceRoot}/Source/*.c",
+                "${workspaceRoot}/Headers/*.h",
+                "${workspaceRoot}/Resources/main.res",
+                "-o",
+                "${workspaceRoot}/bin/Release/Gatherers.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Linux i686 - Build Resources (Release)."
+            ],
+            "detail": "Linux i686 - Build Application (Release)."
         }
     ],
     "version": "2.0.0"

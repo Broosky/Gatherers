@@ -2,24 +2,49 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Linux Win64 - Launch application",
+            "name": "Linux x64 - Launch Debug Application (Wine).",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/Gatherers.exe",
-            "args": [],
+            "program": "/usr/bin/wine",
+            "args": [
+                "${workspaceRoot}/bin/Debug/Gatherers.exe"
+            ],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceRoot}/bin/Debug/",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "MIMode": "gdb",
             "setupCommands": [
                 {
-                    "description": "Enable pretty-printing for gdb",
+                    "description": "Enable pretty-printing for gdb.",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Linux Win64 - Build application.",
+            "preLaunchTask": "Linux x64 - Build Application (Debug).",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Linux x64 - Launch Release Application (Wine).",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/wine",
+            "args": [
+                "${workspaceRoot}/bin/Release/Gatherers.exe"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/bin/Debug/",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb.",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Linux x64 - Build Application (Release).",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]

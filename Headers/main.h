@@ -118,7 +118,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Volatile entity constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define WORKER_MOVE_SPEED                   2.0f
+#define WORKER_MOVE_SPEED                   7.0f
 #define WORKER_MINERAL_DIVISOR              5.0f
 #define WORKER_GAS_DIVISOR                  6.0f
 #define MINERAL_MOVE_SPEED                  1.0f
@@ -130,9 +130,9 @@
 #define REFINERY_PAUSE                      2000.0f
 #define REFINERY_COMMAND_PAUSE              4000.0f
 #define MINERALS_PER_GRAB                   1
-#define MINERALS_MULTIPLIER                 4
+#define MINERALS_MULTIPLIER                 3
 #define GAS_PER_GRAB                        1
-#define GAS_MULTIPLIER                      4
+#define GAS_MULTIPLIER                      3
 #define MINERALS_ON_CREATION                100000
 #define GAS_ON_CREATION                     100000
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,7 @@
 #ifndef _PROCESS_C_
 #define _PROCESS_C_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "..\Headers\main.h"
+#include "../Headers/main.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Main simulation processing. All operations are centralized in this one, timed, function.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1119,20 +1119,11 @@ void __cdecl PROC_AdjustMinimapViewport(GLOBALS* p_Globals, IMAGES* p_Images) {
         NewViewportActualLocation.fY = MINIMAP_SIZE - ViewportActualDelta.fY;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FPOINT NewViewportActualDelta = {
-        NewViewportActualLocation.fX + ViewportActualDelta.fX,
-        NewViewportActualLocation.fY + ViewportActualDelta.fY
-    };
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Relative dimensions to upscale.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT NewViewportRelativeLocation = {
          NewViewportActualLocation.fX / MINIMAP_SIZE,
          NewViewportActualLocation.fY / MINIMAP_SIZE
-    };
-    FPOINT NewViewportRelativeDelta = {
-        NewViewportActualDelta.fX / MINIMAP_SIZE,
-        NewViewportActualDelta.fY / MINIMAP_SIZE,
     };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Actual upscaled dimensions.
@@ -1140,10 +1131,6 @@ void __cdecl PROC_AdjustMinimapViewport(GLOBALS* p_Globals, IMAGES* p_Images) {
     FPOINT NewMainViewActualLocation = {
         NewViewportRelativeLocation.fX * MAP_SIZE,
         NewViewportRelativeLocation.fY * MAP_SIZE,
-    };
-    FPOINT NewMainViewActualDelta = {
-        NewViewportRelativeDelta.fX * MAP_SIZE,
-        NewViewportRelativeDelta.fY * MAP_SIZE
     };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Determine the delta and apply the change to the global translations and the entities on the screen.

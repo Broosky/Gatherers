@@ -1,84 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
-	<ActiveTarget name="Release" />
+	<ActiveTarget name="Debug" />
+	<File name="..\.vscode\Windows\x64\tasks.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="219" topLine="0" />
+		</Cursor>
+	</File>
 	<File name="Gatherers.depend" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="1030" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="..\.vscode\launch.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+	<File name="..\Source\globals.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="469" topLine="0" />
+			<Cursor1 position="2637" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="..\Source\render.c" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+	<File name="..\Resources\main.rc" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3293" topLine="0" />
-		</Cursor>
-		<Folding>
-			<Collapse line="10" />
-			<Collapse line="14" />
-			<Collapse line="44" />
-		</Folding>
-	</File>
-	<File name="..\Source\picture.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2297" topLine="0" />
+			<Cursor1 position="4259" topLine="66" />
 		</Cursor>
 	</File>
-	<File name="..\Source\ai.c" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+	<File name="..\.vscode\tasks.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="4038" topLine="0" />
-		</Cursor>
-		<Folding>
-			<Collapse line="10" />
-			<Collapse line="39" />
-			<Collapse line="92" />
-			<Collapse line="282" />
-		</Folding>
-	</File>
-	<File name="..\Source\menu.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2317" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\README.md" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="236" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\.vscode\Ubuntu\x64\tasks.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="317" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\Source\timebase.c" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="737" topLine="0" />
-		</Cursor>
-		<Folding>
-			<Collapse line="10" />
-			<Collapse line="14" />
-			<Collapse line="27" />
-			<Collapse line="37" />
-			<Collapse line="44" />
-			<Collapse line="50" />
-		</Folding>
-	</File>
-	<File name="..\Source\main.c" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1970" topLine="65" />
-		</Cursor>
-	</File>
-	<File name="..\Source\load.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2058" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\.vscode\Windows\x64\launch.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="290" topLine="0" />
+			<Cursor1 position="219" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="..\Source\entity.c" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
@@ -102,9 +48,52 @@
 			<Collapse line="740" />
 		</Folding>
 	</File>
-	<File name="..\Source\settings.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+	<File name="Gatherers.cbp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="834" topLine="0" />
+			<Cursor1 position="6000" topLine="105" />
+		</Cursor>
+	</File>
+	<File name="..\.vscode\Ubuntu\i686\tasks.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="360" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\Source\timebase.c" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="737" topLine="0" />
+		</Cursor>
+		<Folding>
+			<Collapse line="10" />
+			<Collapse line="14" />
+			<Collapse line="27" />
+			<Collapse line="37" />
+			<Collapse line="44" />
+			<Collapse line="50" />
+		</Folding>
+	</File>
+	<File name="..\Source\misc.c" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1773" topLine="0" />
+		</Cursor>
+		<Folding>
+			<Collapse line="10" />
+			<Collapse line="14" />
+		</Folding>
+	</File>
+	<File name="..\Source\ai.c" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4038" topLine="0" />
+		</Cursor>
+		<Folding>
+			<Collapse line="10" />
+			<Collapse line="39" />
+			<Collapse line="92" />
+			<Collapse line="282" />
+		</Folding>
+	</File>
+	<File name="..\README.md" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="236" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="..\Source\message.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
@@ -112,14 +101,101 @@
 			<Cursor1 position="832" topLine="3" />
 		</Cursor>
 	</File>
+	<File name="..\Source\card.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3423" topLine="13" />
+		</Cursor>
+	</File>
+	<File name="..\.vscode\c_cpp_properties.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="417" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\Source\dblbuf.c" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10840" topLine="138" />
+		</Cursor>
+	</File>
+	<File name="..\Headers\main.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="25341" topLine="434" />
+		</Cursor>
+	</File>
+	<File name="..\Source\picture.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2297" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\.vscode\Windows\x64\launch.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="290" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\Source\load.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2058" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="Gatherers.layout" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="689" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\.vscode\Ubuntu\x64\launch.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="372" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\Source\winproc.c" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="29431" topLine="435" />
+		</Cursor>
+		<Folding>
+			<Collapse line="503" />
+			<Collapse line="543" />
+			<Collapse line="650" />
+			<Collapse line="785" />
+			<Collapse line="830" />
+		</Folding>
+	</File>
+	<File name="..\Source\menu.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2317" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\.vscode\launch.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="469" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="..\Source\render.c" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3293" topLine="0" />
+		</Cursor>
+		<Folding>
+			<Collapse line="10" />
+			<Collapse line="14" />
+			<Collapse line="44" />
+		</Folding>
+	</File>
+	<File name="..\.vscode\Ubuntu\x64\tasks.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="317" topLine="0" />
+		</Cursor>
+	</File>
 	<File name="..\Source\images.c" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="2494" topLine="123" />
 		</Cursor>
 	</File>
+	<File name="..\Source\settings.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="834" topLine="0" />
+		</Cursor>
+	</File>
 	<File name="..\Source\process.c" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="71325" topLine="52" />
+			<Cursor1 position="75624" topLine="357" />
 		</Cursor>
 		<Folding>
 			<Collapse line="12" />
@@ -142,85 +218,9 @@
 			<Collapse line="1343" />
 		</Folding>
 	</File>
-	<File name="..\Source\dblbuf.c" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+	<File name="..\Source\main.c" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="10840" topLine="138" />
-		</Cursor>
-	</File>
-	<File name="..\Source\misc.c" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1773" topLine="0" />
-		</Cursor>
-		<Folding>
-			<Collapse line="10" />
-			<Collapse line="14" />
-		</Folding>
-	</File>
-	<File name="..\.vscode\c_cpp_properties.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="417" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\Headers\main.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="25341" topLine="434" />
-		</Cursor>
-	</File>
-	<File name="..\.vscode\Ubuntu\i686\tasks.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="360" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\.vscode\Windows\x64\tasks.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="219" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="Gatherers.cbp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6000" topLine="105" />
-		</Cursor>
-	</File>
-	<File name="..\Source\winproc.c" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="29431" topLine="435" />
-		</Cursor>
-		<Folding>
-			<Collapse line="503" />
-			<Collapse line="543" />
-			<Collapse line="650" />
-			<Collapse line="785" />
-			<Collapse line="830" />
-		</Folding>
-	</File>
-	<File name="..\Source\card.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="3423" topLine="13" />
-		</Cursor>
-	</File>
-	<File name="Gatherers.layout" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="689" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\Source\globals.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="2637" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\.vscode\Ubuntu\x64\launch.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="372" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="..\Resources\main.rc" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="4259" topLine="66" />
-		</Cursor>
-	</File>
-	<File name="..\.vscode\tasks.json" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="219" topLine="0" />
+			<Cursor1 position="1970" topLine="65" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

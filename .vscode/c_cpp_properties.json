@@ -12,7 +12,8 @@
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "NDEBUG"
             ],
             "compilerPath": "C:/msys64/mingw64/bin/gcc.exe",
             "intelliSenseMode": "gcc-x64",
