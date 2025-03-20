@@ -33,7 +33,7 @@
                 "${workspaceRoot}/bin/Release/Gatherers.exe"
             ],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}/bin/Debug/",
+            "cwd": "${workspaceRoot}/bin/Release/",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
