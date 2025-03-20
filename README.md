@@ -16,7 +16,7 @@ This is a continuation of the Gatherers-Historic repo that I will contribute to 
   <li>Minimap now shows selection area.</li>
   <li>Minimap allows left clicking to translate the main view.</li>
   <li>Minimap highlights selected entities.</li>
-  <li>Added worker scattering when commanding to harvest.</li>
+  <li>Added worker scattering when commanding to harvest. AI will find the nearest resources to the one selected to harvest for multiple selected workers.</li>
   <li>Reorganized file structure.</li>
   <li>Added Code::Blocks project file.</li>
   <li>Added some assembly info.</li>
