@@ -6,7 +6,7 @@
 #ifndef _MAIN_RC_
 #define _MAIN_RC_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "..\Headers\main.h"
+#include "../Headers/main.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ICO_MAIN ICON "II.ico"
 IMG_MAIN BITMAP "../Images/II/Illusion Interactive.bmp"
@@ -38,7 +38,7 @@ BEGIN
             VALUE "FileDescription", "Resource Gathering Simulator"
             VALUE "FileVersion", "11.0.0.0"
             VALUE "InternalName", "Gatherers"
-            VALUE "LegalCopyright", "© Illusion Interactive"
+            VALUE "LegalCopyright", "ï¿½ Illusion Interactive"
             VALUE "OriginalFilename", "Gatherers"
             VALUE "ProductName", "Gatherers"
             VALUE "ProductVersion", "11.0.0.0"
