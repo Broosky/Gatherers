@@ -18,5 +18,7 @@ This is a continuation of the Gatherers-Historic repo that I will contribute to 
   <li>Minimap highlights selected entities.</li>
   <li>Added worker scattering when commanding to harvest.</li>
   <li>Reorganized file structure.</li>
+  <li>Added Code::Blocks project file.</li>
+  <li>Added some assembly info.</li>
   <li>Updated toolchain for Windows and Linux.</li>
 </ul>
