@@ -100,7 +100,6 @@
                 "-ffast-math",
                 "-funroll-all-loops",
                 "-fno-exceptions",
-                "-fno-rtti",
                 "-DNDEBUG",
                 "-Wall",
                 "-mwindows",

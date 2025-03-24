@@ -34,32 +34,32 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 }
                  case MENU_SIMULATION_TOGGLE_SCATTER: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bToggleScatter) {
+                    if((*p_Menu).ubToggleScatter) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_SIMULATION_TOGGLE_SCATTER, MF_UNCHECKED);
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_SIMULATION_TOGGLE_SCATTER, MF_CHECKED);
                     }
-                    (*p_Menu).bToggleScatter = !(*p_Menu).bToggleScatter;
+                    (*p_Menu).ubToggleScatter = !(*p_Menu).ubToggleScatter;
                     break;
                 }
                 case MENU_SIMULATION_TOGGLE_SIMULATION: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bBegin) {
+                    if((*p_Menu).ubToggleSimulation) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_SIMULATION_TOGGLE_SIMULATION, MF_UNCHECKED);
-                        (*p_Menu).bBegin = !(*p_Menu).bBegin;
+                        (*p_Menu).ubToggleSimulation = !(*p_Menu).ubToggleSimulation;
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         // Stop each entity that was moving.
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         ENTITY* p_Current = (*p_Globals).p_RootEntity;
                         while(p_Current) {
-                            (*p_Current).bIsInMotion = 0;
+                            (*p_Current).ubIsInMotion = 0;
                             p_Current = (ENTITY*)(*p_Current).p_Next;
                         }
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_SIMULATION_TOGGLE_SIMULATION, MF_CHECKED);
-                        (*p_Menu).bBegin = !(*p_Menu).bBegin;
+                        (*p_Menu).ubToggleSimulation = !(*p_Menu).ubToggleSimulation;
                     }
                     break;
                 }
@@ -101,148 +101,148 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 case MENU_BUILD_NONE: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     WINPROC_BuildHelper(ENTITY_NONE, p_Menu);
-                    (*p_Globals).iBuildType = ENTITY_WORKER;
-                    (*p_Globals).bCreate = 0;
+                    (*p_Globals).usBuildType = ENTITY_WORKER;
+                    (*p_Globals).ubCreate = 0;
                     break;
                 }
                 case MENU_BUILD_WORKER: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     WINPROC_BuildHelper(ENTITY_WORKER, p_Menu);
-                    (*p_Globals).iBuildType = ENTITY_WORKER;
-                    (*p_Globals).bCreate = 1;
+                    (*p_Globals).usBuildType = ENTITY_WORKER;
+                    (*p_Globals).ubCreate = 1;
                     break;
                 }
                 case MENU_BUILD_COMMAND: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     WINPROC_BuildHelper(ENTITY_COMMAND, p_Menu);
-                    (*p_Globals).iBuildType = ENTITY_COMMAND;
-                    (*p_Globals).bCreate = 1;
+                    (*p_Globals).usBuildType = ENTITY_COMMAND;
+                    (*p_Globals).ubCreate = 1;
                     break;
                 }
                 case MENU_BUILD_MINERAL: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     WINPROC_BuildHelper(ENTITY_MINERAL, p_Menu);
-                    (*p_Globals).iBuildType = ENTITY_MINERAL;
-                    (*p_Globals).bCreate = 1;
+                    (*p_Globals).usBuildType = ENTITY_MINERAL;
+                    (*p_Globals).ubCreate = 1;
                     break;
                 }
                 case MENU_BUILD_SUPPLY: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     WINPROC_BuildHelper(ENTITY_SUPPLY, p_Menu);
-                    (*p_Globals).iBuildType = ENTITY_SUPPLY;
-                    (*p_Globals).bCreate = 1;
+                    (*p_Globals).usBuildType = ENTITY_SUPPLY;
+                    (*p_Globals).ubCreate = 1;
                     break;
                 }
                 case MENU_BUILD_REFINERY: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     WINPROC_BuildHelper(ENTITY_REFINERY, p_Menu);
-                    (*p_Globals).iBuildType = ENTITY_REFINERY;
-                    (*p_Globals).bCreate = 1;
+                    (*p_Globals).usBuildType = ENTITY_REFINERY;
+                    (*p_Globals).ubCreate = 1;
                     break;
                 }
                 case MENU_OPTIONS_ALL_DIAGNOSTICS: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bAllDiagnostics) {
+                    if((*p_Menu).ubAllDiagnosticsToggle) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_IDS, MF_UNCHECKED);
-                        CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_DIAGNOSTICS, MF_UNCHECKED);
+                        CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_STATS, MF_UNCHECKED);
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_RESOURCES, MF_UNCHECKED);
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_STATUSES, MF_UNCHECKED);
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_SHOW_MINOR, MF_UNCHECKED);
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_SHOW_MAJOR, MF_UNCHECKED);
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
-                        (*p_Menu).bDrawIds = 0;
-                        (*p_Menu).bDiagnostics = 0;
-                        (*p_Menu).bDrawResources = 0;
-                        (*p_Menu).bDrawStatuses = 0;
-                        (*p_Menu).bDrawMinor = 0;
-                        (*p_Menu).bDrawMajor = 0;
+                        (*p_Menu).ubDrawIds = 0;
+                        (*p_Menu).ubDrawDiagnostics = 0;
+                        (*p_Menu).ubDrawResources = 0;
+                        (*p_Menu).ubDrawStatuses = 0;
+                        (*p_Menu).ubDrawMinor = 0;
+                        (*p_Menu).ubDrawMajor = 0;
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
-                        (*p_Menu).bAllDiagnostics = 0;
+                        (*p_Menu).ubAllDiagnosticsToggle = 0;
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_IDS, MF_CHECKED);
-                        CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_DIAGNOSTICS, MF_CHECKED);
+                        CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_STATS, MF_CHECKED);
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_RESOURCES, MF_CHECKED);
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_STATUSES, MF_CHECKED);
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_SHOW_MINOR, MF_CHECKED);
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_SHOW_MAJOR, MF_CHECKED);
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
-                        (*p_Menu).bDrawIds = 1;
-                        (*p_Menu).bDiagnostics = 1;
-                        (*p_Menu).bDrawResources = 1;
-                        (*p_Menu).bDrawStatuses = 1;
-                        (*p_Menu).bDrawMinor = 1;
-                        (*p_Menu).bDrawMajor = 1;
+                        (*p_Menu).ubDrawIds = 1;
+                        (*p_Menu).ubDrawDiagnostics = 1;
+                        (*p_Menu).ubDrawResources = 1;
+                        (*p_Menu).ubDrawStatuses = 1;
+                        (*p_Menu).ubDrawMinor = 1;
+                        (*p_Menu).ubDrawMajor = 1;
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
-                        (*p_Menu).bAllDiagnostics = 1;
+                        (*p_Menu).ubAllDiagnosticsToggle = 1;
                     }
                     break;
                 }
-                case MENU_OPTIONS_DIAGNOSTICS: {
+                case MENU_OPTIONS_STATS: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bDiagnostics) {
-                        CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_DIAGNOSTICS, MF_UNCHECKED);
-                        (*p_Menu).bDiagnostics = !(*p_Menu).bDiagnostics;
+                    if((*p_Menu).ubDrawDiagnostics) {
+                        CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_STATS, MF_UNCHECKED);
+                        (*p_Menu).ubDrawDiagnostics = !(*p_Menu).ubDrawDiagnostics;
                     }
                     else {
-                        CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_DIAGNOSTICS, MF_CHECKED);
-                        (*p_Menu).bDiagnostics = !(*p_Menu).bDiagnostics;
+                        CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_STATS, MF_CHECKED);
+                        (*p_Menu).ubDrawDiagnostics = !(*p_Menu).ubDrawDiagnostics;
                     }
                     break;
                 }
                 case MENU_OPTIONS_MASKING: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bEnableMasking) {
+                    if((*p_Menu).ubEnableMasking) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_MASKING, MF_UNCHECKED);
-                        (*p_Menu).bEnableMasking = !(*p_Menu).bEnableMasking;
+                        (*p_Menu).ubEnableMasking = !(*p_Menu).ubEnableMasking;
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_MASKING, MF_CHECKED);
-                        (*p_Menu).bEnableMasking = !(*p_Menu).bEnableMasking;
+                        (*p_Menu).ubEnableMasking = !(*p_Menu).ubEnableMasking;
                     }
                     break;
                 }
                 case MENU_OPTIONS_RESOURCES: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bDrawResources) {
+                    if((*p_Menu).ubDrawResources) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_RESOURCES, MF_UNCHECKED);
-                        (*p_Menu).bDrawResources = !(*p_Menu).bDrawResources;
+                        (*p_Menu).ubDrawResources = !(*p_Menu).ubDrawResources;
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_RESOURCES, MF_CHECKED);
-                        (*p_Menu).bDrawResources = !(*p_Menu).bDrawResources;
+                        (*p_Menu).ubDrawResources = !(*p_Menu).ubDrawResources;
                     }
                     break;
                 }
                 case MENU_OPTIONS_IDS: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bDrawIds) {
+                    if((*p_Menu).ubDrawIds) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_IDS, MF_UNCHECKED);
-                        (*p_Menu).bDrawIds = !(*p_Menu).bDrawIds;
+                        (*p_Menu).ubDrawIds = !(*p_Menu).ubDrawIds;
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_IDS, MF_CHECKED);
-                        (*p_Menu).bDrawIds = !(*p_Menu).bDrawIds;
+                        (*p_Menu).ubDrawIds = !(*p_Menu).ubDrawIds;
                     }
                     break;
                 }
                 case MENU_OPTIONS_ENABLE_TRANSLATIONS: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bEnableTranslations) {
+                    if((*p_Menu).ubEnableTranslations) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_ENABLE_TRANSLATIONS, MF_UNCHECKED);
-                        (*p_Menu).bEnableTranslations = !(*p_Menu).bEnableTranslations;
+                        (*p_Menu).ubEnableTranslations = !(*p_Menu).ubEnableTranslations;
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_ENABLE_TRANSLATIONS, MF_CHECKED);
-                        (*p_Menu).bEnableTranslations = !(*p_Menu).bEnableTranslations;
+                        (*p_Menu).ubEnableTranslations = !(*p_Menu).ubEnableTranslations;
                     }
                     break;
                 }
                 case MENU_OPTIONS_TOPMOST: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bTopmost) {
+                    if((*p_Menu).ubIsTopmostWindow) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_TOPMOST, MF_UNCHECKED);
-                        (*p_Menu).bTopmost = !(*p_Menu).bTopmost;
+                        (*p_Menu).ubIsTopmostWindow = !(*p_Menu).ubIsTopmostWindow;
                         SetWindowPos(hWnd, HWND_BOTTOM, 0, 0, 0, 0,  SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
                         //LONG_PTR dwExStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
                         //dwExStyle &= ~WS_EX_TOPMOST;
@@ -250,7 +250,7 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_TOPMOST, MF_CHECKED);
-                        (*p_Menu).bTopmost = !(*p_Menu).bTopmost;
+                        (*p_Menu).ubIsTopmostWindow = !(*p_Menu).ubIsTopmostWindow;
                         SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0,  SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
                         //LONG_PTR dwExStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
                         //dwExStyle = WS_EX_TOPMOST;
@@ -260,9 +260,9 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 }
                 case MENU_OPTIONS_FULLSCREEN: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bFullScreen) {
+                    if((*p_Menu).ubIsFullScreen) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_FULLSCREEN, MF_UNCHECKED);
-                        (*p_Menu).bFullScreen = !(*p_Menu).bFullScreen;
+                        (*p_Menu).ubIsFullScreen = !(*p_Menu).ubIsFullScreen;
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         // Change double buffer settings.
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,7 +279,7 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_FULLSCREEN, MF_CHECKED);
-                        (*p_Menu).bFullScreen = !(*p_Menu).bFullScreen;
+                        (*p_Menu).ubIsFullScreen = !(*p_Menu).ubIsFullScreen;
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         // Change double buffer settings.
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -300,37 +300,37 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 }
                 case MENU_OPTIONS_STATUSES: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bDrawStatuses) {
+                    if((*p_Menu).ubDrawStatuses) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_STATUSES, MF_UNCHECKED);
-                        (*p_Menu).bDrawStatuses = !(*p_Menu).bDrawStatuses;
+                        (*p_Menu).ubDrawStatuses = !(*p_Menu).ubDrawStatuses;
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_STATUSES, MF_CHECKED);
-                        (*p_Menu).bDrawStatuses = !(*p_Menu).bDrawStatuses;
+                        (*p_Menu).ubDrawStatuses = !(*p_Menu).ubDrawStatuses;
                     }
                     break;
                 }
                 case MENU_OPTIONS_SHOW_MINOR: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bDrawMinor) {
+                    if((*p_Menu).ubDrawMinor) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_SHOW_MINOR, MF_UNCHECKED);
-                        (*p_Menu).bDrawMinor = !(*p_Menu).bDrawMinor;
+                        (*p_Menu).ubDrawMinor = !(*p_Menu).ubDrawMinor;
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_SHOW_MINOR, MF_CHECKED);
-                        (*p_Menu).bDrawMinor = !(*p_Menu).bDrawMinor;
+                        (*p_Menu).ubDrawMinor = !(*p_Menu).ubDrawMinor;
                     }
                     break;
                 }
                 case MENU_OPTIONS_SHOW_MAJOR: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Menu).bDrawMajor) {
+                    if((*p_Menu).ubDrawMajor) {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_SHOW_MAJOR, MF_UNCHECKED);
-                        (*p_Menu).bDrawMajor = !(*p_Menu).bDrawMajor;
+                        (*p_Menu).ubDrawMajor = !(*p_Menu).ubDrawMajor;
                     }
                     else {
                         CheckMenuItem((*p_Menu).hMenu, MENU_OPTIONS_SHOW_MAJOR, MF_CHECKED);
-                        (*p_Menu).bDrawMajor = !(*p_Menu).bDrawMajor;
+                        (*p_Menu).ubDrawMajor = !(*p_Menu).ubDrawMajor;
                     }
                     break;
                 }
@@ -338,7 +338,7 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     ENTITY* p_Current = (*p_Globals).p_RootEntity;
                     while(p_Current) {
-                        (*p_Current).bIsSelected = 0;
+                        (*p_Current).ubIsSelected = 0;
                         p_Current = (ENTITY*)(*p_Current).p_Next;
                     }
                     break;
@@ -346,17 +346,57 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 case MENU_CLEAR_MINERAL_COUNT: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     (*p_Globals).iMineralCount = 0;
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // Clear minerals collected by the command centers.
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    ENTITY* p_Current = (*p_Globals).p_RootEntity;
+                    while(p_Current) {
+                        switch((*p_Current).usType) {
+                            case ENTITY_COMMAND: {
+                                (*p_Current).iMineralCount = 0;
+                                break;
+                            }
+                        }
+                        p_Current = (ENTITY*)(*p_Current).p_Next;
+                    }
                     break;
                 }
                 case MENU_CLEAR_GAS_COUNT: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     (*p_Globals).iGasCount = 0;
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // Clear gas collected by the command centers.
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    ENTITY* p_Current = (*p_Globals).p_RootEntity;
+                    while(p_Current) {
+                        switch((*p_Current).usType) {
+                            case ENTITY_COMMAND: {
+                                (*p_Current).iGasCount = 0;
+                                break;
+                            }
+                        }
+                        p_Current = (ENTITY*)(*p_Current).p_Next;
+                    }
                     break;
                 }
                 case MENU_CLEAR_ALL_COUNT: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     (*p_Globals).iMineralCount = 0;
                     (*p_Globals).iGasCount = 0;
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // Clear resources collected by the command centers.
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    ENTITY* p_Current = (*p_Globals).p_RootEntity;
+                    while(p_Current) {
+                        switch((*p_Current).usType) {
+                            case ENTITY_COMMAND: {
+                                (*p_Current).iMineralCount = 0;
+                                (*p_Current).iGasCount = 0;
+                                break;
+                            }
+                        }
+                        p_Current = (ENTITY*)(*p_Current).p_Next;
+                    }
                     break;
                 }
                 case MENU_SORT_WORKERS: {
@@ -406,30 +446,30 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Reset for subsequent left mouse clicks.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if(!(*p_Globals).bClickOriginFromMinimap) {
+            if(!(*p_Globals).ubClickOriginFromMinimap) {
                 WINPROC_SelectEntities(p_Globals);
             }
-            (*p_Globals).bClickOriginFromMinimap = 0;
+            (*p_Globals).ubClickOriginFromMinimap = 0;
             break;
         }
         case WM_LBUTTONDOWN: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if(PROC_IsMinimapClicked(p_DblBuf, p_Images, p_Globals)) {
-                (*p_Globals).bClickOriginFromMinimap = 1;
+                (*p_Globals).ubClickOriginFromMinimap = 1;
                 PROC_AdjustMinimapViewport(p_Globals, p_Images);
             }
             else {
-                (*p_Globals).bClickOriginFromMinimap = 0;
+                (*p_Globals).ubClickOriginFromMinimap = 0;
                 WINPROC_CreateOrCaptureEntities(p_Globals, p_Images);
             }
             break;
         }
         case WM_RBUTTONDOWN: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if ((*p_Menu).bToggleScatter) {
+            if ((*p_Menu).ubToggleScatter) {
                 SELECTED_COUNT SelectedCount = ENTITY_GetSelectedEntityCounts(p_Globals);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if (SelectedCount.iSelectedWorkersCount > 1) {
+                if (SelectedCount.usSelectedWorkersCount > 1) {
                     WINPROC_DistributeAndSendWorkers(p_Globals, p_Images);
                 }
                 else {
@@ -447,19 +487,19 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             (*p_Globals).iMouseY = HIWORD(lParam);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // If we've clicked in the minimap area, we will translate the view to match the adjustments to the viewport. So,
-            // we don't ave to do anything with the selection area.
+            // we don't have to do anything with the selection area.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if(!(*p_Globals).bClickOriginFromMinimap) {
+            if(!(*p_Globals).ubClickOriginFromMinimap) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // For mouse drag selection.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 if(wParam == MK_LBUTTON) {
-                    (*p_Globals).bDrawSelectionRect = 1;
+                    (*p_Globals).ubDrawSelectionRect = 1;
                 }
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Consider translations when calculating selection area during scrolling.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if((*p_Globals).bDrawSelectionRect && !(*p_Globals).bCreate) {
+                if((*p_Globals).ubDrawSelectionRect && !(*p_Globals).ubCreate) {
                     (*p_Globals).iCaptureCurrentX = (*p_Globals).iMouseX + -(*p_Globals).fLateralTranslation;
                     (*p_Globals).iCaptureCurrentY = (*p_Globals).iMouseY + -(*p_Globals).fVerticalTranslation;
                 }
@@ -501,7 +541,7 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
     return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINPROC_BuildHelper(int iType, MENU* p_Menu) {
+void __cdecl WINPROC_BuildHelper(USHORT usType, MENU* p_Menu) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Uncheck all of the menu items
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -514,7 +554,7 @@ void __cdecl WINPROC_BuildHelper(int iType, MENU* p_Menu) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Check the one we want.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    switch(iType) {
+    switch(usType) {
         case ENTITY_WORKER: {
             CheckMenuItem((*p_Menu).hMenu, MENU_BUILD_WORKER, MF_CHECKED);
             break;
@@ -552,12 +592,12 @@ void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Hijack this loop to keep track of how many moveable entities are selected.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if((*p_Current).bIsMovable) {
-            if((*p_Current).bIsSelected) {
+        if((*p_Current).ubIsMovable) {
+            if((*p_Current).ubIsSelected) {
                 iMoveableCount++;
             }
         }
-        switch((*p_Current).iType) {
+        switch((*p_Current).usType) {
             case ENTITY_MINERAL: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // True, if I right clicked on a mineral field.
@@ -626,9 +666,9 @@ void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Current = (*p_Globals).p_RootEntity;
     while(p_Current) {
-        if((*p_Current).bIsSelected) {
-            (*p_Current).bIsSelected = 0;
-            if((*p_Current).bIsMovable) {
+        if((*p_Current).ubIsSelected) {
+            (*p_Current).ubIsSelected = 0;
+            if((*p_Current).ubIsMovable) {
                 if(p_Resource) {
                     (*p_Current).p_Operating = (struct ENTITY*)p_Resource;
                 }
@@ -660,12 +700,12 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Hijack this loop to keep track of how many moveable entities are selected.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if((*p_Current).bIsMovable) {
-            if((*p_Current).bIsSelected) {
+        if((*p_Current).ubIsMovable) {
+            if((*p_Current).ubIsSelected) {
                 iMoveableCount++;
             }
         }
-        switch((*p_Current).iType) {
+        switch((*p_Current).usType) {
             case ENTITY_MINERAL: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // True, if I right clicked on a mineral field.
@@ -695,11 +735,11 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // If we clicked on a resource, get a collection of pointers to available resources of that type, considering their distance.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    int iFound = 0;
+    USHORT usFound = 0;
     int iRollingAllocationHeap = 0;
     AI_CLOSEST* p_ClosestEntities = NULL;
     if (p_Resource) {
-        p_ClosestEntities = AI_FindClosestByDistance(p_Resource, (*p_Resource).iType, &iRollingAllocationHeap, &iFound, p_Globals);
+        p_ClosestEntities = AI_FindClosestByDistance(p_Resource, (*p_Resource).usType, &iRollingAllocationHeap, &usFound, p_Globals);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Data for moving entities to a specific destination (not gathering resources).
@@ -746,9 +786,9 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
     int iDestinationResourceIndex = 0;
     p_Current = (*p_Globals).p_RootEntity;
     while(p_Current) {
-        if((*p_Current).bIsSelected) {
-            (*p_Current).bIsSelected = 0;
-            if((*p_Current).bIsMovable) {
+        if((*p_Current).ubIsSelected) {
+            (*p_Current).ubIsSelected = 0;
+            if((*p_Current).ubIsMovable) {
                 if(p_ClosestEntities) {
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Run through the resources ordered by their closest distance from the inquirer.
@@ -758,7 +798,7 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
                     // There will most likely be cases where there are more workers than available resources. Let's reset the
                     // index to recycle them.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if (iDestinationResourceIndex >= iFound) {
+                    if (iDestinationResourceIndex >= usFound) {
                         iDestinationResourceIndex = 0;
                     }
                 }
@@ -792,10 +832,10 @@ void __cdecl WINPROC_CreateOrCaptureEntities(GLOBALS* p_Globals, IMAGES* p_Image
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // If build mode is selected, create an entity at the mouse position.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if((*p_Globals).bCreate) {
+    if((*p_Globals).ubCreate) {
         ENTITY_Create(
             (FPOINT){(*p_Globals).iMouseX, (*p_Globals).iMouseY},
-            (*p_Globals).iBuildType,
+            (*p_Globals).usBuildType,
             p_Images,
             p_Globals
         );
@@ -808,7 +848,7 @@ void __cdecl WINPROC_CreateOrCaptureEntities(GLOBALS* p_Globals, IMAGES* p_Image
         ENTITY* p_Current = (*p_Globals).p_RootEntity;
         while(p_Current) {
             if(ENTITY_WithinPoint(p_Current, (FPOINT){(*p_Globals).iMouseX, (*p_Globals).iMouseY})) {
-                (*p_Current).bIsSelected = !(*p_Current).bIsSelected;
+                (*p_Current).ubIsSelected = !(*p_Current).ubIsSelected;
                 bIsSomethingThere = 1;
             }
             p_Current = (ENTITY*)(*p_Current).p_Next;
@@ -816,7 +856,7 @@ void __cdecl WINPROC_CreateOrCaptureEntities(GLOBALS* p_Globals, IMAGES* p_Image
         if(!bIsSomethingThere) {
             p_Current = (*p_Globals).p_RootEntity;
             while(p_Current) {
-                (*p_Current).bIsSelected = 0;
+                (*p_Current).ubIsSelected = 0;
                 p_Current = (ENTITY*)(*p_Current).p_Next;
             }
         }
@@ -829,7 +869,7 @@ void __cdecl WINPROC_CreateOrCaptureEntities(GLOBALS* p_Globals, IMAGES* p_Image
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl WINPROC_SelectEntities(GLOBALS* p_Globals) {
-    if(!(*p_Globals).bCreate) {
+    if(!(*p_Globals).ubCreate) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Allow the operation to work when the mouse is dragged from all directions.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -855,7 +895,7 @@ void __cdecl WINPROC_SelectEntities(GLOBALS* p_Globals) {
                 (*p_Current).CenterPoint.fY >= (*p_Globals).iOldMouseY &&
                 (*p_Current).CenterPoint.fY <= (*p_Globals).iMouseY
             ) {
-                (*p_Current).bIsSelected = !(*p_Current).bIsSelected;
+                (*p_Current).ubIsSelected = !(*p_Current).ubIsSelected;
             }
             p_Current = (ENTITY*)(*p_Current).p_Next;
         }
@@ -866,9 +906,9 @@ void __cdecl WINPROC_SelectEntities(GLOBALS* p_Globals) {
         (*p_Globals).iMouseY = iSavedY;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    (*p_Globals).bDrawSelectionRect = 0;
+    (*p_Globals).ubDrawSelectionRect = 0;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!(*p_Globals).bDrawSelectionRect) {
+    if (!(*p_Globals).ubDrawSelectionRect) {
         (*p_Globals).iCaptureStartX = 0;
         (*p_Globals).iCaptureStartY = 0;
         (*p_Globals).iCaptureCurrentX = 0;

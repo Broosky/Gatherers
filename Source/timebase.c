@@ -25,7 +25,7 @@ TIMEBASE* __cdecl TIMEBASE_Create(float fRate, GLOBALS* p_Globals) {
     return p_Timebase;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int __cdecl TIMEBASE_Tick(TIMEBASE* p_Timebase) {
+UINT8 __cdecl TIMEBASE_Tick(TIMEBASE* p_Timebase) {
     QueryPerformanceCounter((LARGE_INTEGER*)&(*p_Timebase).iCountNow);
     (*p_Timebase).fDifference = ((*p_Timebase).iCountNow - (*p_Timebase).iStartCount) / (float)(*p_Timebase).iFreq;
     if((*p_Timebase).fDifference >= (*p_Timebase).fMSPerFrame) {

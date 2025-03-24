@@ -2,7 +2,7 @@
 
 This is a continuation of the Gatherers-Historic repo that I will contribute to when I have some free time. See https://github.com/Broosky/Gatherers-Historic for more info.
 
-## March 2025 Changes
+## March 2025 Changes:
 <ul>
   <li>Write current working directory.</li>
   <li>Added prefixes for diagnostics.</li>
@@ -21,4 +21,13 @@ This is a continuation of the Gatherers-Historic repo that I will contribute to 
   <li>Added Code::Blocks project file.</li>
   <li>Added some assembly info.</li>
   <li>Updated toolchain for Windows and Linux.</li>
+  <li>Added .gitignore.</li>
+  <li>Adjust typedef's.</li>
+  <li>Review code and comments.</li>
+  <li>Distance calc's</li>
+  <li>Added Dev-C++ project file and toolchain.
+    <ul>
+      <li>Note, Dev-C++ will generate *_private.h and *_private.rc files which, AFAIK, can't be turned off even when the project file option for assembly information is disabled. For completeness, I've aligned them with whatever is in the main.rc.</ul>
+    </ul>
+  </li>
 </ul>

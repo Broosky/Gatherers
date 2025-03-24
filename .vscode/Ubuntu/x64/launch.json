@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Linux x64 - Launch Debug Application (Wine).",
+            "name": "Linux x64 - Build & Launch Debug Application (Wine64).",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/usr/bin/wine",
+            "program": "/usr/bin/wine64",
             "args": [
                 "${workspaceRoot}/bin/Debug/Gatherers.exe"
             ],
@@ -25,10 +25,32 @@
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
-            "name": "Linux x64 - Launch Release Application (Wine).",
+            "name": "Linux x64 - Launch Debug Application (Wine64).",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/usr/bin/wine",
+            "program": "/usr/bin/wine64",
+            "args": [
+                "${workspaceRoot}/bin/Debug/Gatherers.exe"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/bin/Debug/",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb.",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Linux x64 - Build & Launch Release Application (Wine64).",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/wine64",
             "args": [
                 "${workspaceRoot}/bin/Release/Gatherers.exe"
             ],
@@ -45,6 +67,28 @@
                 }
             ],
             "preLaunchTask": "Linux x64 - Build Application (Release).",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Linux x64 - Launch Release Application (Wine64).",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/wine64",
+            "args": [
+                "${workspaceRoot}/bin/Release/Gatherers.exe"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/bin/Release/",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb.",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]

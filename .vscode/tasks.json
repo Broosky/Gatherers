@@ -6,13 +6,13 @@
             "type": "shell",
             "command": "C:/msys64/mingw64/bin/windres.exe",
             "args": [
-                "-J", 
+                "-J",
                 "rc",
-                "-O", 
+                "-O",
                 "coff",
-                "-i", 
+                "-i",
                 "${workspaceRoot}/Resources/main.rc",
-                "-o", 
+                "-o",
                 "${workspaceRoot}/Resources/main.res"
             ],
             "options": {
@@ -32,13 +32,13 @@
             "type": "shell",
             "command": "C:/msys64/mingw64/bin/windres.exe",
             "args": [
-                "-J", 
+                "-J",
                 "rc",
-                "-O", 
+                "-O",
                 "coff",
-                "-i", 
+                "-i",
                 "${workspaceRoot}/Resources/main.rc",
-                "-o", 
+                "-o",
                 "${workspaceRoot}/Resources/main.res"
             ],
             "options": {
@@ -101,11 +101,10 @@
                 "-ffast-math",
                 "-funroll-all-loops",
                 "-fno-exceptions",
-                "-fno-rtti",
                 "-DNDEBUG",
                 "-Wall",
                 "-mwindows",
-                "${workspaceRoot}/Source/*.c", 
+                "${workspaceRoot}/Source/*.c",
                 "${workspaceRoot}/Headers/*.h",
                 "${workspaceRoot}/Resources/main.res",
                 "-o",

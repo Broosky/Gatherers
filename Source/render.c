@@ -12,8 +12,8 @@ void __cdecl RENDER_Init(DBLBUF* p_DblBuf) {
     SetGraphicsMode((*p_DblBuf).hDCMem, GM_ADVANCED);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl RENDER_ApplyTransform(DBLBUF* p_DblBuf, int iType, float fValue, FPOINT Pin) {
-    switch(iType) {
+void __cdecl RENDER_ApplyTransform(DBLBUF* p_DblBuf, USHORT usType, float fValue, FPOINT Pin) {
+    switch(usType) {
         case RENDER_ROTATE: {
             float fRadians = MISC_CalculateRadians(fValue);
             float fSin = sin(fRadians);

@@ -150,7 +150,7 @@ void __cdecl DBLBUF_SetBlitter(DBLBUF* p_DblBuf, PICTURE* p_Picture) {
     (*p_DblBuf).p_Blitter = p_Picture;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DBLBUF_Blitter(DBLBUF* p_DblBuf, char* p_szText, FPOINT Location, int bMask) {
+void __cdecl DBLBUF_Blitter(DBLBUF* p_DblBuf, char* p_szText, FPOINT Location, UINT8 ubMask) {
     int iCharWid = 11;
     int iCharHgt = 22;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ void __cdecl DBLBUF_Blitter(DBLBUF* p_DblBuf, char* p_szText, FPOINT Location, i
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT SavedLocation = Location;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if(bMask) {
+    if(ubMask) {
         HGDIOBJ hMaskTemp = SelectObject((*p_DblBuf).hDCBmp, (*(*p_DblBuf).p_Blitter).hBmpMask);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         int iI;
@@ -203,7 +203,7 @@ void __cdecl DBLBUF_Blitter(DBLBUF* p_DblBuf, char* p_szText, FPOINT Location, i
             (*p_DblBuf).hDCBmp,
             BlitterPoint.iX * iCharWid,
             BlitterPoint.iY * iCharHgt,
-            bMask ? SRCPAINT : SRCCOPY
+            ubMask ? SRCPAINT : SRCCOPY
         );
         Location.fX += iCharWid;
     }
@@ -266,8 +266,8 @@ void __cdecl DBLBUF_DrawEntityEllipse(DBLBUF* p_DblBuf, ENTITY* p_Entity, COLORR
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Remember: The transform is translated to the center point of the entity to be drawn.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DBLBUF_DrawEntity(DBLBUF* p_DblBuf, ENTITY* p_Entity, int bMask) {
-    if(bMask) {
+void __cdecl DBLBUF_DrawEntity(DBLBUF* p_DblBuf, ENTITY* p_Entity, UINT8 ubMask) {
+    if(ubMask) {
         HGDIOBJ hMaskTemp = SelectObject((*p_DblBuf).hDCBmp, (*(*p_Entity).p_Picture).hBmpMask);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         BitBlt(
@@ -297,7 +297,7 @@ void __cdecl DBLBUF_DrawEntity(DBLBUF* p_DblBuf, ENTITY* p_Entity, int bMask) {
         (*p_DblBuf).hDCBmp,
         0,
         0,
-        bMask ? SRCPAINT : SRCCOPY
+        ubMask ? SRCPAINT : SRCCOPY
     );
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject((*p_DblBuf).hDCBmp, hPicTemp);
@@ -350,8 +350,8 @@ void __cdecl DBLBUF_FlipArea(DBLBUF* p_DblBuf, int iX, int iY, int iWidth, int i
     BitBlt((*p_DblBuf).hDC, iX, iY, iWidth, iHeight, (*p_DblBuf).hDCMem, iX, iY, SRCCOPY);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DBLBUF_DrawPicture(DBLBUF* p_DblBuf, PICTURE* p_Picture, int bMask) {
-    if(bMask) {
+void __cdecl DBLBUF_DrawPicture(DBLBUF* p_DblBuf, PICTURE* p_Picture, UINT8 ubMask) {
+    if(ubMask) {
         HGDIOBJ hMaskTemp = SelectObject((*p_DblBuf).hDCBmp, (*p_Picture).hBmpMask);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         BitBlt(
@@ -381,15 +381,15 @@ void __cdecl DBLBUF_DrawPicture(DBLBUF* p_DblBuf, PICTURE* p_Picture, int bMask)
         (*p_DblBuf).hDCBmp,
         0,
         0,
-        bMask ? SRCPAINT : SRCCOPY
+        ubMask ? SRCPAINT : SRCCOPY
     );
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject((*p_DblBuf).hDCBmp, hPicTemp);
     DeleteObject(hPicTemp);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DBLBUF_DrawPictureAt(DBLBUF* p_DblBuf, PICTURE* p_Picture, FPOINT Location, int bMask) {
-    if(bMask) {
+void __cdecl DBLBUF_DrawPictureAt(DBLBUF* p_DblBuf, PICTURE* p_Picture, FPOINT Location, UINT8 ubMask) {
+    if(ubMask) {
         HGDIOBJ hMaskTemp = SelectObject((*p_DblBuf).hDCBmp, (*p_Picture).hBmpMask);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         BitBlt(
@@ -419,7 +419,7 @@ void __cdecl DBLBUF_DrawPictureAt(DBLBUF* p_DblBuf, PICTURE* p_Picture, FPOINT L
         (*p_DblBuf).hDCBmp,
         0,
         0,
-        bMask ? SRCPAINT : SRCCOPY
+        ubMask ? SRCPAINT : SRCCOPY
     );
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject((*p_DblBuf).hDCBmp, hPicTemp);

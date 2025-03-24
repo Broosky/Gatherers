@@ -1,0 +1,80 @@
+# Project: Gatherers
+# Makefile created by Dev-C++ 5.11
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+RES      = ../Resources/main.res
+OBJ      = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/dblbuf.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/images.o ../obj/Release/load.o ../obj/Release/main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/render.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/winproc.o $(RES)
+LINKOBJ  = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/dblbuf.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/images.o ../obj/Release/load.o ../obj/Release/main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/render.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/winproc.o $(RES)
+LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -mwindows  "../../../Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32/libgdi32.a" -m32
+INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
+CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
+BIN      = ../bin/Release/Gatherers.exe
+CXXFLAGS = $(CXXINCS) -m32
+CFLAGS   = $(INCS) -m32
+RM       = rm.exe -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+../obj/Release/ai.o: ../Source/ai.c
+	$(CC) -c ../Source/ai.c -o ../obj/Release/ai.o $(CFLAGS)
+
+../obj/Release/card.o: ../Source/card.c
+	$(CC) -c ../Source/card.c -o ../obj/Release/card.o $(CFLAGS)
+
+../obj/Release/dblbuf.o: ../Source/dblbuf.c
+	$(CC) -c ../Source/dblbuf.c -o ../obj/Release/dblbuf.o $(CFLAGS)
+
+../obj/Release/entity.o: ../Source/entity.c
+	$(CC) -c ../Source/entity.c -o ../obj/Release/entity.o $(CFLAGS)
+
+../obj/Release/globals.o: ../Source/globals.c
+	$(CC) -c ../Source/globals.c -o ../obj/Release/globals.o $(CFLAGS)
+
+../obj/Release/images.o: ../Source/images.c
+	$(CC) -c ../Source/images.c -o ../obj/Release/images.o $(CFLAGS)
+
+../obj/Release/load.o: ../Source/load.c
+	$(CC) -c ../Source/load.c -o ../obj/Release/load.o $(CFLAGS)
+
+../obj/Release/main.o: ../Source/main.c
+	$(CC) -c ../Source/main.c -o ../obj/Release/main.o $(CFLAGS)
+
+../obj/Release/menu.o: ../Source/menu.c
+	$(CC) -c ../Source/menu.c -o ../obj/Release/menu.o $(CFLAGS)
+
+../obj/Release/message.o: ../Source/message.c
+	$(CC) -c ../Source/message.c -o ../obj/Release/message.o $(CFLAGS)
+
+../obj/Release/misc.o: ../Source/misc.c
+	$(CC) -c ../Source/misc.c -o ../obj/Release/misc.o $(CFLAGS)
+
+../obj/Release/picture.o: ../Source/picture.c
+	$(CC) -c ../Source/picture.c -o ../obj/Release/picture.o $(CFLAGS)
+
+../obj/Release/process.o: ../Source/process.c
+	$(CC) -c ../Source/process.c -o ../obj/Release/process.o $(CFLAGS)
+
+../obj/Release/render.o: ../Source/render.c
+	$(CC) -c ../Source/render.c -o ../obj/Release/render.o $(CFLAGS)
+
+../obj/Release/settings.o: ../Source/settings.c
+	$(CC) -c ../Source/settings.c -o ../obj/Release/settings.o $(CFLAGS)
+
+../obj/Release/timebase.o: ../Source/timebase.c
+	$(CC) -c ../Source/timebase.c -o ../obj/Release/timebase.o $(CFLAGS)
+
+../obj/Release/winproc.o: ../Source/winproc.c
+	$(CC) -c ../Source/winproc.c -o ../obj/Release/winproc.o $(CFLAGS)
+
+../Resources/main.res: ../Resources/main.rc 
+	$(WINDRES) -i ../Resources/main.rc  -F pe-i386 --input-format=rc -o ../Resources/main.res -O coff

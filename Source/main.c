@@ -127,9 +127,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if(TIMEBASE_Tick(p_ProcessAverage)) {
-                (*p_Globals).iSecondTick++;
-                (*p_Globals).fFramesPerSecond = (float)(*p_Globals).iFrameCount / (*p_Globals).iSecondTick;
-                (*p_Globals).fProcessTimeAverage = (*p_Globals).fProcessTimeSum * 1000.0f / (*p_Globals).iSecondTick;
+                (*p_Globals).uiSecondTick++;
+                (*p_Globals).fFramesPerSecond = (float)(*p_Globals).ulFrameCount / (*p_Globals).uiSecondTick;
+                (*p_Globals).fProcessTimeAverage = (*p_Globals).fProcessTimeSum * 1000.0f / (*p_Globals).uiSecondTick;
             }
         }
     }

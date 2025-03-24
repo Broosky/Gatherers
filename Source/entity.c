@@ -16,19 +16,19 @@ void __cdecl ENTITY_Zero(ENTITY* p_Entity) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // - Pass in the global structure. I use it more than once in this function.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_Create(FPOINT Location, int iType, IMAGES* p_Images, GLOBALS* p_Globals) {
+void __cdecl ENTITY_Create(FPOINT Location, USHORT usType, IMAGES* p_Images, GLOBALS* p_Globals) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // If there are no manufacturing restrictions, and no entity overlap, allow creation.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if(!ENTITY_Overlap(iType, p_Images, p_Globals) && !ENTITY_Restrict(iType, p_Globals)) {
+    if(!ENTITY_Overlap(usType, p_Images, p_Globals) && !ENTITY_Restrict(usType, p_Globals)) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ENTITY* p_Entity = (ENTITY*)malloc(sizeof(ENTITY));
         (*p_Globals).iRunningHeap += sizeof(ENTITY);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ENTITY_Zero(p_Entity);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        (*p_Entity).iId = (*p_Globals).iIdStamp++;
-        (*p_Entity).iType = iType;
+        (*p_Entity).usId = (*p_Globals).usIdStamp++;
+        (*p_Entity).usType = usType;
         (*p_Entity).CenterPoint = Location;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // To avoid lines being drawn from each entity's center point to the client (0, 0) coordinate.
@@ -36,15 +36,15 @@ void __cdecl ENTITY_Create(FPOINT Location, int iType, IMAGES* p_Images, GLOBALS
         (*p_Entity).MinorDestinationCenterPoint = (*p_Entity).CenterPoint;
         (*p_Entity).MajorDestinationCenterPoint = (*p_Entity).CenterPoint;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        (*p_Entity).bIsAlive = 1;
+        (*p_Entity).ubIsAlive = 1;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        switch((*p_Entity).iType) {
+        switch((*p_Entity).usType) {
             case ENTITY_WORKER: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 (*p_Entity).p_Picture = &(*p_Images).Worker[0];
                 (*p_Entity).MovementSpeed = (FPOINT){WORKER_MOVE_SPEED, WORKER_MOVE_SPEED};
-                (*p_Entity).bIsMovable = 1;
-                (*p_Entity).iState = ANIMATE_WORKER_NORMAL;
+                (*p_Entity).ubIsMovable = 1;
+                (*p_Entity).usState = ANIMATE_WORKER_NORMAL;
                 break;
             }
             case ENTITY_MINERAL: {
@@ -52,23 +52,23 @@ void __cdecl ENTITY_Create(FPOINT Location, int iType, IMAGES* p_Images, GLOBALS
                 (*p_Entity).p_Picture = &(*p_Images).Mineral[0];
                 (*p_Entity).iMineralCount = MINERALS_ON_CREATION;
                 (*p_Entity).MovementSpeed = (FPOINT){MINERAL_MOVE_SPEED, MINERAL_MOVE_SPEED};
-                (*p_Entity).bIsObstacle = 1;
+                (*p_Entity).ubIsObstacle = 1;
                 break;
             }
             case ENTITY_COMMAND: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 (*p_Entity).p_Picture = &(*p_Images).Command[0];
                 (*p_Entity).MovementSpeed = (FPOINT){COMMAND_MOVE_SPEED, COMMAND_MOVE_SPEED};
-                (*p_Entity).bIsObstacle = 1;
-                (*p_Entity).iState = ANIMATE_COMMAND_CREATING;
+                (*p_Entity).ubIsObstacle = 1;
+                (*p_Entity).usState = ANIMATE_COMMAND_CREATING;
                 break;
             }
             case ENTITY_SUPPLY: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 (*p_Entity).p_Picture = &(*p_Images).Supply[0];
                 (*p_Entity).MovementSpeed = (FPOINT){SUPPLY_MOVE_SPEED, SUPPLY_MOVE_SPEED};
-                (*p_Entity).bIsObstacle = 1;
-                (*p_Entity).iState = ANIMATE_SUPPLY_NORMAL;
+                (*p_Entity).ubIsObstacle = 1;
+                (*p_Entity).usState = ANIMATE_SUPPLY_NORMAL;
                 break;
             }
             case ENTITY_REFINERY: {
@@ -76,7 +76,7 @@ void __cdecl ENTITY_Create(FPOINT Location, int iType, IMAGES* p_Images, GLOBALS
                 (*p_Entity).p_Picture = &(*p_Images).Refinery[0];
                 (*p_Entity).iGasCount = GAS_ON_CREATION;
                 (*p_Entity).MovementSpeed = (FPOINT){REFINERY_MOVE_SPEED, REFINERY_MOVE_SPEED};
-                (*p_Entity).bIsObstacle = 1;
+                (*p_Entity).ubIsObstacle = 1;
                 break;
             }
             default: {
@@ -108,12 +108,12 @@ void __cdecl ENTITY_Create(FPOINT Location, int iType, IMAGES* p_Images, GLOBALS
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int __cdecl ENTITY_Restrict(int iType, GLOBALS* p_Globals) {
+UINT8 __cdecl ENTITY_Restrict(USHORT usType, GLOBALS* p_Globals) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // This function will return 0 if there are no manufacturing restrictions, otherwise it will return 1.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT Position = {15.0f, 85.0f};
-    switch(iType) {
+    switch(usType) {
         case ENTITY_COMMAND: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // If I have enough minerals and gas, allow it.
@@ -213,11 +213,11 @@ int __cdecl ENTITY_Restrict(int iType, GLOBALS* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int __cdecl ENTITY_Overlap(int iType, IMAGES* p_Images, GLOBALS* p_Globals) {
+UINT8 __cdecl ENTITY_Overlap(USHORT usType, IMAGES* p_Images, GLOBALS* p_Globals) {
     FPOINT Position = {15.0f, 85.0f};
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT Size = {0.0f, 0.0f};
-    switch(iType) {
+    switch(usType) {
         case ENTITY_WORKER: {
             Size.fX = (*p_Images).Worker[0].Bitmap.bmWidth;
             Size.fY = (*p_Images).Worker[0].Bitmap.bmHeight;
@@ -284,24 +284,26 @@ void __cdecl ENTITY_Pause(ENTITY* p_Entity, float fTime) {
     // When the entity is paused, reset the pause counter for each call.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     (*p_Entity).fPauseCount = 0.0f;
-    (*p_Entity).bIsPaused = 1;
+    (*p_Entity).ubIsPaused = 1;
     (*p_Entity).fPauseTime = fTime * PROCESS_FPS / 1000.0f;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int __cdecl ENTITY_CollidedWith(ENTITY* p_Source, ENTITY* p_Destination) {
-    float fDistance = sqrt(
-        pow((*p_Destination).CenterPoint.fX - (*p_Source).CenterPoint.fX, 2.0f) +
-        pow((*p_Destination).CenterPoint.fY - (*p_Source).CenterPoint.fY, 2.0f)
+UINT8 __cdecl ENTITY_CollidedWith(ENTITY* p_Source, ENTITY* p_Destination) {
+    float fDistance = sqrtf(
+        ((*p_Destination).CenterPoint.fX - (*p_Source).CenterPoint.fX) *
+        ((*p_Destination).CenterPoint.fX - (*p_Source).CenterPoint.fX) +
+        ((*p_Destination).CenterPoint.fY - (*p_Source).CenterPoint.fY) *
+        ((*p_Destination).CenterPoint.fY - (*p_Source).CenterPoint.fY)
     );
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if(fDistance <= (*p_Source).fRadius + COLLISION_BUFFER + (*p_Destination).fRadius + COLLISION_BUFFER) {
-        (*p_Source).bIsInMotion = 0;
+        (*p_Source).ubIsInMotion = 0;
         return 1;
     }
     return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int __cdecl ENTITY_WithinPoint(ENTITY* p_Inquirer, FPOINT Location) {
+UINT8 __cdecl ENTITY_WithinPoint(ENTITY* p_Inquirer, FPOINT Location) {
     if(
         Location.fX >= (*p_Inquirer).Location.fX &&
         Location.fX <= (*p_Inquirer).Location.fX + (*p_Inquirer).Size.fX &&
@@ -318,7 +320,7 @@ void __cdecl ENTITY_MoveTo(ENTITY* p_Source, ENTITY* p_Destination, GLOBALS* p_G
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ENTITY_MoveToPoint(ENTITY* p_Source, FPOINT CenterPoint, GLOBALS* p_Globals) {
-    (*p_Source).bIsInMotion = 1;
+    (*p_Source).ubIsInMotion = 1;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Calculate the absolute destination data. This is the major vector.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -373,7 +375,7 @@ void __cdecl ENTITY_FindMinorVector(ENTITY* p_Source, GLOBALS* p_Globals) {
         }
         else {
             ENTITY* p_Current = (*p_Globals).p_RootEntity;
-            while(p_Current && (*p_Current).bIsObstacle) {
+            while(p_Current && (*p_Current).ubIsObstacle) {
                 if(ENTITY_WithinPoint(p_Current, CurrentPoint)) {
                     if(ENTITY_WithinPoint(p_Current, (*p_Source).MajorDestinationCenterPoint)) {
                         return;
@@ -435,9 +437,11 @@ FPOINT __cdecl ENTITY_MinorVectorHead(ENTITY* p_Source, ENTITY* p_Current, GLOBA
     int iI;
     float fDistances[4];
     for(iI = 0; iI < 4; iI++) {
-        fDistances[iI] = sqrt(
-            pow(CornerPoints[iI].fX - (*p_Source).MajorDestinationCenterPoint.fX, 2.0f) +
-            pow(CornerPoints[iI].fY - (*p_Source).MajorDestinationCenterPoint.fY, 2.0f)
+        fDistances[iI] = sqrtf(
+            (CornerPoints[iI].fX - (*p_Source).MajorDestinationCenterPoint.fX) *
+            (CornerPoints[iI].fX - (*p_Source).MajorDestinationCenterPoint.fX) +
+            (CornerPoints[iI].fY - (*p_Source).MajorDestinationCenterPoint.fY) *
+            (CornerPoints[iI].fY - (*p_Source).MajorDestinationCenterPoint.fY)
         );
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -518,7 +522,7 @@ FPOINT __cdecl ENTITY_MinorVectorHead(ENTITY* p_Source, ENTITY* p_Current, GLOBA
                 }
                 else {
                     ENTITY* p_NewObstacle = (*p_Globals).p_RootEntity;
-                    while(p_NewObstacle && (*p_NewObstacle).bIsObstacle) {
+                    while(p_NewObstacle && (*p_NewObstacle).ubIsObstacle) {
                         if(ENTITY_WithinPoint(p_NewObstacle, CurrentPoint)) {
                             return ENTITY_MinorVectorHead(p_Source, p_NewObstacle, p_Globals);
                         }
@@ -562,7 +566,7 @@ void __cdecl ENTITY_UpdatePosition(ENTITY* p_Entity, GLOBALS* p_Globals) {
             (*p_Entity).CenterPoint = (*p_Entity).MajorDestinationCenterPoint;
             (*p_Entity).Location.fX = (*p_Entity).MajorDestinationCenterPoint.fX - (*p_Entity).HalfSize.fX;
             (*p_Entity).Location.fY = (*p_Entity).MajorDestinationCenterPoint.fY - (*p_Entity).HalfSize.fY;
-            (*p_Entity).bIsInMotion = 0;
+            (*p_Entity).ubIsInMotion = 0;
         }
         else {
             ENTITY_FindMinorVector(p_Entity, p_Globals);
@@ -572,8 +576,8 @@ void __cdecl ENTITY_UpdatePosition(ENTITY* p_Entity, GLOBALS* p_Globals) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // This function will redefine the manufacturing statistics when an entity is deleted.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_Redefine(int iType, GLOBALS* p_Globals) {
-    switch(iType) {
+void __cdecl ENTITY_Redefine(USHORT usType, GLOBALS* p_Globals) {
+    switch(usType) {
         case ENTITY_WORKER: {
             (*p_Globals).iCurrentSupply -= SUPPLY_USED_WORKER;
             break;
@@ -606,9 +610,9 @@ void __cdecl ENTITY_DeleteAll(GLOBALS* p_Globals) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Re-calculate manufacturing statistics.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY_Redefine((*p_Temp).iType, p_Globals);
+        ENTITY_Redefine((*p_Temp).usType, p_Globals);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        (*p_Temp).bIsAlive = 0;
+        (*p_Temp).ubIsAlive = 0;
         free(p_Temp);
         (*p_Globals).iRunningHeap -= sizeof(ENTITY);
     }
@@ -619,15 +623,15 @@ void __cdecl ENTITY_DeleteSelected(GLOBALS* p_Globals) {
     ENTITY* p_Previous = NULL;
     ENTITY* p_Current = (*p_Globals).p_RootEntity;
     while(p_Current) {
-        if((*p_Current).bIsSelected) {
+        if((*p_Current).ubIsSelected) {
             if(p_Current == (*p_Globals).p_RootEntity) {
                 (*p_Globals).p_RootEntity = (ENTITY*)(*p_Current).p_Next;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine((*p_Current).iType, p_Globals);
+                ENTITY_Redefine((*p_Current).usType, p_Globals);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                (*p_Current).bIsAlive = 0;
+                (*p_Current).ubIsAlive = 0;
                 free(p_Current);
                 (*p_Globals).iRunningHeap -= sizeof(ENTITY);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -640,9 +644,9 @@ void __cdecl ENTITY_DeleteSelected(GLOBALS* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine((*p_Current).iType, p_Globals);
+                ENTITY_Redefine((*p_Current).usType, p_Globals);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                (*p_Current).bIsAlive = 0;
+                (*p_Current).ubIsAlive = 0;
                 free(p_Current);
                 (*p_Globals).iRunningHeap -= sizeof(ENTITY);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -668,9 +672,9 @@ void __cdecl ENTITY_DeleteSpecific(ENTITY* p_Entity, GLOBALS* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine((*p_Current).iType, p_Globals);
+                ENTITY_Redefine((*p_Current).usType, p_Globals);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                (*p_Current).bIsAlive = 0;
+                (*p_Current).ubIsAlive = 0;
                 free(p_Current);
                 (*p_Globals).iRunningHeap -= sizeof(ENTITY);
                 break;
@@ -680,9 +684,9 @@ void __cdecl ENTITY_DeleteSpecific(ENTITY* p_Entity, GLOBALS* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine((*p_Current).iType, p_Globals);
+                ENTITY_Redefine((*p_Current).usType, p_Globals);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                (*p_Current).bIsAlive = 0;
+                (*p_Current).ubIsAlive = 0;
                 free(p_Current);
                 (*p_Globals).iRunningHeap -= sizeof(ENTITY);
                 break;
@@ -695,19 +699,19 @@ void __cdecl ENTITY_DeleteSpecific(ENTITY* p_Entity, GLOBALS* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_DeleteEntityType(int iType, GLOBALS* p_Globals) {
+void __cdecl ENTITY_DeleteEntityType(USHORT usType, GLOBALS* p_Globals) {
     ENTITY* p_Previous = NULL;
     ENTITY* p_Current = (*p_Globals).p_RootEntity;
     while(p_Current) {
-        if((*p_Current).iType == iType) {
+        if((*p_Current).usType == usType) {
             if(p_Current == (*p_Globals).p_RootEntity) {
                 (*p_Globals).p_RootEntity = (ENTITY*)(*p_Current).p_Next;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine((*p_Current).iType, p_Globals);
+                ENTITY_Redefine((*p_Current).usType, p_Globals);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                (*p_Current).bIsAlive = 0;
+                (*p_Current).ubIsAlive = 0;
                 free(p_Current);
                 (*p_Globals).iRunningHeap -= sizeof(ENTITY);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -720,9 +724,9 @@ void __cdecl ENTITY_DeleteEntityType(int iType, GLOBALS* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine((*p_Current).iType, p_Globals);
+                ENTITY_Redefine((*p_Current).usType, p_Globals);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                (*p_Current).bIsAlive = 0;
+                (*p_Current).ubIsAlive = 0;
                 free(p_Current);
                 (*p_Globals).iRunningHeap -= sizeof(ENTITY);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -738,14 +742,14 @@ void __cdecl ENTITY_DeleteEntityType(int iType, GLOBALS* p_Globals) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Using 'goto' statements in this function because I wanted to sort different entity types in one central place.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_SortToFront(int iCondition, GLOBALS* p_Globals) {
+void __cdecl ENTITY_SortToFront(USHORT usCondition, GLOBALS* p_Globals) {
     ENTITY* p_Previous = NULL;
     ENTITY* p_Current = (*p_Globals).p_RootEntity;
     while(p_Current) {
-        switch(iCondition) {
+        switch(usCondition) {
             case WORKERS_TO_FRONT: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if((*p_Current).iType == ENTITY_WORKER) {
+                if((*p_Current).usType == ENTITY_WORKER) {
                     goto Sort;
                 }
                 else {
@@ -754,7 +758,7 @@ void __cdecl ENTITY_SortToFront(int iCondition, GLOBALS* p_Globals) {
             }
             case MINERALS_TO_FRONT: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if((*p_Current).iType == ENTITY_MINERAL) {
+                if((*p_Current).usType == ENTITY_MINERAL) {
                     goto Sort;
                 }
                 else {
@@ -763,7 +767,7 @@ void __cdecl ENTITY_SortToFront(int iCondition, GLOBALS* p_Globals) {
             }
             case COMMANDS_TO_FRONT: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if((*p_Current).iType == ENTITY_COMMAND)  {
+                if((*p_Current).usType == ENTITY_COMMAND)  {
                     goto Sort;
                 }
                 else {
@@ -772,7 +776,7 @@ void __cdecl ENTITY_SortToFront(int iCondition, GLOBALS* p_Globals) {
             }
             case SUPPLIES_TO_FRONT: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if((*p_Current).iType == ENTITY_SUPPLY) {
+                if((*p_Current).usType == ENTITY_SUPPLY) {
                     goto Sort;
                 }
                 else {
@@ -781,7 +785,7 @@ void __cdecl ENTITY_SortToFront(int iCondition, GLOBALS* p_Globals) {
             }
             case REFINERIES_TO_FRONT: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if((*p_Current).iType == ENTITY_REFINERY) {
+                if((*p_Current).usType == ENTITY_REFINERY) {
                     goto Sort;
                 }
                 else {
@@ -790,7 +794,7 @@ void __cdecl ENTITY_SortToFront(int iCondition, GLOBALS* p_Globals) {
             }
             case OBSTACLES_TO_FRONT: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if((*p_Current).bIsObstacle) {
+                if((*p_Current).ubIsObstacle) {
                     goto Sort;
                 }
                 else {
@@ -839,7 +843,7 @@ void __cdecl ENTITY_PrintList(GLOBALS* p_Globals) {
     ENTITY* p_Current = (*p_Globals).p_RootEntity;
     printf("--------------------\n");
     while(p_Current) {
-        switch((*p_Current).iType) {
+        switch((*p_Current).usType) {
             case ENTITY_WORKER: {
                 printf("Type: ENTITY_WORKER\n");
                 break;
@@ -875,7 +879,7 @@ void __cdecl ENTITY_PrintClosestEntitiesList(AI_CLOSEST* p_ClosestEntities) {
         int iI = 0;
         while(p_ClosestEntities[iI].p_Entity) {
             ENTITY* p_Entity = p_ClosestEntities[iI].p_Entity;
-            printf("Closest Entity [%d]: ID: %d, P: %p, Distance: %0.2f\n", iI, (*p_Entity).iId, p_Entity, p_ClosestEntities[iI].fDistance);
+            printf("Closest Entity [%d]: ID: %d, P: %p, Distance: %0.2f\n", iI, (*p_Entity).usId, p_Entity, p_ClosestEntities[iI].fDistance);
             iI++;
         }
     }
@@ -883,19 +887,19 @@ void __cdecl ENTITY_PrintClosestEntitiesList(AI_CLOSEST* p_ClosestEntities) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ENTITY_Animate(ENTITY* p_Entity, IMAGES* p_Images) {
-    switch((*p_Entity).iType) {
+    switch((*p_Entity).usType) {
         case ENTITY_SUPPLY: {
-            switch((*p_Entity).iState) {
+            switch((*p_Entity).usState) {
                 case ANIMATE_SUPPLY_NORMAL: {
-                    (*p_Entity).iCurrentFrame++;
+                    (*p_Entity).usCurrentFrame++;
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // I know there is only 6 frames in this animation.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Entity).iCurrentFrame > 5) {
-                        (*p_Entity).iCurrentFrame = 0;
+                    if((*p_Entity).usCurrentFrame > 5) {
+                        (*p_Entity).usCurrentFrame = 0;
                     }
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    switch((*p_Entity).iCurrentFrame) {
+                    switch((*p_Entity).usCurrentFrame) {
                         case 0: { (*p_Entity).p_Picture = &(*p_Images).Supply[0]; break; } // Original.
                         case 1: { (*p_Entity).p_Picture = &(*p_Images).Supply[1]; break; } // Top light bright.
                         case 2: { (*p_Entity).p_Picture = &(*p_Images).Supply[2]; break; } // Top light brighter.
@@ -918,12 +922,12 @@ void __cdecl ENTITY_Animate(ENTITY* p_Entity, IMAGES* p_Images) {
             break;
         }
         case ENTITY_WORKER: {
-            switch((*p_Entity).iState) {
+            switch((*p_Entity).usState) {
                 case ANIMATE_WORKER_NORMAL:   { (*p_Entity).p_Picture = &(*p_Images).Worker[0]; break; } // Normal.
                 case ANIMATE_WORKER_MINERALS: { (*p_Entity).p_Picture = &(*p_Images).Worker[1]; break; } // Holding minerals.
                 case ANIMATE_WORKER_GAS:      { (*p_Entity).p_Picture = &(*p_Images).Worker[2]; break; } // Holding gas.
                 default: {
-                    printf("ENTITY_Animate(): Unknown entity state. %d\n", (*p_Entity).iState);
+                    printf("ENTITY_Animate(): Unknown entity state. %d\n", (*p_Entity).usState);
                 }
             }
             break;
@@ -953,21 +957,21 @@ void __cdecl ENTITY_Animate(ENTITY* p_Entity, IMAGES* p_Images) {
             break;
         }
         case ENTITY_COMMAND: {
-            switch((*p_Entity).iState) {
+            switch((*p_Entity).usState) {
                 case ANIMATE_COMMAND_NORMAL: {
                     (*p_Entity).p_Picture = &(*p_Images).Command[0]; // Normal.
                     break;
                 }
                 case ANIMATE_COMMAND_CREATING: {
-                    (*p_Entity).iCurrentFrame++;
+                    (*p_Entity).usCurrentFrame++;
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // I know there is only 24 frames in this animation.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Entity).iCurrentFrame > 23) {
-                        (*p_Entity).iCurrentFrame = 0;
+                    if((*p_Entity).usCurrentFrame > 23) {
+                        (*p_Entity).usCurrentFrame = 0;
                     }
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    switch((*p_Entity).iCurrentFrame) {
+                    switch((*p_Entity).usCurrentFrame) {
                         case 0: {  (*p_Entity).p_Picture = &(*p_Images).Command[0];  break; } // Original.
                         case 1: {  (*p_Entity).p_Picture = &(*p_Images).Command[6];  break; } // East light bright.
                         case 2: {  (*p_Entity).p_Picture = &(*p_Images).Command[7];  break; } // East light brighter.
@@ -999,15 +1003,15 @@ void __cdecl ENTITY_Animate(ENTITY* p_Entity, IMAGES* p_Images) {
                     break;
                 }
                 case ANIMATE_COMMAND_RECEIVE: {
-                    (*p_Entity).iCurrentFrame++;
+                    (*p_Entity).usCurrentFrame++;
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // I know there is only 6 frames in this animation.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    if((*p_Entity).iCurrentFrame > 5) {
-                        (*p_Entity).iCurrentFrame = 0;
+                    if((*p_Entity).usCurrentFrame > 5) {
+                        (*p_Entity).usCurrentFrame = 0;
                     }
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    switch((*p_Entity).iCurrentFrame) {
+                    switch((*p_Entity).usCurrentFrame) {
                         case 0: { (*p_Entity).p_Picture = &(*p_Images).Command[0]; break; } // Original.
                         case 1: { (*p_Entity).p_Picture = &(*p_Images).Command[1]; break; } // All lights bright.
                         case 2: { (*p_Entity).p_Picture = &(*p_Images).Command[2]; break; } // All lights brighter.
@@ -1039,16 +1043,16 @@ SELECTED_COUNT __cdecl ENTITY_GetSelectedEntityCounts(GLOBALS* p_Globals) {
     // Loop through all of the entities and count the workers selected.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     while(p_Current) {
-        if((*p_Current).bIsSelected) {
-            switch((*p_Current).iType) {
+        if((*p_Current).ubIsSelected) {
+            switch((*p_Current).usType) {
                 case ENTITY_WORKER: {
-                    SelectedCount.iSelectedWorkersCount++;
-                    SelectedCount.iSelectedAllCount++;
+                    SelectedCount.usSelectedWorkersCount++;
+                    SelectedCount.usSelectedAllCount++;
                     break;
                 }
                 default: {
-                    SelectedCount.iSelectedOthersCount++;
-                    SelectedCount.iSelectedAllCount++;
+                    SelectedCount.usSelectedOthersCount++;
+                    SelectedCount.usSelectedAllCount++;
                     break;
                 }
             }

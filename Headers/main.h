@@ -31,90 +31,90 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define MAIN_MENU                           600
 #define MENU_SIMULATION_TOGGLE_SIMULATION   700
-#define MENU_SIMULATION_FREE                750
-#define MENU_SIMULATION_EXIT                800
-#define MENU_SIMULATION_PRINT               900
-#define MENU_SIMULATION_TOGGLE_SCATTER      950
-#define MENU_DELETE_SELECTED                1000
-#define MENU_DELETE_WORKER                  1020
-#define MENU_DELETE_COMMAND                 1040
-#define MENU_DELETE_MINERAL                 1060
-#define MENU_DELETE_SUPPLY                  1070
-#define MENU_DELETE_REFINERY                1080
-#define MENU_DELETE_ALL                     1100
-#define MENU_BUILD_NONE                     1200
-#define MENU_BUILD_WORKER                   1300
-#define MENU_BUILD_COMMAND                  1400
-#define MENU_BUILD_MINERAL                  1500
-#define MENU_BUILD_SUPPLY                   1600
-#define MENU_BUILD_REFINERY                 1700
-#define MENU_OPTIONS_ALL_DIAGNOSTICS        1800
-#define MENU_OPTIONS_IDS                    1850
-#define MENU_OPTIONS_DIAGNOSTICS            1900
-#define MENU_OPTIONS_MASKING                2000
-#define MENU_OPTIONS_RESOURCES              2100
-#define MENU_OPTIONS_STATUSES               2200
-#define MENU_OPTIONS_FULLSCREEN             2300
-#define MENU_OPTIONS_SHOW_MINOR             2400
-#define MENU_OPTIONS_SHOW_MAJOR             2500
-#define MENU_OPTIONS_ENABLE_TRANSLATIONS    2600
-#define MENU_OPTIONS_TOPMOST                2650
-#define MENU_CLEAR_SELECTED                 2700
-#define MENU_CLEAR_MINERAL_COUNT            2800
-#define MENU_CLEAR_GAS_COUNT                2900
-#define MENU_CLEAR_ALL_COUNT                3000
-#define MENU_SORT_WORKERS                   3100
-#define MENU_SORT_COMMANDS                  3200
-#define MENU_SORT_MINERALS                  3300
-#define MENU_SORT_SUPPLY                    3400
-#define MENU_SORT_REFINERIES                3450
-#define MENU_SORT_OBSTACLES                 3500
+#define MENU_SIMULATION_FREE                800
+#define MENU_SIMULATION_EXIT                900
+#define MENU_SIMULATION_PRINT               1000
+#define MENU_SIMULATION_TOGGLE_SCATTER      1100
+#define MENU_DELETE_SELECTED                1200
+#define MENU_DELETE_WORKER                  1300
+#define MENU_DELETE_COMMAND                 1400
+#define MENU_DELETE_MINERAL                 1500
+#define MENU_DELETE_SUPPLY                  1600
+#define MENU_DELETE_REFINERY                1700
+#define MENU_DELETE_ALL                     1800
+#define MENU_BUILD_NONE                     1900
+#define MENU_BUILD_WORKER                   2000
+#define MENU_BUILD_COMMAND                  2100
+#define MENU_BUILD_MINERAL                  2200
+#define MENU_BUILD_SUPPLY                   2300
+#define MENU_BUILD_REFINERY                 2400
+#define MENU_OPTIONS_ALL_DIAGNOSTICS        2500
+#define MENU_OPTIONS_IDS                    2600
+#define MENU_OPTIONS_STATS                  2700
+#define MENU_OPTIONS_MASKING                2800
+#define MENU_OPTIONS_RESOURCES              2900
+#define MENU_OPTIONS_STATUSES               3000
+#define MENU_OPTIONS_FULLSCREEN             3100
+#define MENU_OPTIONS_SHOW_MINOR             3200
+#define MENU_OPTIONS_SHOW_MAJOR             3300
+#define MENU_OPTIONS_ENABLE_TRANSLATIONS    3400
+#define MENU_OPTIONS_TOPMOST                3500
+#define MENU_CLEAR_SELECTED                 3600
+#define MENU_CLEAR_MINERAL_COUNT            3700
+#define MENU_CLEAR_GAS_COUNT                3800
+#define MENU_CLEAR_ALL_COUNT                3900
+#define MENU_SORT_WORKERS                   4000
+#define MENU_SORT_COMMANDS                  4100
+#define MENU_SORT_MINERALS                  4200
+#define MENU_SORT_SUPPLY                    4300
+#define MENU_SORT_REFINERIES                4400
+#define MENU_SORT_OBSTACLES                 4500
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Non-volatile sorting constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define WORKERS_TO_FRONT                    3600
-#define MINERALS_TO_FRONT                   3700
-#define COMMANDS_TO_FRONT                   3800
-#define SUPPLIES_TO_FRONT                   3900
-#define REFINERIES_TO_FRONT                 3950
-#define OBSTACLES_TO_FRONT                  4000
+#define WORKERS_TO_FRONT                    4600
+#define MINERALS_TO_FRONT                   4700
+#define COMMANDS_TO_FRONT                   4800
+#define SUPPLIES_TO_FRONT                   4900
+#define REFINERIES_TO_FRONT                 5000
+#define OBSTACLES_TO_FRONT                  5100
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Non-volatile entity constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define ENTITY_NONE                         4050
-#define ENTITY_WORKER                       4100
-#define ENTITY_MINERAL                      4200
-#define ENTITY_COMMAND                      4300
-#define ENTITY_SUPPLY                       4400
-#define ENTITY_REFINERY                     4500
-#define ENTITY_OBSTACLE                     4600
+#define ENTITY_NONE                         5200
+#define ENTITY_WORKER                       5300
+#define ENTITY_MINERAL                      5400
+#define ENTITY_COMMAND                      5500
+#define ENTITY_SUPPLY                       5600
+#define ENTITY_REFINERY                     5700
+#define ENTITY_OBSTACLE                     5800
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Non-volatile animation constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define ANIMATE_WORKER_NORMAL               4700
-#define ANIMATE_WORKER_MINERALS             4800
-#define ANIMATE_WORKER_GAS                  4900
-#define ANIMATE_COMMAND_NORMAL              5000
-#define ANIMATE_COMMAND_RECEIVE             5100
-#define ANIMATE_COMMAND_CREATING            5200
-#define ANIMATE_SUPPLY_NORMAL               5300
+#define ANIMATE_WORKER_NORMAL               5900
+#define ANIMATE_WORKER_MINERALS             6000
+#define ANIMATE_WORKER_GAS                  6100
+#define ANIMATE_COMMAND_NORMAL              6200
+#define ANIMATE_COMMAND_RECEIVE             6300
+#define ANIMATE_COMMAND_CREATING            6400
+#define ANIMATE_SUPPLY_NORMAL               6500
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Non-volatile rendering constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define RENDER_ROTATE                       5400
-#define RENDER_SCALE                        5500
+#define RENDER_ROTATE                       6600
+#define RENDER_SCALE                        6700
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Non-volatile message constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define MESSAGE_GAIN_MINERALS               5600
-#define MESSAGE_GAIN_GAS                    5700
-#define MESSAGE_BONUS_MINERALS              5800
-#define MESSAGE_BONUS_GAS                   5900
-#define MESSAGE_GENERAL_WARNING             6000
+#define MESSAGE_GAIN_MINERALS               6800
+#define MESSAGE_GAIN_GAS                    6900
+#define MESSAGE_BONUS_MINERALS              7000
+#define MESSAGE_BONUS_GAS                   7100
+#define MESSAGE_GENERAL_WARNING             7200
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Non-volatile command card constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define CARD_BLANK                          6100
+#define CARD_BLANK                          7300
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Volatile entity constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,24 +166,24 @@
 #define SUFFICIENTLY_CLOSE                  5.0f
 #define COLLISION_BUFFER                    5.0f
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
+typedef struct IPOINT {
     int iX;
     int iY;
 } IPOINT;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
+typedef struct FPOINT {
     float fX;
     float fY;
 } FPOINT;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
+typedef struct PICTURE {
     FPOINT Location;
     HBITMAP hBmp;
     HBITMAP hBmpMask;
     BITMAP Bitmap;
 } PICTURE;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
+typedef struct SETTINGS {
     const float fProcessFPS;
     const float fAnimateFPS;
     const int iClientWidth;
@@ -219,20 +219,21 @@ typedef struct {
     const int iGasPerGrab;
 } SETTINGS;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
-    int iId;
-    int iState;
-    int iCurrentFrame;
-    int iType;
+typedef struct ENTITY {
+    USHORT usId;
+    USHORT usState;
+    USHORT usCurrentFrame;
+    USHORT usType;
     int iMineralCount;
     int iGasCount;
-    int bIsMovable;
-    int bIsObstacle;
-    int bIsCarrying;
-    int bIsSelected;
-    int bIsAlive;
-    int bIsInMotion;
-    int bIsPaused;
+    UINT8 ubIsMovable;
+    UINT8 ubIsObstacle;
+    UINT8 ubIsCarrying;
+    UINT8 ubIsSelected;
+    UINT8 ubIsAlive;
+    UINT8 ubIsInMotion;
+    UINT8 ubIsPaused;
+    UINT8 ubIsHighlighted;
     float fPauseCount;
     float fPauseTime;
     float fRadius;
@@ -252,14 +253,14 @@ typedef struct {
     struct ENTITY* p_Operating;
 } ENTITY;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
-    int iState;
+typedef struct CARD {
+    USHORT usState;
     PICTURE* p_Picture;
 } CARD;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
-    int iType;
-    int iLifespan;
+typedef struct MESSAGE {
+    USHORT usType;
+    short sLifespan;
     char szMessage[128];
     float fScale;
     float fAngle;
@@ -267,7 +268,7 @@ typedef struct {
     FPOINT Location;
 } MESSAGE;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
+typedef struct IMAGES {
     PICTURE Blitter[9];
     PICTURE Worker[3];
     PICTURE Command[26];
@@ -281,7 +282,7 @@ typedef struct {
     PICTURE Card[5];
 } IMAGES;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
+typedef struct DBLBUF {
     char szBlitter[128];
     HDC hDC;
     HWND hWnd;
@@ -294,7 +295,7 @@ typedef struct {
     PICTURE* p_Blitter;
 } DBLBUF;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
+typedef struct TIMEBASE {
     float fMSPerFrame;
     float fDifference;
     __int64 iFreq;
@@ -302,43 +303,42 @@ typedef struct {
     __int64 iCountNow;
 } TIMEBASE;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
-    int bDrawMinor;
-    int bDrawMajor;
-    int bDrawStatuses;
-    int bDrawIds;
-    int bDrawResources;
-    int bEnableTranslations;
-    int bTopmost;
-    int bEnableMasking;
-    int bBegin;
-    int bToggleScatter;
-    int bAllDiagnostics;
-    int bDiagnostics;
-    int bFullScreen;
+typedef struct MENU {
+    UINT8 ubDrawMinor;
+    UINT8 ubDrawMajor;
+    UINT8 ubDrawStatuses;
+    UINT8 ubDrawIds;
+    UINT8 ubDrawResources;
+    UINT8 ubEnableTranslations;
+    UINT8 ubIsTopmostWindow;
+    UINT8 ubEnableMasking;
+    UINT8 ubToggleSimulation;
+    UINT8 ubToggleScatter;
+    UINT8 ubAllDiagnosticsToggle;
+    UINT8 ubDrawDiagnostics;
+    UINT8 ubIsFullScreen;
     HMENU hMenu;
 } MENU;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
-    int iSelectedWorkersCount;
-    int iSelectedOthersCount;
-    int iSelectedAllCount;
+typedef struct SELECTED_COUNT {
+    USHORT usSelectedWorkersCount;
+    USHORT usSelectedOthersCount;
+    USHORT usSelectedAllCount;
 } SELECTED_COUNT;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
+typedef struct AI_CLOSEST {
     float fDistance;
     ENTITY* p_Entity;
-    int iAllocations;
 } AI_CLOSEST;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct {
-    int iIdStamp;
-    int iMapIndex;
-    int iThreshold;
+typedef struct GLOBALS {
+    USHORT usIdStamp;
+    USHORT usMapIndex;
+    USHORT usThreshold;
     int iCurrentSupply;
     int iTotalSupply;
-    int iFrameCount;
-    int iAnimateCount;
+    ULONG ulFrameCount;
+    UINT uiAnimateCount;
     int iMineralCount;
     int iGasCount;
     int iOldMouseX;
@@ -349,15 +349,15 @@ typedef struct {
     int iCaptureStartY;
     int iCaptureCurrentX;
     int iCaptureCurrentY;
-    int iBuildType;
-    int iEntityCount;
-    int iMessageCount;
+    USHORT usBuildType;
+    USHORT usEntityCount;
+    USHORT usMessageCount;
     int iRunningHeap;
-    int iSecondTick;
-    int bAnimate;
-    int bDrawSelectionRect;
-    int bClickOriginFromMinimap;
-    int bCreate;
+    UINT uiSecondTick;
+    UINT8 ubAnimate;
+    UINT8 ubDrawSelectionRect;
+    UINT8 ubClickOriginFromMinimap;
+    UINT8 ubCreate;
     char szBuffer[128];
     float fProcessTime;
     float fProcessTimeSum;
@@ -384,51 +384,51 @@ void            __cdecl     SETTINGS_Zero                               (SETTING
 SETTINGS*       __cdecl     SETTINGS_Create                             (GLOBALS*);
 void            __cdecl     SETTINGS_InitFromFile                       (SETTINGS*);
 void            __cdecl     SETTINGS_Kill                               (SETTINGS*, GLOBALS*);
-////////////    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void            __cdecl     DBLBUF_Zero                                 (DBLBUF*);
 DBLBUF*         __cdecl     DBLBUF_Create                               (HWND, GLOBALS*);
 void            __cdecl     DBLBUF_Resize                               (DBLBUF*, HWND, COLORREF, GLOBALS*);
 void            __cdecl     DBLBUF_Kill                                 (DBLBUF*, GLOBALS*);
 IPOINT          __cdecl     DBLBUF_FindBlitterPoint                     (char);
 void            __cdecl     DBLBUF_SetBlitter                           (DBLBUF*, PICTURE*);
-void            __cdecl     DBLBUF_Blitter                              (DBLBUF*, char*, FPOINT, int);
+void            __cdecl     DBLBUF_Blitter                              (DBLBUF*, char*, FPOINT, UINT8);
 void            __cdecl     DBLBUF_Clear                                (DBLBUF*, COLORREF);
 void            __cdecl     DBLBUF_DrawEntityMinorVector                (DBLBUF*, ENTITY*, COLORREF);
 void            __cdecl     DBLBUF_DrawEntityMajorVector                (DBLBUF*, ENTITY*, COLORREF);
 void            __cdecl     DBLBUF_DrawEntityEllipse                    (DBLBUF*, ENTITY*, COLORREF, COLORREF);
-void            __cdecl     DBLBUF_DrawEntity                           (DBLBUF*, ENTITY*, int);
+void            __cdecl     DBLBUF_DrawEntity                           (DBLBUF*, ENTITY*, UINT8);
 void            __cdecl     DBLBUF_ClearEntity                          (DBLBUF*, ENTITY*, COLORREF);
 void            __cdecl     DBLBUF_FlipEntity                           (DBLBUF*, ENTITY*);
 void            __cdecl     DBLBUF_Flip                                 (DBLBUF*);
 void            __cdecl     DBLBUF_FlipArea                             (DBLBUF*, int, int, int, int);
-void            __cdecl     DBLBUF_DrawPicture                          (DBLBUF*, PICTURE*, int);
-void            __cdecl     DBLBUF_DrawPictureAt                        (DBLBUF*, PICTURE*, FPOINT, int);
+void            __cdecl     DBLBUF_DrawPicture                          (DBLBUF*, PICTURE*, UINT8);
+void            __cdecl     DBLBUF_DrawPictureAt                        (DBLBUF*, PICTURE*, FPOINT, UINT8);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void            __cdecl     TIMEBASE_Zero                               (TIMEBASE*);
 TIMEBASE*       __cdecl     TIMEBASE_Create                             (float, GLOBALS*);
-int             __cdecl     TIMEBASE_Tick                               (TIMEBASE*);
+UINT8           __cdecl     TIMEBASE_Tick                               (TIMEBASE*);
 void            __cdecl     TIMEBASE_StartTimer                         (TIMEBASE*);
 float           __cdecl     TIMEBASE_EndTimer                           (TIMEBASE*);
 void            __cdecl     TIMEBASE_Kill                               (TIMEBASE*, GLOBALS*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void            __cdecl     ENTITY_Zero                                 (ENTITY*);
-void            __cdecl     ENTITY_Create                               (FPOINT, int, IMAGES*, GLOBALS*);
-int             __cdecl     ENTITY_Restrict                             (int, GLOBALS*);
-int             __cdecl     ENTITY_Overlap                              (int, IMAGES*, GLOBALS*);
+void            __cdecl     ENTITY_Create                               (FPOINT, USHORT, IMAGES*, GLOBALS*);
+UINT8           __cdecl     ENTITY_Restrict                             (USHORT, GLOBALS*);
+UINT8           __cdecl     ENTITY_Overlap                              (USHORT, IMAGES*, GLOBALS*);
 void            __cdecl     ENTITY_Pause                                (ENTITY*, float);
-int             __cdecl     ENTITY_CollidedWith                         (ENTITY*, ENTITY*);
-int             __cdecl     ENTITY_WithinPoint                          (ENTITY*, FPOINT);
+UINT8           __cdecl     ENTITY_CollidedWith                         (ENTITY*, ENTITY*);
+UINT8           __cdecl     ENTITY_WithinPoint                          (ENTITY*, FPOINT);
 void            __cdecl     ENTITY_MoveTo                               (ENTITY*, ENTITY*, GLOBALS*);
 void            __cdecl     ENTITY_MoveToPoint                          (ENTITY*, FPOINT, GLOBALS*);
 void            __cdecl     ENTITY_FindMinorVector                      (ENTITY*, GLOBALS*);
 FPOINT          __cdecl     ENTITY_MinorVectorHead                      (ENTITY*, ENTITY*, GLOBALS*);
 void            __cdecl     ENTITY_UpdatePosition                       (ENTITY*, GLOBALS*);
-void            __cdecl     ENTITY_Redefine                             (int, GLOBALS*);
+void            __cdecl     ENTITY_Redefine                             (USHORT, GLOBALS*);
 void            __cdecl     ENTITY_DeleteAll                            (GLOBALS*);
 void            __cdecl     ENTITY_DeleteSelected                       (GLOBALS*);
 void            __cdecl     ENTITY_DeleteSpecific                       (ENTITY*, GLOBALS*);
-void            __cdecl     ENTITY_DeleteEntityType                     (int, GLOBALS*);
-void            __cdecl     ENTITY_SortToFront                          (int, GLOBALS*);
+void            __cdecl     ENTITY_DeleteEntityType                     (USHORT, GLOBALS*);
+void            __cdecl     ENTITY_SortToFront                          (USHORT, GLOBALS*);
 void            __cdecl     ENTITY_PrintList                            (GLOBALS*);
 void            __cdecl     ENTITY_PrintClosestEntitiesList             (AI_CLOSEST*);
 void            __cdecl     ENTITY_Animate                              (ENTITY*, IMAGES*);
@@ -439,9 +439,9 @@ void            __cdecl     GLOBALS_Zero                                (GLOBALS
 int             __cdecl     GLOBALS_Kill                                (GLOBALS*);
 void            __cdecl     GLOBALS_Init                                (GLOBALS*, HINSTANCE);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ENTITY*         __cdecl     AI_FindClosest                              (ENTITY*, int, GLOBALS*);
+ENTITY*         __cdecl     AI_FindClosest                              (ENTITY*, USHORT, GLOBALS*);
 void            __cdecl     AI_HandleWorkers                            (ENTITY*, GLOBALS*);
-AI_CLOSEST*     __cdecl     AI_FindClosestByDistance                    (ENTITY*, int, int*, int*, GLOBALS*);
+AI_CLOSEST*     __cdecl     AI_FindClosestByDistance                    (ENTITY*, USHORT, int*, USHORT*, GLOBALS*);
 int             __cdecl     AI_CompareDistances                         (const void*, const void*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int             __cdecl     MISC_RandomNumber                           (int, int);
@@ -459,17 +459,17 @@ void            __cdecl     PROC_ProcessMessages                        (DBLBUF*
 void            __cdecl     PROC_DrawDiagnostics                        (DBLBUF*, GLOBALS*, IMAGES*, MENU*);
 void            __cdecl     PROC_DrawResourceBar                        (DBLBUF*, GLOBALS*, IMAGES*, MENU*);
 void            __cdecl     PROC_DrawTaskbar                            (DBLBUF*, GLOBALS*, IMAGES*, CARD*, MENU*);
-void            __cdecl     PROC_HandleMinimap                          (DBLBUF*, GLOBALS*, IMAGES* p_Images);
-void            __cdecl     PROC_DrawMinimapPicture                     (DBLBUF*, GLOBALS*, IMAGES* p_Images, FPOINT);
+void            __cdecl     PROC_HandleMinimap                          (DBLBUF*, GLOBALS*, IMAGES*);
+void            __cdecl     PROC_DrawMinimapPicture                     (DBLBUF*, GLOBALS*, IMAGES*, FPOINT);
 void            __cdecl     PROC_DrawMinimapEntities                    (DBLBUF*, GLOBALS*, FPOINT);
-void            __cdecl     PROC_DrawMinimapViewport                    (DBLBUF*, GLOBALS*, IMAGES* p_Images, FPOINT);
+void            __cdecl     PROC_DrawMinimapViewport                    (DBLBUF*, GLOBALS*, IMAGES*, FPOINT);
 void            __cdecl     PROC_DrawMinimapSelectionArea               (DBLBUF*, GLOBALS*, FPOINT);
 void            __cdecl     PROC_HandleHud                              (DBLBUF*, GLOBALS*, IMAGES*, CARD*, MENU*);
 void            __cdecl     PROC_DrawBuildLimits                        (DBLBUF*, ENTITY*, IMAGES*);
 void            __cdecl     PROC_DrawBuildType                          (DBLBUF*, GLOBALS*, IMAGES*, MENU*);
 void            __cdecl     PROC_PopulateViewportRelativity             (FPOINT*, FPOINT*, FPOINT*, FPOINT*, DBLBUF*, IMAGES*, GLOBALS*);
 void            __cdecl     PROC_PopulateMinimapDimensions              (FPOINT*, FPOINT*, DBLBUF*, IMAGES*);
-int             __cdecl     PROC_IsMinimapClicked                       (DBLBUF*, IMAGES*, GLOBALS*);
+UINT8           __cdecl     PROC_IsMinimapClicked                       (DBLBUF*, IMAGES*, GLOBALS*);
 void            __cdecl     PROC_AdjustMinimapViewport                  (GLOBALS*, IMAGES*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void            __cdecl     PICTURE_Zero                                (PICTURE*);
@@ -482,12 +482,12 @@ void            __cdecl     IMAGES_InitFromFile                         (IMAGES*
 void            __cdecl     IMAGES_Kill                                 (IMAGES*, GLOBALS*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void            __cdecl     MESSAGE_Zero                                (MESSAGE*);
-void            __cdecl     MESSAGE_Create                              (char*, FPOINT, int, GLOBALS*);
+void            __cdecl     MESSAGE_Create                              (char*, FPOINT, USHORT, GLOBALS*);
 void            __cdecl     MESSAGE_DeleteSpecific                      (MESSAGE*, GLOBALS*);
 void            __cdecl     MESSAGE_DeleteAll                           (GLOBALS*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void            __cdecl     RENDER_Init                                 (DBLBUF*);
-void            __cdecl     RENDER_ApplyTransform                       (DBLBUF*, int, float, FPOINT);
+void            __cdecl     RENDER_ApplyTransform                       (DBLBUF*, USHORT, float, FPOINT);
 void            __cdecl     RENDER_ResetTransform                       (DBLBUF*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void            __cdecl     CARD_Zero                                   (CARD*);
@@ -497,7 +497,7 @@ void            __cdecl     CARD_EvaluateSelected                       (CARD*, 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 INT_PTR         CALLBACK    WINPROC_DlgLoad                             (HWND, UINT, WPARAM, LPARAM);
 LRESULT         CALLBACK    WINPROC_WindowProc                          (HWND, UINT, WPARAM, LPARAM);
-void            __cdecl     WINPROC_BuildHelper                         (int, MENU*);
+void            __cdecl     WINPROC_BuildHelper                         (USHORT, MENU*);
 void            __cdecl     WINPROC_SendWorkers                         (GLOBALS*, IMAGES*);
 void            __cdecl     WINPROC_DistributeAndSendWorkers            (GLOBALS*, IMAGES*);
 void            __cdecl     WINPROC_SelectEntities                      (GLOBALS*);

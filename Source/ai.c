@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../Headers/main.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ENTITY* __cdecl AI_FindClosest(ENTITY* p_Inquirer, int iType, GLOBALS* p_Globals) {
+ENTITY* __cdecl AI_FindClosest(ENTITY* p_Inquirer, USHORT usType, GLOBALS* p_Globals) {
     ENTITY* p_Closest = NULL;
     ENTITY* p_Current = (*p_Globals).p_RootEntity;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -17,11 +17,14 @@ ENTITY* __cdecl AI_FindClosest(ENTITY* p_Inquirer, int iType, GLOBALS* p_Globals
     float fClosestDistance = AI_MAX_SEARCH_RANGE;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     while(p_Current) {
-        if((*p_Current).iType == iType && (*p_Current).bIsAlive) {
-            float fDistance = sqrt(
-                pow((*p_Inquirer).CenterPoint.fX - (*p_Current).CenterPoint.fX, 2.0f) +
-                pow((*p_Inquirer).CenterPoint.fY - (*p_Current).CenterPoint.fY, 2.0f)
+        if((*p_Current).usType == usType && (*p_Current).ubIsAlive) {
+            float fDistance = sqrtf(
+                ((*p_Inquirer).CenterPoint.fX - (*p_Current).CenterPoint.fX) *
+                ((*p_Inquirer).CenterPoint.fX - (*p_Current).CenterPoint.fX) +
+                ((*p_Inquirer).CenterPoint.fY - (*p_Current).CenterPoint.fY) *
+                ((*p_Inquirer).CenterPoint.fY - (*p_Current).CenterPoint.fY)
             );
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if(fDistance < fClosestDistance) {
                 fClosestDistance = fDistance;
                 p_Closest = p_Current;
@@ -37,33 +40,35 @@ ENTITY* __cdecl AI_FindClosest(ENTITY* p_Inquirer, int iType, GLOBALS* p_Globals
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Allocation adjustments include an extra element to detect a null pointer during enumerations.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AI_CLOSEST* __cdecl AI_FindClosestByDistance(ENTITY* p_Inquirer, int iType, int* iRollingAllocationHeap, int* iFound, GLOBALS* p_Globals) {
+AI_CLOSEST* __cdecl AI_FindClosestByDistance(ENTITY* p_Inquirer, USHORT usType, int* p_iRollingAllocationHeap, USHORT* p_usFound, GLOBALS* p_Globals) {
     int iResizeThresholdCapacity = 5;
     int iCurrentAllocationCount = 0;
-    *iRollingAllocationHeap = sizeof(AI_CLOSEST) * (iResizeThresholdCapacity + 1);
+    *p_iRollingAllocationHeap = sizeof(AI_CLOSEST) * (iResizeThresholdCapacity + 1);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    AI_CLOSEST* p_ClosestEntities = (AI_CLOSEST*)malloc(*iRollingAllocationHeap);
-    (*p_Globals).iRunningHeap += *iRollingAllocationHeap;
+    AI_CLOSEST* p_ClosestEntities = (AI_CLOSEST*)malloc(*p_iRollingAllocationHeap);
+    (*p_Globals).iRunningHeap += *p_iRollingAllocationHeap;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ENTITY* p_Current = (*p_Globals).p_RootEntity;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     while(p_Current) {
-        if((*p_Current).iType == iType && (*p_Current).bIsAlive) {
-            float fDistance = sqrt(
-                pow((*p_Inquirer).CenterPoint.fX - (*p_Current).CenterPoint.fX, 2.0f) +
-                pow((*p_Inquirer).CenterPoint.fY - (*p_Current).CenterPoint.fY, 2.0f)
+        if((*p_Current).usType == usType && (*p_Current).ubIsAlive) {
+            float fDistance = sqrtf(
+                ((*p_Inquirer).CenterPoint.fX - (*p_Current).CenterPoint.fX) *
+                ((*p_Inquirer).CenterPoint.fX - (*p_Current).CenterPoint.fX) +
+                ((*p_Inquirer).CenterPoint.fY - (*p_Current).CenterPoint.fY) *
+                ((*p_Inquirer).CenterPoint.fY - (*p_Current).CenterPoint.fY)
             );
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Resize dynamically.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if(iCurrentAllocationCount >= iResizeThresholdCapacity) {
-                (*p_Globals).iRunningHeap -= *iRollingAllocationHeap;
+                (*p_Globals).iRunningHeap -= *p_iRollingAllocationHeap;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 iResizeThresholdCapacity <<= 1;
-                *iRollingAllocationHeap = sizeof(AI_CLOSEST) * (iResizeThresholdCapacity + 1);
-                AI_CLOSEST* p_ClosestEntitiesResized = (AI_CLOSEST*)realloc(p_ClosestEntities, *iRollingAllocationHeap);
+                *p_iRollingAllocationHeap = sizeof(AI_CLOSEST) * (iResizeThresholdCapacity + 1);
+                AI_CLOSEST* p_ClosestEntitiesResized = (AI_CLOSEST*)realloc(p_ClosestEntities, *p_iRollingAllocationHeap);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                (*p_Globals).iRunningHeap += *iRollingAllocationHeap;
+                (*p_Globals).iRunningHeap += *p_iRollingAllocationHeap;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_ClosestEntities = p_ClosestEntitiesResized;
             }
@@ -85,13 +90,13 @@ AI_CLOSEST* __cdecl AI_FindClosestByDistance(ENTITY* p_Inquirer, int iType, int*
     p_ClosestEntities[iCurrentAllocationCount].p_Entity = NULL;
     p_ClosestEntities[iCurrentAllocationCount].fDistance = AI_MAX_SEARCH_RANGE;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    *iFound = iCurrentAllocationCount;
+    *p_usFound = iCurrentAllocationCount;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     return p_ClosestEntities;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl AI_HandleWorkers(ENTITY* p_Worker, GLOBALS* p_Globals) {
-    if((*p_Worker).bIsCarrying) {
+    if((*p_Worker).ubIsCarrying) {
         ENTITY* p_ComCenter = AI_FindClosest(p_Worker, ENTITY_COMMAND, p_Globals);
         if(p_ComCenter) {
             if(ENTITY_CollidedWith(p_Worker, p_ComCenter)) {
@@ -146,7 +151,7 @@ void __cdecl AI_HandleWorkers(ENTITY* p_Worker, GLOBALS* p_Globals) {
                     ENTITY_Pause(p_ComCenter, REFINERY_COMMAND_PAUSE);
                 }
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                (*p_Worker).bIsCarrying = 0;
+                (*p_Worker).ubIsCarrying = 0;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Reset the workers movement speed.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,8 +159,8 @@ void __cdecl AI_HandleWorkers(ENTITY* p_Worker, GLOBALS* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Allow the animation engine to draw particular images.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                (*p_ComCenter).iState = ANIMATE_COMMAND_RECEIVE;
-                (*p_Worker).iState = ANIMATE_WORKER_NORMAL;
+                (*p_ComCenter).usState = ANIMATE_COMMAND_RECEIVE;
+                (*p_Worker).usState = ANIMATE_WORKER_NORMAL;
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // The worker has NOT collided with the command center.
@@ -176,7 +181,7 @@ void __cdecl AI_HandleWorkers(ENTITY* p_Worker, GLOBALS* p_Globals) {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // What resource did I collide with?
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            switch((*(ENTITY*)(*p_Worker).p_Operating).iType) {
+            switch((*(ENTITY*)(*p_Worker).p_Operating).usType) {
                 case ENTITY_MINERAL: {
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // True, if there is enough minerals to grab.
@@ -187,7 +192,7 @@ void __cdecl AI_HandleWorkers(ENTITY* p_Worker, GLOBALS* p_Globals) {
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         (*(ENTITY*)(*p_Worker).p_Operating).iMineralCount -= MINERALS_PER_GRAB;
                         (*p_Worker).iMineralCount += MINERALS_PER_GRAB;
-                        (*p_Worker).bIsCarrying = 1;
+                        (*p_Worker).ubIsCarrying = 1;
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         // Slow the workers movement speed.
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,7 +204,7 @@ void __cdecl AI_HandleWorkers(ENTITY* p_Worker, GLOBALS* p_Globals) {
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         // Allow the animation engine to draw particular images.
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
-                        (*p_Worker).iState = ANIMATE_WORKER_MINERALS;
+                        (*p_Worker).usState = ANIMATE_WORKER_MINERALS;
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         // Keep them there for a period of time.
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +239,7 @@ void __cdecl AI_HandleWorkers(ENTITY* p_Worker, GLOBALS* p_Globals) {
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         (*(ENTITY*)(*p_Worker).p_Operating).iGasCount -= GAS_PER_GRAB;
                         (*p_Worker).iGasCount += GAS_PER_GRAB;
-                        (*p_Worker).bIsCarrying = 1;
+                        (*p_Worker).ubIsCarrying = 1;
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         // Slow the workers movement speed.
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,7 +251,7 @@ void __cdecl AI_HandleWorkers(ENTITY* p_Worker, GLOBALS* p_Globals) {
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         // Allow the animation engine to draw particular images.
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
-                        (*p_Worker).iState = ANIMATE_WORKER_GAS;
+                        (*p_Worker).usState = ANIMATE_WORKER_GAS;
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
                         // Keep them there for a period of time.
                         /////////////////////////////////////////////////////////////////////////////////////////////////////

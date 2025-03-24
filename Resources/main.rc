@@ -38,7 +38,7 @@ BEGIN
             VALUE "FileDescription", "Resource Gathering Simulator"
             VALUE "FileVersion", "11.0.0.0"
             VALUE "InternalName", "Gatherers"
-            VALUE "LegalCopyright", "� Illusion Interactive"
+            VALUE "LegalCopyright", "(C) Illusion Interactive"
             VALUE "OriginalFilename", "Gatherers"
             VALUE "ProductName", "Gatherers"
             VALUE "ProductVersion", "11.0.0.0"
@@ -84,13 +84,16 @@ MAIN_MENU MENU {
     POPUP "&Options" {
         MENUITEM "Draw With &Transparency", MENU_OPTIONS_MASKING
         MENUITEM SEPARATOR
-        MENUITEM "Draw All Tog&gle", MENU_OPTIONS_ALL_DIAGNOSTICS
-        MENUITEM "Draw &ID's", MENU_OPTIONS_IDS
-        MENUITEM "Draw Diagnosti&cs", MENU_OPTIONS_DIAGNOSTICS
-        MENUITEM "&Draw Resources", MENU_OPTIONS_RESOURCES
-        MENUITEM "D&raw Statuses", MENU_OPTIONS_STATUSES
-        MENUITEM "Dr&aw Minor Vectors", MENU_OPTIONS_SHOW_MINOR
-        MENUITEM "Dra&w Major Vectors", MENU_OPTIONS_SHOW_MAJOR
+        POPUP "Draw Diagno&stics"
+        BEGIN
+            MENUITEM "Draw All Tog&gle", MENU_OPTIONS_ALL_DIAGNOSTICS
+            MENUITEM "Draw &ID's", MENU_OPTIONS_IDS
+            MENUITEM "Draw S&tats", MENU_OPTIONS_STATS
+            MENUITEM "&Draw Resources", MENU_OPTIONS_RESOURCES
+            MENUITEM "D&raw Statuses", MENU_OPTIONS_STATUSES
+            MENUITEM "Dr&aw Minor Vectors", MENU_OPTIONS_SHOW_MINOR
+            MENUITEM "Dra&w Major Vectors", MENU_OPTIONS_SHOW_MAJOR
+        END
         MENUITEM SEPARATOR
         MENUITEM "Enable Tra&nslations", MENU_OPTIONS_ENABLE_TRANSLATIONS
         MENUITEM SEPARATOR
