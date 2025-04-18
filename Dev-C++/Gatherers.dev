@@ -9,13 +9,13 @@ Libs=
 PrivateResource=Gatherers_private.rc
 ResourceIncludes=
 MakeIncludes=
-Compiler=
+Compiler=-DRELEASE_@@_
 CppCompiler=
 Linker="../../../Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32/libgdi32.a"_@@_
 IsCpp=0
 Icon=
-ExeOutput=..\bin\Debug
-ObjectOutput=..\obj\Debug
+ExeOutput=..\bin\Release
+ObjectOutput=..\obj\Release
 LogOutput=
 LogOutputEnabled=0
 OverrideOutput=0
@@ -24,29 +24,29 @@ HostApplication=
 UseCustomMakefile=1
 CustomMakefile=Makefile.win
 CommandLine=
-Folders=Headers,Others,Others/.vscode,Others/CodeBlocks,Others/Dev-C++,Others/Images,Others/Images/BL,Others/Images/CA,Others/Images/CC,Others/Images/GA,Others/Images/HU,Others/Images/MF,Others/Images/MI,Others/Images/RE,Others/Images/SU,Others/Images/TE,Others/Images/WO,Others/Ubuntu,Others/Ubuntu/i686,Others/Ubuntu/x64,Others/Windows,Others/Windows/x64,Resources,Source
+Folders=Headers,Others,Others/.vscode,Others/.vscode/Ubuntu,Others/.vscode/Ubuntu/i686,Others/.vscode/Ubuntu/x64,Others/.vscode/Windows,Others/.vscode/Windows/x64,Others/CodeBlocks,Others/Dev-C++,Others/Images,Others/Images/BL,Others/Images/CA,Others/Images/CC,Others/Images/GA,Others/Images/HU,Others/Images/MF,Others/Images/MI,Others/Images/RE,Others/Images/SU,Others/Images/TE,Others/Images/WO,"Others/Visual Studio","Others/Visual Studio/Gatherers",Resources,Source
 IncludeVersionInfo=1
 SupportXPThemes=0
 CompilerSet=3
 CompilerSettings=0000000100000000000000000
-UnitCount=113
+UnitCount=126
 
 [VersionInfo]
-Major=11
+Major=12
 Minor=0
 Release=0
 Build=0
 LanguageID=4105
 CharsetID=1252
 CompanyName=Illusion Interactive
-FileVersion=11.0.0.0
+FileVersion=12.0.0.0
 FileDescription=Resource Gathering Simulator
 InternalName=Gatherers
-LegalCopyright=(C) Illusion Interactive
+LegalCopyright=(c) Illusion Interactive
 LegalTrademarks=
 OriginalFilename=Gatherers
 ProductName=Gatherers
-ProductVersion=11.0.0.0
+ProductVersion=12.0.0.0
 AutoIncBuildNr=0
 SyncProduct=1
 
@@ -267,7 +267,7 @@ BuildCmd=
 
 [Unit23]
 FileName=..\.vscode\Ubuntu\i686\launch.json
-Folder=Others/Ubuntu/i686
+Folder=Others/.vscode/Ubuntu/i686
 Compile=0
 Link=0
 Priority=1000
@@ -276,7 +276,7 @@ BuildCmd=
 
 [Unit24]
 FileName=..\.vscode\Ubuntu\i686\tasks.json
-Folder=Others/Ubuntu/i686
+Folder=Others/.vscode/Ubuntu/i686
 Compile=0
 Link=0
 Priority=1000
@@ -285,7 +285,7 @@ BuildCmd=
 
 [Unit25]
 FileName=..\.vscode\Ubuntu\x64\launch.json
-Folder=Others/Ubuntu/x64
+Folder=Others/.vscode/Ubuntu/x64
 Compile=0
 Link=0
 Priority=1000
@@ -294,7 +294,7 @@ BuildCmd=
 
 [Unit26]
 FileName=..\.vscode\Ubuntu\x64\tasks.json
-Folder=Others/Ubuntu/x64
+Folder=Others/.vscode/Ubuntu/x64
 Compile=0
 Link=0
 Priority=1000
@@ -303,7 +303,7 @@ BuildCmd=
 
 [Unit27]
 FileName=..\.vscode\Windows\x64\launch.json
-Folder=Others/Windows/x64
+Folder=Others/.vscode/Windows/x64
 Compile=0
 Link=0
 Priority=1000
@@ -312,7 +312,7 @@ BuildCmd=
 
 [Unit28]
 FileName=..\.vscode\Windows\x64\tasks.json
-Folder=Others/Windows/x64
+Folder=Others/.vscode/Windows/x64
 Compile=0
 Link=0
 Priority=1000
@@ -1082,6 +1082,130 @@ CompileCpp=0
 Folder=Others/Dev-C++
 Compile=1
 Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit114]
+FileName=..\.gitignore
+Folder=Others
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit115]
+FileName=..\Source\bench.c
+Folder=Source
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+CompileCpp=0
+
+[Unit116]
+FileName=..\Source\engine.c
+CompileCpp=0
+Folder=Source
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit117]
+FileName=..\Visual Studio\Gatherers.sln
+CompileCpp=0
+Folder=Others/Visual Studio
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit118]
+FileName=..\Visual Studio\Gatherers\Gatherers.vcxproj
+Folder=Others/Visual Studio/Gatherers
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit119]
+FileName=..\Visual Studio\Gatherers\Gatherers.vcxproj.filters
+Folder=Others/Visual Studio/Gatherers
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit120]
+FileName=..\Visual Studio\Gatherers\Gatherers.vcxproj.user
+Folder=Others/Visual Studio/Gatherers
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit121]
+FileName=..\.vscode\settings.json
+Folder=Others/.vscode
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit122]
+FileName=..\Source\log.c
+Folder=Source
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+CompileCpp=0
+
+[Unit123]
+FileName=..\Headers\constants.h
+CompileCpp=0
+Folder=Headers
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit124]
+FileName=..\Headers\functions.h
+CompileCpp=0
+Folder=Headers
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit125]
+FileName=..\Headers\types.h
+CompileCpp=0
+Folder=Headers
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit126]
+FileName=..\IDEAS.md
+Folder=Others
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=

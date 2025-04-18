@@ -1,56 +1,56 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  Program Name: Gatherers (C)                                                                                            //
-//  Author: Jeffrey Bednar                                                                                                 //
-//  Copyright: Illusion Interactive, 2011                                                                                  //
+// Program Name: Gatherers (C)                                                                                             //
+// Author: Jeffrey Bednar                                                                                                  //
+// Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef _TIMEBASE_C_
 #define _TIMEBASE_C_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "../Headers/main.h"
+#include "../Headers/types.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl TIMEBASE_Zero(TIMEBASE* p_Timebase) {
-    ZeroMemory(p_Timebase, sizeof(TIMEBASE));
+	ZeroMemory(p_Timebase, sizeof(TIMEBASE));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 TIMEBASE* __cdecl TIMEBASE_Create(float fRate, GLOBALS* p_Globals) {
-    TIMEBASE* p_Timebase = (TIMEBASE*)malloc(sizeof(TIMEBASE));
-    (*p_Globals).iRunningHeap += sizeof(TIMEBASE);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TIMEBASE_Zero(p_Timebase);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    (*p_Timebase).fMSPerFrame = 1.0f / fRate;
-    QueryPerformanceFrequency((LARGE_INTEGER*)&(*p_Timebase).iFreq);
-    QueryPerformanceCounter((LARGE_INTEGER*)&(*p_Timebase).iStartCount);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    return p_Timebase;
+	TIMEBASE* p_Timebase = (TIMEBASE*)malloc(sizeof(TIMEBASE));
+	p_Globals->iRunningHeap += sizeof(TIMEBASE);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	TIMEBASE_Zero(p_Timebase);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Timebase->fMsPerFrame = 1.0f / fRate;
+	QueryPerformanceFrequency((LARGE_INTEGER*)&p_Timebase->iFreq);
+	QueryPerformanceCounter((LARGE_INTEGER*)&p_Timebase->iStartCount);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	return p_Timebase;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UINT8 __cdecl TIMEBASE_Tick(TIMEBASE* p_Timebase) {
-    QueryPerformanceCounter((LARGE_INTEGER*)&(*p_Timebase).iCountNow);
-    (*p_Timebase).fDifference = ((*p_Timebase).iCountNow - (*p_Timebase).iStartCount) / (float)(*p_Timebase).iFreq;
-    if((*p_Timebase).fDifference >= (*p_Timebase).fMSPerFrame) {
-        (*p_Timebase).iStartCount = (*p_Timebase).iCountNow;
-        return 1;
-    }
-    return 0;
+	QueryPerformanceCounter((LARGE_INTEGER*)&p_Timebase->iCountNow);
+	p_Timebase->fDifference = (p_Timebase->iCountNow - p_Timebase->iStartCount) / (float)p_Timebase->iFreq;
+	if (p_Timebase->fDifference >= p_Timebase->fMsPerFrame) {
+		p_Timebase->iStartCount = p_Timebase->iCountNow;
+		return 1;
+	}
+	return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl TIMEBASE_StartTimer(TIMEBASE* p_Timebase) {
-    TIMEBASE_Zero(p_Timebase);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    QueryPerformanceFrequency((LARGE_INTEGER*)&(*p_Timebase).iFreq);
-    QueryPerformanceCounter((LARGE_INTEGER*)&(*p_Timebase).iStartCount);
+	TIMEBASE_Zero(p_Timebase);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	QueryPerformanceFrequency((LARGE_INTEGER*)&p_Timebase->iFreq);
+	QueryPerformanceCounter((LARGE_INTEGER*)&p_Timebase->iStartCount);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float __cdecl TIMEBASE_EndTimer(TIMEBASE* p_Timebase) {
-    QueryPerformanceCounter((LARGE_INTEGER*)&(*p_Timebase).iCountNow);
-    (*p_Timebase).fDifference = ((*p_Timebase).iCountNow - (*p_Timebase).iStartCount) / (float)(*p_Timebase).iFreq;
-    return (*p_Timebase).fDifference;
+	QueryPerformanceCounter((LARGE_INTEGER*)&p_Timebase->iCountNow);
+	p_Timebase->fDifference = (p_Timebase->iCountNow - p_Timebase->iStartCount) / (float)p_Timebase->iFreq;
+	return p_Timebase->fDifference;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl TIMEBASE_Kill(TIMEBASE* p_Timebase, GLOBALS* p_Globals) {
-    free(p_Timebase);
-    (*p_Globals).iRunningHeap -= sizeof(TIMEBASE);
+	free(p_Timebase);
+	p_Globals->iRunningHeap -= sizeof(TIMEBASE);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif

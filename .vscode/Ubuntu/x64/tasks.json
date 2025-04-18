@@ -5,6 +5,7 @@
             "type": "shell",
             "command": "/usr/bin/x86_64-w64-mingw32-windres",
             "args": [
+                "-DDEBUG",
                 "-J", 
                 "rc",
                 "-O", 
@@ -31,6 +32,7 @@
             "type": "shell",
             "command": "/usr/bin/x86_64-w64-mingw32-windres",
             "args": [
+                "-DRELEASE",
                 "-J", 
                 "rc",
                 "-O", 
@@ -57,12 +59,12 @@
             "label": "Linux x64 - Build Application (Debug).",
             "command": "/usr/bin/x86_64-w64-mingw32-gcc",
             "args": [
+                "-DDEBUG",
                 "-g",
                 "-O0",
                 "-ggdb",
                 "-fno-inline",
                 "-fno-omit-frame-pointer",
-                "-DDEBUG",
                 "-Wall",
                 "-mwindows",
                 "${workspaceRoot}/Source/*.c",
@@ -91,6 +93,8 @@
             "label": "Linux x64 - Build Application (Release).",
             "command": "/usr/bin/x86_64-w64-mingw32-gcc",
             "args": [
+                "-DRELEASE",
+                "-DNDEBUG",
                 "-O3",
                 "-march=native",
                 "-flto",
@@ -100,7 +104,6 @@
                 "-ffast-math",
                 "-funroll-all-loops",
                 "-fno-exceptions",
-                "-DNDEBUG",
                 "-Wall",
                 "-mwindows",
                 "${workspaceRoot}/Source/*.c",

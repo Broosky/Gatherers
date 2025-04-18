@@ -6,6 +6,7 @@
             "type": "shell",
             "command": "C:/msys64/mingw64/bin/windres.exe",
             "args": [
+                "-DDEBUG",
                 "-J", 
                 "rc",
                 "-O", 
@@ -32,6 +33,7 @@
             "type": "shell",
             "command": "C:/msys64/mingw64/bin/windres.exe",
             "args": [
+                "-DRELEASE",
                 "-J", 
                 "rc",
                 "-O", 
@@ -58,12 +60,12 @@
             "label": "Windows x64 - Build Application (Debug).",
             "command": "C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe",
             "args": [
+                "-DDEBUG",
                 "-g",
                 "-O0",
                 "-ggdb",
                 "-fno-inline",
                 "-fno-omit-frame-pointer",
-                "-DDEBUG",
                 "-Wall",
                 "-mwindows",
                 "${workspaceRoot}/Source/*.c",
@@ -92,6 +94,8 @@
             "label": "Windows x64 - Build Application (Release).",
             "command": "C:/msys64/mingw64/bin/x86_64-w64-mingw32-gcc.exe",
             "args": [
+                "-DRELEASE",
+                "-DNDEBUG",
                 "-O3",
                 "-march=native",
                 "-flto",
@@ -101,7 +105,6 @@
                 "-ffast-math",
                 "-funroll-all-loops",
                 "-fno-exceptions",
-                "-DNDEBUG",
                 "-Wall",
                 "-mwindows",
                 "${workspaceRoot}/Source/*.c", 

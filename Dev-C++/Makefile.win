@@ -5,14 +5,14 @@ CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
 RES      = ../Resources/main.res
-OBJ      = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/dblbuf.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/images.o ../obj/Release/load.o ../obj/Release/main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/render.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/winproc.o $(RES)
-LINKOBJ  = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/dblbuf.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/images.o ../obj/Release/load.o ../obj/Release/main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/render.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/winproc.o $(RES)
+OBJ      = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/dblbuf.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/images.o ../obj/Release/load.o ../obj/Release/main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/render.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/winproc.o ../obj/Release/engine.o ../obj/Release/bench.o ../obj/Release/log.o $(RES)
+LINKOBJ  = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/dblbuf.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/images.o ../obj/Release/load.o ../obj/Release/main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/render.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/winproc.o ../obj/Release/engine.o ../obj/Release/bench.o ../obj/Release/log.o $(RES)
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -mwindows  "../../../Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32/libgdi32.a" -m32
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
 BIN      = ../bin/Release/Gatherers.exe
 CXXFLAGS = $(CXXINCS) -m32
-CFLAGS   = $(INCS) -m32
+CFLAGS   = $(INCS) -m32 -DRELEASE
 RM       = rm.exe -f
 
 .PHONY: all all-before all-after clean clean-custom
@@ -75,6 +75,15 @@ $(BIN): $(OBJ)
 
 ../obj/Release/winproc.o: ../Source/winproc.c
 	$(CC) -c ../Source/winproc.c -o ../obj/Release/winproc.o $(CFLAGS)
+	
+../obj/Release/engine.o: ../Source/engine.c
+	$(CC) -c ../Source/engine.c -o ../obj/Release/engine.o $(CFLAGS)
+	
+../obj/Release/bench.o: ../Source/bench.c
+	$(CC) -c ../Source/bench.c -o ../obj/Release/bench.o $(CFLAGS)
+	
+../obj/Release/log.o: ../Source/log.c
+	$(CC) -c ../Source/log.c -o ../obj/Release/log.o $(CFLAGS)
 
 ../Resources/main.res: ../Resources/main.rc 
 	$(WINDRES) -i ../Resources/main.rc  -F pe-i386 --input-format=rc -o ../Resources/main.res -O coff

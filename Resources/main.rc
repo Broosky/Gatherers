@@ -1,12 +1,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  Program Name: Gatherers (C)                                                                                            //
-//  Author: Jeffrey Bednar                                                                                                 //
-//  Copyright: Illusion Interactive, 2011                                                                                  //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Program Name: Gatherers (C)                                                                                             //
+// Author: Jeffrey Bednar                                                                                                  //
+// Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifndef _MAIN_RC_
 #define _MAIN_RC_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "../Headers/constants.h"
 #include "../Headers/main.h"
+#include <windows.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ICO_MAIN ICON "II.ico"
 IMG_MAIN BITMAP "../Images/II/Illusion Interactive.bmp"
@@ -17,14 +19,14 @@ FONT 8, "MS Sans Serif"
 STYLE 0x90800800
 EXSTYLE 0x00000000 {
     CONTROL "#200", DLG_LOAD_IMG, "Static", 0x5000020e, 0, 0, 478, 157, 0x00000000
-	CONTROL "", DLG_LOAD_STATUS, "Static", 0x50000000, 4, 145, 470, 9, 0x00000000
+    CONTROL "", DLG_LOAD_STATUS, "Static", 0x50000000, 4, 145, 470, 9, 0x00000000
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://learn.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 11,0,0,0
-PRODUCTVERSION 11,0,0,0
+FILEVERSION 12, 0, 0, 0
+PRODUCTVERSION 12, 0, 0, 0
 FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
 FILEOS VOS_NT_WINDOWS32
 FILETYPE VFT_APP
@@ -36,14 +38,14 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Illusion Interactive"
             VALUE "FileDescription", "Resource Gathering Simulator"
-            VALUE "FileVersion", "11.0.0.0"
+            VALUE "FileVersion", "12.0.0.0"
             VALUE "InternalName", "Gatherers"
-            VALUE "LegalCopyright", "(C) Illusion Interactive"
+            VALUE "LegalCopyright", "(c) Illusion Interactive"
             VALUE "OriginalFilename", "Gatherers"
             VALUE "ProductName", "Gatherers"
-            VALUE "ProductVersion", "11.0.0.0"
+            VALUE "ProductVersion", "12.0.0.0"
         END
-    END
+    END 
     BLOCK "VarFileInfo"
     BEGIN
         VALUE "Translation", 0x409, 1252
@@ -84,7 +86,7 @@ MAIN_MENU MENU {
     POPUP "&Options" {
         MENUITEM "Draw With &Transparency", MENU_OPTIONS_MASKING
         MENUITEM SEPARATOR
-        POPUP "Draw Diagno&stics"
+        POPUP "Draw Diagno&stics..."
         BEGIN
             MENUITEM "Draw All Tog&gle", MENU_OPTIONS_ALL_DIAGNOSTICS
             MENUITEM "Draw &ID's", MENU_OPTIONS_IDS
@@ -95,9 +97,15 @@ MAIN_MENU MENU {
             MENUITEM "Dra&w Major Vectors", MENU_OPTIONS_SHOW_MAJOR
         END
         MENUITEM SEPARATOR
+        POPUP "&Pathfinding..."
+        BEGIN
+            MENUITEM "&Raycast", MENU_OPTIONS_PATH_RAYCAST
+            MENUITEM "&Bisection", MENU_OPTIONS_PATH_BISECTION
+        END
+        MENUITEM SEPARATOR
         MENUITEM "Enable Tra&nslations", MENU_OPTIONS_ENABLE_TRANSLATIONS
         MENUITEM SEPARATOR
-        MENUITEM "T&opmost", MENU_OPTIONS_TOPMOST
+        MENUITEM "Pin As T&opmost", MENU_OPTIONS_TOPMOST
         MENUITEM "&Fullscreen", MENU_OPTIONS_FULLSCREEN
     }
     POPUP "&Clear" {
@@ -108,11 +116,14 @@ MAIN_MENU MENU {
         MENUITEM "Total &Resource Count", MENU_CLEAR_ALL_COUNT
     }
     POPUP "&Sort" {
-        MENUITEM "&Workers to Front", MENU_SORT_WORKERS
-        MENUITEM "&Command Centers to Front", MENU_SORT_COMMANDS
-        MENUITEM "&Mineral Fields to Front", MENU_SORT_MINERALS
-        MENUITEM "&Supply Depots to Front", MENU_SORT_SUPPLY
-        MENUITEM "&Refineries to Front", MENU_SORT_REFINERIES
+        POPUP "&Entities..."
+        BEGIN
+            MENUITEM "&Workers to Front", MENU_SORT_WORKERS
+            MENUITEM "&Command Centers to Front", MENU_SORT_COMMANDS
+            MENUITEM "&Mineral Fields to Front", MENU_SORT_MINERALS
+            MENUITEM "&Supply Depots to Front", MENU_SORT_SUPPLY
+            MENUITEM "&Refineries to Front", MENU_SORT_REFINERIES
+        END
         MENUITEM SEPARATOR
         MENUITEM "&Obstacles to Front", MENU_SORT_OBSTACLES
     }
