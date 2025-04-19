@@ -1,46 +1,80 @@
-# Gatherers
+﻿# 🛠️ **Gatherers**
 
-This is a continuation of the Gatherers-Historic repo that I will contribute to when I have some free time. See https://github.com/Broosky/Gatherers-Historic for more info.
+A continuation of the [Gatherers-Historic](https://github.com/Broosky/Gatherers-Historic) StarCraft-style simulation.  
+Active development continues here when time allows — see the historic repo for early progress and design context.
 
-## April 2025 Changes:
+---
 
-- At long last, update pointer deref style.
-- Arrow keys adjust translations.
-- Uptime.
-- Combine engine consideration in Win32 message loop.
-- Crop images for DC blit operations.
-- Build mode + date & time.
-- Updates to toolchain.
-- Benchmarking capture rough-in.
-- Logging system.
-- Add Visual Studio Community 2022 solution, project, compiler directives, and code formatting.
-- Debug and release flags for MSVC.
-- Partial `#include` dependency graph organization.
-- Menu shuffling.
-- Local function type review.
+## 💡 Ideas & Upcoming Changes
 
-## March 2025 Changes:
+- Optimize pathfinding...
+  - Selectable pathfinding mode: raycast, bisection...
+  - Memoize pathfinding points.
+  - For main pathfinding points, curve the transitions such that the movement is not jagged.
+- Move entity resource diagnostic rendering out of entity rendering logic.
+- Draw scaled down versions of entities in the minimap instead of coloured blocks.
+- Engine:
+  - Homebrew renderer (DIBSECTION)...
+  - Selectable renderer: GDI32/SDL/Direct2D...
+  - Networking...
+  - Sound...
+- Mouse wheel zoom in or out.
+- Change constant `#define`s types.
+- Load settings from file/hot reload.
+- Replace classic `char` buffer copying with modern safer alternatives.
+- Fail fast on bad `malloc`s.
+- When building, if the entity extends past the client area, disallow it.
+- All functions to reference passed pointers & variables instead of global declarations/externs (where applicable).
+- Double check and update `const` parameters.
+- New assets...
+- `#include` dependency graph organization.
+- Use stack allocations instead of repetitive pointer dereferences.
+- Add forward declaration for internally referenced structs (e.g. `struct ENTITY* p_Next`, `p_Operating`).
+- Crossplatform support: Refactor IO, clock, etc...
 
-- Write current working directory.
-- Added prefixes for diagnostics.
-- New diagnostics: selected entities, selected workers, selection area location and size.
-- Improved double buffer canvas stability on resize.
-- Bumped some initial values to get building faster.
-- Rearranged and renamed some menu items.
-- Added a diagnostics toggle-all in the menu.
-- Changed some diagnostic colours.
-- Added ID's to entities.
-- Minimap now shows selection area.
-- Minimap allows left clicking to translate the main view.
-- Minimap highlights selected entities.
-- Added worker scattering when commanding to harvest. AI will find the nearest resources to the one selected to harvest for multiple selected workers.
-- Reorganized file structure.
-- Added Code::Blocks project file.
-- Added some assembly info.
-- Updated toolchain for Windows and Linux.
-- Added .gitignore.
-- Adjust typedef's.
-- Review code and comments.
-- Distance calc's.
-- Added Dev-C++ project file and toolchain.
-  - Note, Dev-C++ will generate *_private.h and *_private.rc files which, AFAIK, can't be turned off even when the project file option for assembly information is disabled. For completeness, I've aligned them with whatever is in the main.rc.
+---
+
+## 🔄 April 2025 Updates
+
+- Updated pointer dereference style.
+- Arrow keys now adjust view translation.
+- Added uptime tracking.
+- Combined engine logic into Win32 message loop.
+- Cropped images for DC blit ops.
+- Added build mode, date & time stamping.
+- Toolchain updates.
+- Began benchmarking capture system.
+- Introduced a logging system.
+- Added Visual Studio 2022 solution/project setup and formatting rules.
+- Configured debug/release flags for MSVC.
+- Partial organization of `#include` dependency graph.
+- Menu structure refinements.
+- Reviewed local function types.
+
+---
+
+## 📦 March 2025 Updates
+
+- Output current working directory.
+- Prefixed diagnostics for clarity.
+- New diagnostics: selected entities, selection box dimensions, selected workers.
+- Improved double-buffer canvas stability on resize.
+- Tweaked initial conditions for quicker building.
+- Renamed and rearranged menu items.
+- Added a diagnostics toggle-all option.
+- Diagnostic colour updates.
+- Assigned IDs to entities.
+- Minimap:
+  - Displays selection area.
+  - Allows left-click translation of main view.
+  - Highlights selected entities.
+- Worker AI:
+  - Scatters to nearest resources when multiple are selected.
+- File structure reorganization.
+- Added project files for:
+  - Code::Blocks
+  - Dev-C++
+- Updated Windows/Linux toolchain support.
+- Reviewed and updated typedefs, code, and comments.
+- General code review and distance calculations.
+- Note: Dev-C++ generates `_private.h`/`.rc` files by default — aligned these with `main.rc` where applicable.
