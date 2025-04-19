@@ -11,20 +11,20 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #define STRICT
-#define _WIN32_WINNT 0x0600	// Vista and later (GetTickCount64).
-#define WINUSERAPI 			// Only UI related API.
-#define NOSERVICE			// No service control manager.
-#define NOMCX				// No media center extensions.
-#define NOIME				// No IME support.
-#define NOCRYPT				// No cryptography support.
-#define NOOPENFILE			// No open file support.
-#define NOHELP				// No help support.
+#define _WIN32_WINNT 0x0600 // Vista and later (GetTickCount64).
+#define WINUSERAPI          // Only UI related API.
+#define NOSERVICE           // No service control manager.
+#define NOMCX               // No media center extensions.
+#define NOIME               // No IME support.
+#define NOCRYPT             // No cryptography support.
+#define NOOPENFILE          // No open file support.
+#define NOHELP              // No help support.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// For MSVC compiler specific annotations (/analyze). Introduced with Visual Studio having much more extensive code analysis 
+// For MSVC compiler specific annotations (/analyze). Introduced with Visual Studio having much more extensive code analysis
 // versus the much older original tooling.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define _CRT_NONSTDC_NO_DEPRECATE
-#define _CRT_SECURE_NO_WARNINGS		// stdio.h: Disable warnings for unsafe CSL runtime functions.
+#define _CRT_SECURE_NO_WARNINGS // stdio.h: Disable warnings for unsafe CSL runtime functions.
 #define SAL_NO_ATTRIBUTE 1
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // App will use floating point where applicable, with precision truncated when calling library functions which is intentional.

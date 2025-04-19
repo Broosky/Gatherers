@@ -20,70 +20,70 @@ RM       = rm.exe -f
 all: all-before $(BIN) all-after
 
 clean: clean-custom
-	${RM} $(OBJ) $(BIN)
+    ${RM} $(OBJ) $(BIN)
 
 $(BIN): $(OBJ)
-	$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)
+    $(CC) $(LINKOBJ) -o $(BIN) $(LIBS)
 
 ../obj/Release/ai.o: ../Source/ai.c
-	$(CC) -c ../Source/ai.c -o ../obj/Release/ai.o $(CFLAGS)
+    $(CC) -c ../Source/ai.c -o ../obj/Release/ai.o $(CFLAGS)
 
 ../obj/Release/card.o: ../Source/card.c
-	$(CC) -c ../Source/card.c -o ../obj/Release/card.o $(CFLAGS)
+    $(CC) -c ../Source/card.c -o ../obj/Release/card.o $(CFLAGS)
 
 ../obj/Release/dblbuf.o: ../Source/dblbuf.c
-	$(CC) -c ../Source/dblbuf.c -o ../obj/Release/dblbuf.o $(CFLAGS)
+    $(CC) -c ../Source/dblbuf.c -o ../obj/Release/dblbuf.o $(CFLAGS)
 
 ../obj/Release/entity.o: ../Source/entity.c
-	$(CC) -c ../Source/entity.c -o ../obj/Release/entity.o $(CFLAGS)
+    $(CC) -c ../Source/entity.c -o ../obj/Release/entity.o $(CFLAGS)
 
 ../obj/Release/globals.o: ../Source/globals.c
-	$(CC) -c ../Source/globals.c -o ../obj/Release/globals.o $(CFLAGS)
+    $(CC) -c ../Source/globals.c -o ../obj/Release/globals.o $(CFLAGS)
 
 ../obj/Release/images.o: ../Source/images.c
-	$(CC) -c ../Source/images.c -o ../obj/Release/images.o $(CFLAGS)
+    $(CC) -c ../Source/images.c -o ../obj/Release/images.o $(CFLAGS)
 
 ../obj/Release/load.o: ../Source/load.c
-	$(CC) -c ../Source/load.c -o ../obj/Release/load.o $(CFLAGS)
+    $(CC) -c ../Source/load.c -o ../obj/Release/load.o $(CFLAGS)
 
 ../obj/Release/main.o: ../Source/main.c
-	$(CC) -c ../Source/main.c -o ../obj/Release/main.o $(CFLAGS)
+    $(CC) -c ../Source/main.c -o ../obj/Release/main.o $(CFLAGS)
 
 ../obj/Release/menu.o: ../Source/menu.c
-	$(CC) -c ../Source/menu.c -o ../obj/Release/menu.o $(CFLAGS)
+    $(CC) -c ../Source/menu.c -o ../obj/Release/menu.o $(CFLAGS)
 
 ../obj/Release/message.o: ../Source/message.c
-	$(CC) -c ../Source/message.c -o ../obj/Release/message.o $(CFLAGS)
+    $(CC) -c ../Source/message.c -o ../obj/Release/message.o $(CFLAGS)
 
 ../obj/Release/misc.o: ../Source/misc.c
-	$(CC) -c ../Source/misc.c -o ../obj/Release/misc.o $(CFLAGS)
+    $(CC) -c ../Source/misc.c -o ../obj/Release/misc.o $(CFLAGS)
 
 ../obj/Release/picture.o: ../Source/picture.c
-	$(CC) -c ../Source/picture.c -o ../obj/Release/picture.o $(CFLAGS)
+    $(CC) -c ../Source/picture.c -o ../obj/Release/picture.o $(CFLAGS)
 
 ../obj/Release/process.o: ../Source/process.c
-	$(CC) -c ../Source/process.c -o ../obj/Release/process.o $(CFLAGS)
+    $(CC) -c ../Source/process.c -o ../obj/Release/process.o $(CFLAGS)
 
 ../obj/Release/render.o: ../Source/render.c
-	$(CC) -c ../Source/render.c -o ../obj/Release/render.o $(CFLAGS)
+    $(CC) -c ../Source/render.c -o ../obj/Release/render.o $(CFLAGS)
 
 ../obj/Release/settings.o: ../Source/settings.c
-	$(CC) -c ../Source/settings.c -o ../obj/Release/settings.o $(CFLAGS)
+    $(CC) -c ../Source/settings.c -o ../obj/Release/settings.o $(CFLAGS)
 
 ../obj/Release/timebase.o: ../Source/timebase.c
-	$(CC) -c ../Source/timebase.c -o ../obj/Release/timebase.o $(CFLAGS)
+    $(CC) -c ../Source/timebase.c -o ../obj/Release/timebase.o $(CFLAGS)
 
 ../obj/Release/winproc.o: ../Source/winproc.c
-	$(CC) -c ../Source/winproc.c -o ../obj/Release/winproc.o $(CFLAGS)
-	
+    $(CC) -c ../Source/winproc.c -o ../obj/Release/winproc.o $(CFLAGS)
+    
 ../obj/Release/engine.o: ../Source/engine.c
-	$(CC) -c ../Source/engine.c -o ../obj/Release/engine.o $(CFLAGS)
-	
+    $(CC) -c ../Source/engine.c -o ../obj/Release/engine.o $(CFLAGS)
+    
 ../obj/Release/bench.o: ../Source/bench.c
-	$(CC) -c ../Source/bench.c -o ../obj/Release/bench.o $(CFLAGS)
-	
+    $(CC) -c ../Source/bench.c -o ../obj/Release/bench.o $(CFLAGS)
+    
 ../obj/Release/log.o: ../Source/log.c
-	$(CC) -c ../Source/log.c -o ../obj/Release/log.o $(CFLAGS)
+    $(CC) -c ../Source/log.c -o ../obj/Release/log.o $(CFLAGS)
 
 ../Resources/main.res: ../Resources/main.rc 
-	$(WINDRES) -i ../Resources/main.rc  -F pe-i386 --input-format=rc -o ../Resources/main.res -O coff
+    $(WINDRES) -i ../Resources/main.rc  -F pe-i386 --input-format=rc -o ../Resources/main.res -O coff

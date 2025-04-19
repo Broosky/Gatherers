@@ -19,7 +19,7 @@ FONT 8, "MS Sans Serif"
 STYLE 0x90800800
 EXSTYLE 0x00000000 {
     CONTROL "#200", DLG_LOAD_IMG, "Static", 0x5000020e, 0, 0, 478, 157, 0x00000000
-    CONTROL "", DLG_LOAD_STATUS, "Static", 0x50000000, 4, 145, 470, 9, 0x00000000
+        CONTROL "", DLG_LOAD_STATUS, "Static", 0x50000000, 4, 145, 470, 9, 0x00000000
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://learn.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource
@@ -45,7 +45,7 @@ BEGIN
             VALUE "ProductName", "Gatherers"
             VALUE "ProductVersion", "12.0.0.0"
         END
-    END 
+    END
     BLOCK "VarFileInfo"
     BEGIN
         VALUE "Translation", 0x409, 1252

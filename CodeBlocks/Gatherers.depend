@@ -1,62 +1,61 @@
 # depslib dependency file v1.0
 1742457758 source:c:\broosky\gatherers\source\ai.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742702359 c:\broosky\gatherers\headers\main.h
-	<windows.h>
-	<commctrl.h>
-	<math.h>
-	<stdio.h>
-	<malloc.h>
+    <windows.h>
+    <commctrl.h>
+    <math.h>
+    <stdio.h>
+    <malloc.h>
 
 1742457758 source:c:\broosky\gatherers\source\card.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\dblbuf.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\entity.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\globals.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742473819 source:c:\broosky\gatherers\source\images.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\load.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\main.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\menu.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\message.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\misc.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\picture.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742702777 source:c:\broosky\gatherers\source\process.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\render.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\settings.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742457758 source:c:\broosky\gatherers\source\timebase.c
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742702366 source:c:\broosky\gatherers\resources\main.rc
-	"../Headers/main.h"
+    "../Headers/main.h"
 
 1742703142 source:c:\broosky\gatherers\source\winproc.c
-	"../Headers/main.h"
-
+    "../Headers/main.h"

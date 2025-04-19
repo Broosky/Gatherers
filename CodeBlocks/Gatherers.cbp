@@ -1,213 +1,213 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_project_file>
-	<FileVersion major="1" minor="6" />
-	<Project>
-		<Option title="Gatherers" />
-		<Option pch_mode="2" />
-		<Option compiler="gcc" />
-		<Build>
-			<Target title="Debug">
-				<Option output="../bin/Debug/Gatherers" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../bin/Debug/" />
-				<Option object_output="../obj/Debug/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
-				<Compiler>
-					<Add option="-g" />
-					<Add option="-DDEBUG" />
-				</Compiler>
-			</Target>
-			<Target title="Release">
-				<Option output="../bin/Release/Gatherers" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../bin/Release/" />
-				<Option object_output="../obj/Release/" />
-				<Option type="0" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-DRELEASE" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
-			</Target>
-		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-		</Compiler>
-		<Unit filename="../.gitignore" />
-		<Unit filename="../.vscode/Ubuntu/i686/launch.json" />
-		<Unit filename="../.vscode/Ubuntu/i686/tasks.json" />
-		<Unit filename="../.vscode/Ubuntu/x64/launch.json" />
-		<Unit filename="../.vscode/Ubuntu/x64/tasks.json" />
-		<Unit filename="../.vscode/Windows/x64/launch.json" />
-		<Unit filename="../.vscode/Windows/x64/tasks.json" />
-		<Unit filename="../.vscode/c_cpp_properties.json" />
-		<Unit filename="../.vscode/launch.json" />
-		<Unit filename="../.vscode/settings.json" />
-		<Unit filename="../.vscode/tasks.json" />
-		<Unit filename="../Dev-C++/Gatherers.dev" />
-		<Unit filename="../Dev-C++/Gatherers.layout" />
-		<Unit filename="../Dev-C++/Gatherers_private.h" />
-		<Unit filename="../Dev-C++/Gatherers_private.rc">
-			<Option compilerVar="WINDRES" />
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="../Dev-C++/Makefile.win" />
-		<Unit filename="../Headers/constants.h" />
-		<Unit filename="../Headers/functions.h" />
-		<Unit filename="../Headers/main.h" />
-		<Unit filename="../Headers/types.h" />
-		<Unit filename="../IDEAS.md" />
-		<Unit filename="../Images/BL/BB0.bmp" />
-		<Unit filename="../Images/BL/BB1.bmp" />
-		<Unit filename="../Images/BL/BG0.bmp" />
-		<Unit filename="../Images/BL/BO0.bmp" />
-		<Unit filename="../Images/BL/BP0.bmp" />
-		<Unit filename="../Images/BL/BP1.bmp" />
-		<Unit filename="../Images/BL/BR0.bmp" />
-		<Unit filename="../Images/BL/BW0.bmp" />
-		<Unit filename="../Images/BL/BY0.bmp" />
-		<Unit filename="../Images/BL/B_M.bmp" />
-		<Unit filename="../Images/CA/CA0.bmp" />
-		<Unit filename="../Images/CA/CA1.bmp" />
-		<Unit filename="../Images/CA/CA2.bmp" />
-		<Unit filename="../Images/CA/CA3.bmp" />
-		<Unit filename="../Images/CA/CC0.bmp" />
-		<Unit filename="../Images/CA/MO0.bmp" />
-		<Unit filename="../Images/CA/ST0.bmp" />
-		<Unit filename="../Images/CA/Thumbs.db" />
-		<Unit filename="../Images/CA/WO0.bmp" />
-		<Unit filename="../Images/CC/CC0.bmp" />
-		<Unit filename="../Images/CC/CC0_M.bmp" />
-		<Unit filename="../Images/CC/CC1.bmp" />
-		<Unit filename="../Images/CC/CC10.bmp" />
-		<Unit filename="../Images/CC/CC11.bmp" />
-		<Unit filename="../Images/CC/CC12.bmp" />
-		<Unit filename="../Images/CC/CC13.bmp" />
-		<Unit filename="../Images/CC/CC14.bmp" />
-		<Unit filename="../Images/CC/CC15.bmp" />
-		<Unit filename="../Images/CC/CC16.bmp" />
-		<Unit filename="../Images/CC/CC17.bmp" />
-		<Unit filename="../Images/CC/CC18.bmp" />
-		<Unit filename="../Images/CC/CC19.bmp" />
-		<Unit filename="../Images/CC/CC2.bmp" />
-		<Unit filename="../Images/CC/CC20.bmp" />
-		<Unit filename="../Images/CC/CC21.bmp" />
-		<Unit filename="../Images/CC/CC22.bmp" />
-		<Unit filename="../Images/CC/CC23.bmp" />
-		<Unit filename="../Images/CC/CC24.bmp" />
-		<Unit filename="../Images/CC/CC25.bmp" />
-		<Unit filename="../Images/CC/CC3.bmp" />
-		<Unit filename="../Images/CC/CC4.bmp" />
-		<Unit filename="../Images/CC/CC5.bmp" />
-		<Unit filename="../Images/CC/CC6.bmp" />
-		<Unit filename="../Images/CC/CC7.bmp" />
-		<Unit filename="../Images/CC/CC8.bmp" />
-		<Unit filename="../Images/CC/CC9.bmp" />
-		<Unit filename="../Images/GA/GA0.bmp" />
-		<Unit filename="../Images/HU/DI0.bmp" />
-		<Unit filename="../Images/HU/HU0.bmp" />
-		<Unit filename="../Images/HU/HU0_M.bmp" />
-		<Unit filename="../Images/HU/HU1.bmp" />
-		<Unit filename="../Images/MF/MF0.bmp" />
-		<Unit filename="../Images/MF/MF0_M.bmp" />
-		<Unit filename="../Images/MF/MF1.bmp" />
-		<Unit filename="../Images/MF/MF1_M.bmp" />
-		<Unit filename="../Images/MF/MF2.bmp" />
-		<Unit filename="../Images/MF/MF2_M.bmp" />
-		<Unit filename="../Images/MF/MF3.bmp" />
-		<Unit filename="../Images/MF/MF3_M.bmp" />
-		<Unit filename="../Images/MF/MF4.bmp" />
-		<Unit filename="../Images/MF/MF4_M.bmp" />
-		<Unit filename="../Images/MI/MI0.bmp" />
-		<Unit filename="../Images/RE/RE0.bmp" />
-		<Unit filename="../Images/RE/RE0_M.bmp" />
-		<Unit filename="../Images/SU/SU0.bmp" />
-		<Unit filename="../Images/SU/SU0_M.bmp" />
-		<Unit filename="../Images/SU/SU1.bmp" />
-		<Unit filename="../Images/SU/SU2.bmp" />
-		<Unit filename="../Images/SU/SU3.bmp" />
-		<Unit filename="../Images/SU/SU4.bmp" />
-		<Unit filename="../Images/SU/SU5.bmp" />
-		<Unit filename="../Images/TE/TE0.bmp" />
-		<Unit filename="../Images/WO/WO0.bmp" />
-		<Unit filename="../Images/WO/WO0_M.bmp" />
-		<Unit filename="../Images/WO/WO1.bmp" />
-		<Unit filename="../Images/WO/WO2.bmp" />
-		<Unit filename="../README.md" />
-		<Unit filename="../Resources/II.ico" />
-		<Unit filename="../Resources/main.rc">
-			<Option compilerVar="WINDRES" />
-		</Unit>
-		<Unit filename="../Source/ai.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/bench.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/card.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/dblbuf.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/engine.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/entity.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/globals.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/images.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/load.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/log.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/menu.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/message.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/misc.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/picture.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/process.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/render.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/settings.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/timebase.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/winproc.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Visual Studio/Gatherers.sln" />
-		<Unit filename="../Visual Studio/Gatherers/Gatherers.vcxproj" />
-		<Unit filename="../Visual Studio/Gatherers/Gatherers.vcxproj.filters" />
-		<Unit filename="../Visual Studio/Gatherers/Gatherers.vcxproj.user" />
-		<Unit filename="Gatherers.cbp" />
-		<Unit filename="Gatherers.depend" />
-		<Unit filename="Gatherers.layout" />
-		<Extensions />
-	</Project>
+    <FileVersion major="1" minor="6" />
+    <Project>
+        <Option title="Gatherers" />
+        <Option pch_mode="2" />
+        <Option compiler="gcc" />
+        <Build>
+            <Target title="Debug">
+                <Option output="../bin/Debug/Gatherers" prefix_auto="1" extension_auto="1" />
+                <Option working_dir="../bin/Debug/" />
+                <Option object_output="../obj/Debug/" />
+                <Option type="1" />
+                <Option compiler="gcc" />
+                <Option use_console_runner="0" />
+                <Compiler>
+                    <Add option="-g" />
+                    <Add option="-DDEBUG" />
+                </Compiler>
+            </Target>
+            <Target title="Release">
+                <Option output="../bin/Release/Gatherers" prefix_auto="1" extension_auto="1" />
+                <Option working_dir="../bin/Release/" />
+                <Option object_output="../obj/Release/" />
+                <Option type="0" />
+                <Option compiler="gcc" />
+                <Compiler>
+                    <Add option="-O2" />
+                    <Add option="-DRELEASE" />
+                </Compiler>
+                <Linker>
+                    <Add option="-s" />
+                </Linker>
+            </Target>
+        </Build>
+        <Compiler>
+            <Add option="-Wall" />
+        </Compiler>
+        <Unit filename="../.gitignore" />
+        <Unit filename="../.vscode/Ubuntu/i686/launch.json" />
+        <Unit filename="../.vscode/Ubuntu/i686/tasks.json" />
+        <Unit filename="../.vscode/Ubuntu/x64/launch.json" />
+        <Unit filename="../.vscode/Ubuntu/x64/tasks.json" />
+        <Unit filename="../.vscode/Windows/x64/launch.json" />
+        <Unit filename="../.vscode/Windows/x64/tasks.json" />
+        <Unit filename="../.vscode/c_cpp_properties.json" />
+        <Unit filename="../.vscode/launch.json" />
+        <Unit filename="../.vscode/settings.json" />
+        <Unit filename="../.vscode/tasks.json" />
+        <Unit filename="../Dev-C++/Gatherers.dev" />
+        <Unit filename="../Dev-C++/Gatherers.layout" />
+        <Unit filename="../Dev-C++/Gatherers_private.h" />
+        <Unit filename="../Dev-C++/Gatherers_private.rc">
+            <Option compilerVar="WINDRES" />
+            <Option target="&lt;{~None~}&gt;" />
+        </Unit>
+        <Unit filename="../Dev-C++/Makefile.win" />
+        <Unit filename="../Headers/constants.h" />
+        <Unit filename="../Headers/functions.h" />
+        <Unit filename="../Headers/main.h" />
+        <Unit filename="../Headers/types.h" />
+        <Unit filename="../IDEAS.md" />
+        <Unit filename="../Images/BL/BB0.bmp" />
+        <Unit filename="../Images/BL/BB1.bmp" />
+        <Unit filename="../Images/BL/BG0.bmp" />
+        <Unit filename="../Images/BL/BO0.bmp" />
+        <Unit filename="../Images/BL/BP0.bmp" />
+        <Unit filename="../Images/BL/BP1.bmp" />
+        <Unit filename="../Images/BL/BR0.bmp" />
+        <Unit filename="../Images/BL/BW0.bmp" />
+        <Unit filename="../Images/BL/BY0.bmp" />
+        <Unit filename="../Images/BL/B_M.bmp" />
+        <Unit filename="../Images/CA/CA0.bmp" />
+        <Unit filename="../Images/CA/CA1.bmp" />
+        <Unit filename="../Images/CA/CA2.bmp" />
+        <Unit filename="../Images/CA/CA3.bmp" />
+        <Unit filename="../Images/CA/CC0.bmp" />
+        <Unit filename="../Images/CA/MO0.bmp" />
+        <Unit filename="../Images/CA/ST0.bmp" />
+        <Unit filename="../Images/CA/Thumbs.db" />
+        <Unit filename="../Images/CA/WO0.bmp" />
+        <Unit filename="../Images/CC/CC0.bmp" />
+        <Unit filename="../Images/CC/CC0_M.bmp" />
+        <Unit filename="../Images/CC/CC1.bmp" />
+        <Unit filename="../Images/CC/CC10.bmp" />
+        <Unit filename="../Images/CC/CC11.bmp" />
+        <Unit filename="../Images/CC/CC12.bmp" />
+        <Unit filename="../Images/CC/CC13.bmp" />
+        <Unit filename="../Images/CC/CC14.bmp" />
+        <Unit filename="../Images/CC/CC15.bmp" />
+        <Unit filename="../Images/CC/CC16.bmp" />
+        <Unit filename="../Images/CC/CC17.bmp" />
+        <Unit filename="../Images/CC/CC18.bmp" />
+        <Unit filename="../Images/CC/CC19.bmp" />
+        <Unit filename="../Images/CC/CC2.bmp" />
+        <Unit filename="../Images/CC/CC20.bmp" />
+        <Unit filename="../Images/CC/CC21.bmp" />
+        <Unit filename="../Images/CC/CC22.bmp" />
+        <Unit filename="../Images/CC/CC23.bmp" />
+        <Unit filename="../Images/CC/CC24.bmp" />
+        <Unit filename="../Images/CC/CC25.bmp" />
+        <Unit filename="../Images/CC/CC3.bmp" />
+        <Unit filename="../Images/CC/CC4.bmp" />
+        <Unit filename="../Images/CC/CC5.bmp" />
+        <Unit filename="../Images/CC/CC6.bmp" />
+        <Unit filename="../Images/CC/CC7.bmp" />
+        <Unit filename="../Images/CC/CC8.bmp" />
+        <Unit filename="../Images/CC/CC9.bmp" />
+        <Unit filename="../Images/GA/GA0.bmp" />
+        <Unit filename="../Images/HU/DI0.bmp" />
+        <Unit filename="../Images/HU/HU0.bmp" />
+        <Unit filename="../Images/HU/HU0_M.bmp" />
+        <Unit filename="../Images/HU/HU1.bmp" />
+        <Unit filename="../Images/MF/MF0.bmp" />
+        <Unit filename="../Images/MF/MF0_M.bmp" />
+        <Unit filename="../Images/MF/MF1.bmp" />
+        <Unit filename="../Images/MF/MF1_M.bmp" />
+        <Unit filename="../Images/MF/MF2.bmp" />
+        <Unit filename="../Images/MF/MF2_M.bmp" />
+        <Unit filename="../Images/MF/MF3.bmp" />
+        <Unit filename="../Images/MF/MF3_M.bmp" />
+        <Unit filename="../Images/MF/MF4.bmp" />
+        <Unit filename="../Images/MF/MF4_M.bmp" />
+        <Unit filename="../Images/MI/MI0.bmp" />
+        <Unit filename="../Images/RE/RE0.bmp" />
+        <Unit filename="../Images/RE/RE0_M.bmp" />
+        <Unit filename="../Images/SU/SU0.bmp" />
+        <Unit filename="../Images/SU/SU0_M.bmp" />
+        <Unit filename="../Images/SU/SU1.bmp" />
+        <Unit filename="../Images/SU/SU2.bmp" />
+        <Unit filename="../Images/SU/SU3.bmp" />
+        <Unit filename="../Images/SU/SU4.bmp" />
+        <Unit filename="../Images/SU/SU5.bmp" />
+        <Unit filename="../Images/TE/TE0.bmp" />
+        <Unit filename="../Images/WO/WO0.bmp" />
+        <Unit filename="../Images/WO/WO0_M.bmp" />
+        <Unit filename="../Images/WO/WO1.bmp" />
+        <Unit filename="../Images/WO/WO2.bmp" />
+        <Unit filename="../README.md" />
+        <Unit filename="../Resources/II.ico" />
+        <Unit filename="../Resources/main.rc">
+            <Option compilerVar="WINDRES" />
+        </Unit>
+        <Unit filename="../Source/ai.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/bench.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/card.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/dblbuf.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/engine.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/entity.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/globals.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/images.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/load.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/log.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/main.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/menu.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/message.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/misc.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/picture.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/process.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/render.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/settings.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/timebase.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Source/winproc.c">
+            <Option compilerVar="CC" />
+        </Unit>
+        <Unit filename="../Visual Studio/Gatherers.sln" />
+        <Unit filename="../Visual Studio/Gatherers/Gatherers.vcxproj" />
+        <Unit filename="../Visual Studio/Gatherers/Gatherers.vcxproj.filters" />
+        <Unit filename="../Visual Studio/Gatherers/Gatherers.vcxproj.user" />
+        <Unit filename="Gatherers.cbp" />
+        <Unit filename="Gatherers.depend" />
+        <Unit filename="Gatherers.layout" />
+        <Extensions />
+    </Project>
 </CodeBlocks_project_file>

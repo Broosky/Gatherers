@@ -12,25 +12,25 @@
 // Main engine processing. All operations are centralized in this one, timed, function.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ENGINE_ProcessScene(DBLBUF* p_DblBuf, GLOBALS* p_Globals, IMAGES* p_Images, CARD* p_Card, MENU* p_Menu) {
-	TIMEBASE* p_Timer = TIMEBASE_Create(0.0f, p_Globals);
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	PROC_CaptureAndApplyTranslations(p_DblBuf, p_Globals, p_Images, p_Menu);
-	PROC_DrawBackground(p_DblBuf, p_Globals, p_Images);
-	PROC_UpdateAnimations(p_Globals);
-	PROC_ProcessEntities(p_DblBuf, p_Globals, p_Images, p_Menu);
-	PROC_DrawSelectionArea(p_DblBuf, p_Globals, RGB(0, 255, 0));
-	PROC_DrawBuildType(p_DblBuf, p_Globals, p_Images, p_Menu);
-	PROC_ProcessMessages(p_DblBuf, p_Globals, p_Images, p_Menu);
-	CARD_EvaluateSelected(p_Card, p_Globals, p_Images);
-	PROC_HandleHud(p_DblBuf, p_Globals, p_Images, p_Card, p_Menu);
-	PROC_DrawDiagnostics(p_DblBuf, p_Globals, p_Images, p_Menu);
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	DBLBUF_Flip(p_DblBuf);
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	p_Globals->fEngineTime = TIMEBASE_EndTimer(p_Timer);
-	p_Globals->fEngineTimeSum += p_Globals->fEngineTime;
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	TIMEBASE_Kill(p_Timer, p_Globals);
+    TIMEBASE* p_Timer = TIMEBASE_Create(0.0f, p_Globals);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PROC_CaptureAndApplyTranslations(p_DblBuf, p_Globals, p_Images, p_Menu);
+    PROC_DrawBackground(p_DblBuf, p_Globals, p_Images);
+    PROC_UpdateAnimations(p_Globals);
+    PROC_ProcessEntities(p_DblBuf, p_Globals, p_Images, p_Menu);
+    PROC_DrawSelectionArea(p_DblBuf, p_Globals, RGB(0, 255, 0));
+    PROC_DrawBuildType(p_DblBuf, p_Globals, p_Images, p_Menu);
+    PROC_ProcessMessages(p_DblBuf, p_Globals, p_Images, p_Menu);
+    CARD_EvaluateSelected(p_Card, p_Globals, p_Images);
+    PROC_HandleHud(p_DblBuf, p_Globals, p_Images, p_Card, p_Menu);
+    PROC_DrawDiagnostics(p_DblBuf, p_Globals, p_Images, p_Menu);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DBLBUF_Flip(p_DblBuf);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->fEngineTime = TIMEBASE_EndTimer(p_Timer);
+    p_Globals->fEngineTimeSum += p_Globals->fEngineTime;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    TIMEBASE_Kill(p_Timer, p_Globals);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
