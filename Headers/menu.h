@@ -1,10 +1,10 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Program Name: Gatherers (C)                                                                                             //
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef _MAIN_H_
-#define _MAIN_H_
+#ifndef _MENU_H_
+#define _MENU_H_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "common.h"
 #include "windows_macros.h"
@@ -13,30 +13,34 @@
 // Forward declares:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct GLOBALS GLOBALS_T;
-typedef struct MENU MENU_T;
-typedef struct DOUBLE_BUFFER DOUBLE_BUFFER_T;
-typedef struct ASSETS ASSETS_T;
-typedef struct SETTINGS SETTINGS_T;
-typedef struct LOG LOG_T;
-typedef struct TIMEBASE TIMEBASE_T;
-typedef struct CARD CARD_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Externs for WinMain, WindowProc, and DlgLoad:
+// Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-extern GLOBALS_T* p_Globals;
-extern MENU_T* p_Menu;
-extern DOUBLE_BUFFER_T* p_DoubleBuffer;
-extern ASSETS_T* p_Assets;
-extern SETTINGS_T* p_Settings;
-extern LOG_T* p_Log;
+typedef struct MENU {
+    UINT8 ubDrawMinor;
+    UINT8 ubDrawMajor;
+    UINT8 ubDrawStatuses;
+    UINT8 ubDrawIds;
+    UINT8 ubDrawResources;
+    UINT8 ubEnableTranslations;
+    UINT8 ubIsTopmostWindow;
+    UINT8 ubEnableMasking;
+    UINT8 ubToggleSimulation;
+    UINT8 ubToggleScatter;
+    UINT8 ubAllDiagnosticsToggle;
+    UINT8 ubDrawDiagnostics;
+    UINT8 ubIsFullScreen;
+    UINT8 ubUseRaycast;
+    UINT8 ubUseBisection;
+    HMENU hMenu;
+} MENU_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int     CALLBACK    WinMain                 (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow);
-void    __cdecl     MAIN_LaunchConsole      (void);
-void    __cdecl     MAIN_ConsiderEngine     (TIMEBASE_T*, TIMEBASE_T*, CARD_T*, DOUBLE_BUFFER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*);
-void    __cdecl     MAIN_HandleQuit         (DOUBLE_BUFFER_T*, TIMEBASE_T*, TIMEBASE_T*, CARD_T*, HWND, GLOBALS_T*, ASSETS_T*, MENU_T*, SETTINGS_T*, LOG_T*);
-void    __cdecl     MAIN_Kill               (GLOBALS_T*);
+void        __cdecl     MENU_Zero       (MENU_T*);
+MENU_T*     __cdecl     MENU_Create     (GLOBALS_T*);
+void        __cdecl     MENU_Init       (MENU_T*);
+void        __cdecl     MENU_Kill       (MENU_T*, GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

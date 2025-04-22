@@ -1,42 +1,42 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Program Name: Gatherers (C)                                                                                             //
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef _MAIN_H_
-#define _MAIN_H_
+#ifndef _ASSETS_H_
+#define _ASSETS_H_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "common.h"
+#include "picture.h"
 #include "windows_macros.h"
 #include <windows.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Forward declares:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct GLOBALS GLOBALS_T;
-typedef struct MENU MENU_T;
-typedef struct DOUBLE_BUFFER DOUBLE_BUFFER_T;
-typedef struct ASSETS ASSETS_T;
-typedef struct SETTINGS SETTINGS_T;
-typedef struct LOG LOG_T;
-typedef struct TIMEBASE TIMEBASE_T;
-typedef struct CARD CARD_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Externs for WinMain, WindowProc, and DlgLoad:
+// Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-extern GLOBALS_T* p_Globals;
-extern MENU_T* p_Menu;
-extern DOUBLE_BUFFER_T* p_DoubleBuffer;
-extern ASSETS_T* p_Assets;
-extern SETTINGS_T* p_Settings;
-extern LOG_T* p_Log;
+typedef struct ASSETS {
+    PICTURE_T Blitter[9];
+    PICTURE_T Worker[3];
+    PICTURE_T Command[26];
+    PICTURE_T Mineral[5];
+    PICTURE_T Supply[6];
+    PICTURE_T Refinery[1];
+    PICTURE_T HUD[2];
+    PICTURE_T Minimap[1];
+    PICTURE_T Gas[1];
+    PICTURE_T Terrain[1];
+    PICTURE_T Card[5];
+} ASSETS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int     CALLBACK    WinMain                 (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow);
-void    __cdecl     MAIN_LaunchConsole      (void);
-void    __cdecl     MAIN_ConsiderEngine     (TIMEBASE_T*, TIMEBASE_T*, CARD_T*, DOUBLE_BUFFER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*);
-void    __cdecl     MAIN_HandleQuit         (DOUBLE_BUFFER_T*, TIMEBASE_T*, TIMEBASE_T*, CARD_T*, HWND, GLOBALS_T*, ASSETS_T*, MENU_T*, SETTINGS_T*, LOG_T*);
-void    __cdecl     MAIN_Kill               (GLOBALS_T*);
+void        __cdecl     ASSETS_Zero             (ASSETS_T*);
+ASSETS_T*   __cdecl     ASSETS_Create           (GLOBALS_T*);
+void        __cdecl     ASSETS_InitFromFile     (ASSETS_T*, HWND);
+void        __cdecl     ASSETS_Kill             (ASSETS_T*, GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

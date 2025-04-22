@@ -10,21 +10,32 @@
 // - I no longer use the original taskbar image. Remove it from the loading process.
 // - When the process terminates, the operating system will destroy the image objects automatically.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef _MAIN_C_
-#define _MAIN_C_
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "../Headers/assets.h"
+#include "../Headers/card.h"
+#include "../Headers/common.h"
 #include "../Headers/constants.h"
-#include "../Headers/functions.h"
+#include "../Headers/double_buffer.h"
+#include "../Headers/engine.h"
+#include "../Headers/entity.h"
+#include "../Headers/globals.h"
+#include "../Headers/log.h"
 #include "../Headers/main.h"
-#include "../Headers/types.h"
+#include "../Headers/menu.h"
+#include "../Headers/message.h"
+#include "../Headers/misc.h"
+#include "../Headers/settings.h"
+#include "../Headers/timebase.h"
+#include "../Headers/transform.h"
+#include "../Headers/windows_macros.h"
+#include "../Headers/windows_procedure.h"
 #include <stdlib.h>
 #include <windows.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Define externs.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-GLOBALS* p_Globals = NULL;
-MENU* p_Menu = NULL;
-LOG* p_Log = NULL;
+GLOBALS_T* p_Globals = NULL;
+MENU_T* p_Menu = NULL;
+LOG_T* p_Log = NULL;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
 #if DEBUG
@@ -36,11 +47,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         printf("Current working directory: %s\n", szCurrentWorkingDirectory);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Globals = (GLOBALS*)GLOBALS_Create();
+    p_Globals = (GLOBALS_T*)GLOBALS_Create();
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Special case fail-fast for the log system.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Log = (LOG*)LOG_Create("Gatherers.log", p_Globals);
+    p_Log = (LOG_T*)LOG_Create("Gatherers.log", p_Globals);
     if (!p_Log) {
         // Unable to create the log file.
         LOG_Kill(p_Log, p_Globals);
@@ -49,9 +60,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     }
     LOG_Append(p_Log, "File hook successful...");
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Settings = (SETTINGS*)SETTINGS_Create(p_Globals);
-    p_Images = (IMAGES*)IMAGES_Create(p_Globals);
-    p_Menu = (MENU*)MENU_Create(p_Globals);
+    p_Settings = (SETTINGS_T*)SETTINGS_Create(p_Globals);
+    p_Assets = (ASSETS_T*)ASSETS_Create(p_Globals);
+    p_Menu = (MENU_T*)MENU_Create(p_Globals);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SetConsoleTitle(APP_NAME);
     srand(GetTickCount64());
@@ -60,7 +71,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     ZeroMemory(&WndClassEx, sizeof(WNDCLASSEX));
     WndClassEx.cbSize = sizeof(WNDCLASSEX);
     WndClassEx.style = 0;
-    WndClassEx.lpfnWndProc = WINPROC_WindowProc;
+    WndClassEx.lpfnWndProc = WINDOWS_PROCEDURE_WindowProc;
     WndClassEx.cbClsExtra = 0;
     WndClassEx.cbWndExtra = 0;
     WndClassEx.hInstance = hInstance;
@@ -73,7 +84,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     RegisterClassEx(&WndClassEx);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    DialogBoxParam(hInstance, MAKEINTRESOURCE(DLG_LOAD), NULL, WINPROC_DlgLoad, (LPARAM)WndClassEx.hIcon);
+    DialogBoxParam(hInstance, MAKEINTRESOURCE(DLG_LOAD), NULL, WINDOWS_PROCEDURE_DlgLoad, (LPARAM)WndClassEx.hIcon);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Menu->hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(MAIN_MENU));
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,45 +109,45 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     MISC_ResizeWindow(hWnd, INITIAL_CLIENT_WIDTH, INITIAL_CLIENT_HEIGHT);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_DblBuf = DBLBUF_Create(hWnd, p_Globals);
-    DBLBUF_SetBlitter(p_DblBuf, &p_Images->Blitter[0]);
-    DBLBUF_Clear(p_DblBuf, RGB(0, 0, 0));
+    p_DoubleBuffer = DOUBLE_BUFFER_Create(hWnd, p_Globals);
+    DOUBLE_BUFFER_SetBlitter(p_DoubleBuffer, &p_Assets->Blitter[0]);
+    DOUBLE_BUFFER_Clear(p_DoubleBuffer, RGB(0, 0, 0));
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ShowWindow(hWnd, nCmdShow);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TIMEBASE* p_Engine = (TIMEBASE*)TIMEBASE_Create(ENGINE_FPS, p_Globals);
-    TIMEBASE* p_Seconds = (TIMEBASE*)TIMEBASE_Create(1.0f, p_Globals);
+    TIMEBASE_T* p_Engine = (TIMEBASE_T*)TIMEBASE_Create(ENGINE_FPS, p_Globals);
+    TIMEBASE_T* p_Seconds = (TIMEBASE_T*)TIMEBASE_Create(1.0f, p_Globals);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    RENDER_Init(p_DblBuf);
+    TRANSFORM_Init(p_DoubleBuffer);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CARD* p_Card = (CARD*)CARD_Create(p_Globals, p_Images);
+    CARD_T* p_Card = (CARD_T*)CARD_Create(p_Globals, p_Assets);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     MSG Msg;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     while (1) {
         if (PeekMessage(&Msg, hWnd, 0, 0, PM_REMOVE)) {
             if (Msg.message == WM_QUIT) {
-                MAIN_HandleQuit(p_DblBuf, p_Engine, p_Seconds, p_Card, hWnd, p_Globals, p_Images, p_Menu, p_Settings, p_Log);
+                MAIN_HandleQuit(p_DoubleBuffer, p_Engine, p_Seconds, p_Card, hWnd, p_Globals, p_Assets, p_Menu, p_Settings, p_Log);
                 break;
             }
             else {
                 TranslateMessage(&Msg);
                 DispatchMessage(&Msg);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                MAIN_ConsiderEngine(p_Engine, p_Seconds, p_Card, p_DblBuf, p_Globals, p_Images, p_Menu);
+                MAIN_ConsiderEngine(p_Engine, p_Seconds, p_Card, p_DoubleBuffer, p_Globals, p_Assets, p_Menu);
             }
         }
         else {
-            MAIN_ConsiderEngine(p_Engine, p_Seconds, p_Card, p_DblBuf, p_Globals, p_Images, p_Menu);
+            MAIN_ConsiderEngine(p_Engine, p_Seconds, p_Card, p_DoubleBuffer, p_Globals, p_Assets, p_Menu);
         }
     }
     return Msg.wParam;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl MAIN_ConsiderEngine(TIMEBASE* p_Engine, TIMEBASE* p_Seconds, CARD* p_Card, DBLBUF* p_DblBuf, GLOBALS* p_Globals, IMAGES* p_Images, MENU* p_Menu) {
+void __cdecl MAIN_ConsiderEngine(TIMEBASE_T* p_Engine, TIMEBASE_T* p_Seconds, CARD_T* p_Card, DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, MENU_T* p_Menu) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (TIMEBASE_Tick(p_Engine)) {
-        ENGINE_ProcessScene(p_DblBuf, p_Globals, p_Images, p_Card, p_Menu);
+        ENGINE_ProcessScene(p_DoubleBuffer, p_Globals, p_Assets, p_Card, p_Menu);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (TIMEBASE_Tick(p_Seconds)) {
@@ -146,14 +157,14 @@ void __cdecl MAIN_ConsiderEngine(TIMEBASE* p_Engine, TIMEBASE* p_Seconds, CARD* 
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl MAIN_HandleQuit(DBLBUF* p_DblBuf, TIMEBASE* p_Engine, TIMEBASE* p_Seconds, CARD* p_Card, HWND hWnd, GLOBALS* p_Globals, IMAGES* p_Images, MENU* p_Menu, SETTINGS* p_Settings, LOG* p_Log) {
+void __cdecl MAIN_HandleQuit(DOUBLE_BUFFER_T* p_DoubleBuffer, TIMEBASE_T* p_Engine, TIMEBASE_T* p_Seconds, CARD_T* p_Card, HWND hWnd, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, MENU_T* p_Menu, SETTINGS_T* p_Settings, LOG_T* p_Log) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Destroy everything the program uses.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ENTITY_DeleteAll(p_Globals);
     MESSAGE_DeleteAll(p_Globals);
-    DBLBUF_Kill(p_DblBuf, p_Globals);
-    IMAGES_Kill(p_Images, p_Globals);
+    DOUBLE_BUFFER_Kill(p_DoubleBuffer, p_Globals);
+    ASSETS_Kill(p_Assets, p_Globals);
     TIMEBASE_Kill(p_Engine, p_Globals);
     TIMEBASE_Kill(p_Seconds, p_Globals);
     CARD_Kill(p_Card, p_Globals);
@@ -167,7 +178,7 @@ void __cdecl MAIN_HandleQuit(DBLBUF* p_DblBuf, TIMEBASE* p_Engine, TIMEBASE* p_S
     MAIN_Kill(p_Globals);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl MAIN_Kill(GLOBALS* p_Globals) {
+void __cdecl MAIN_Kill(GLOBALS_T* p_Globals) {
     int iRemainingHeap = GLOBALS_Kill(p_Globals);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (iRemainingHeap) {
@@ -188,6 +199,4 @@ void __cdecl MAIN_LaunchConsole(void) {
     freopen_s(&p_File, "CONOUT$", "w", stderr);
     freopen_s(&p_File, "CONIN$", "r", stdin);
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

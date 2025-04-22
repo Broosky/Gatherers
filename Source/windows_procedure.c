@@ -3,32 +3,43 @@
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef _WINPROC_C_
-#define _WINPROC_C_
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "../Headers/ai.h"
+#include "../Headers/assets.h"
+#include "../Headers/common.h"
+#include "../Headers/common_types.h"
 #include "../Headers/constants.h"
-#include "../Headers/functions.h"
-#include "../Headers/types.h"
+#include "../Headers/double_buffer.h"
+#include "../Headers/entity.h"
+#include "../Headers/globals.h"
+#include "../Headers/main.h"
+#include "../Headers/menu.h"
+#include "../Headers/misc.h"
+#include "../Headers/process.h"
+#include "../Headers/transform.h"
+#include "../Headers/windows_macros.h"
+#include "../Headers/windows_procedure.h"
 #include <math.h>
+#include <stdlib.h>
+#include <windows.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Future:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // - Put the menu handle into a stack variable because we use it many times.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK WINDOWS_PROCEDURE_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
     switch (uiMsg) {
     case WM_COMMAND: {
-        WINPROC_HandleMenuEvent(hWnd, wParam, p_Menu, p_Globals);
+        WINDOWS_PROCEDURE_HandleMenuEvent(hWnd, wParam, p_Menu, p_Globals);
         break;
     }
     case WM_SIZE: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (p_DblBuf != NULL) {
-            DBLBUF_Resize(p_DblBuf, hWnd, RGB(0, 0, 0), p_Globals);
+        if (p_DoubleBuffer != NULL) {
+            DOUBLE_BUFFER_Resize(p_DoubleBuffer, hWnd, RGB(0, 0, 0), p_Globals);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Remember to reset the graphics mode to allow the rendering engine to work.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            RENDER_Init(p_DblBuf);
+            TRANSFORM_Init(p_DoubleBuffer);
         }
         break;
     }
@@ -37,37 +48,37 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM
             // Reset for subsequent left mouse clicks.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (!p_Globals->ubClickOriginFromMinimap) {
-            WINPROC_SelectEntities(p_Globals);
+            WINDOWS_PROCEDURE_SelectEntities(p_Globals);
         }
         p_Globals->ubClickOriginFromMinimap = 0;
         break;
     }
     case WM_LBUTTONDOWN: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (PROC_IsMinimapClicked(p_DblBuf, p_Images, p_Globals) && p_Menu->ubEnableTranslations) {
+        if (PROCESS_IsMinimapClicked(p_DoubleBuffer, p_Assets, p_Globals) && p_Menu->ubEnableTranslations) {
             p_Globals->ubClickOriginFromMinimap = 1;
-            PROC_AdjustMinimapViewport(p_Globals, p_Images);
+            PROCESS_AdjustMinimapViewport(p_Globals, p_DoubleBuffer, p_Assets);
         }
         else {
             p_Globals->ubClickOriginFromMinimap = 0;
-            WINPROC_CreateOrCaptureEntities(p_Globals, p_Images);
+            WINDOWS_PROCEDURE_CreateOrCaptureEntities(p_Globals, p_Assets);
         }
         break;
     }
     case WM_RBUTTONDOWN: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (p_Menu->ubToggleScatter) {
-            SELECTED_COUNT SelectedCount = ENTITY_GetSelectedEntityCounts(p_Globals);
+            SELECTED_COUNT_T SelectedCount = ENTITY_GetSelectedEntityCounts(p_Globals);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (SelectedCount.usSelectedWorkersCount > 1) {
-                WINPROC_DistributeAndSendWorkers(p_Globals, p_Images);
+                WINDOWS_PROCEDURE_DistributeAndSendWorkers(p_Globals, p_Assets);
             }
             else {
-                WINPROC_SendWorkers(p_Globals, p_Images);
+                WINDOWS_PROCEDURE_SendWorkers(p_Globals, p_Assets);
             }
         }
         else {
-            WINPROC_SendWorkers(p_Globals, p_Images);
+            WINDOWS_PROCEDURE_SendWorkers(p_Globals, p_Assets);
         }
         break;
     }
@@ -95,13 +106,13 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM
             }
         }
         else {
-            PROC_AdjustMinimapViewport(p_Globals, p_Images);
+            PROCESS_AdjustMinimapViewport(p_Globals, p_DoubleBuffer, p_Assets);
         }
         break;
     }
     case WM_KEYDOWN: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        WINPROC_HandleKeyDown(hWnd, wParam, p_Globals, p_Menu, p_DblBuf);
+        WINDOWS_PROCEDURE_HandleKeyDown(hWnd, wParam, p_Globals, p_Menu, p_DoubleBuffer);
         break;
     }
     case WM_CLOSE: {
@@ -120,7 +131,7 @@ LRESULT CALLBACK WINPROC_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM
     return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINPROC_BuildHelper(USHORT usType, MENU* p_Menu) {
+void __cdecl WINDOWS_PROCEDURE_BuildHelper(USHORT usType, MENU_T* p_Menu) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Uncheck all of the menu items
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,10 +171,10 @@ void __cdecl WINPROC_BuildHelper(USHORT usType, MENU* p_Menu) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
+void __cdecl WINDOWS_PROCEDURE_SendWorkers(GLOBALS_T* p_Globals, ASSETS_T* p_Assets) {
     USHORT usMoveableCount = 0;
-    ENTITY* p_Resource = NULL;
-    ENTITY* p_Current = p_Globals->p_RootEntity;
+    ENTITY_T* p_Resource = NULL;
+    ENTITY_T* p_Current = p_Globals->p_RootEntity;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Loop through all of the entities and check to see if we right-clicked on a resource.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,7 +192,7 @@ void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // True, if I right clicked on a mineral field.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (ENTITY_WithinPoint(p_Current, (FPOINT) { p_Globals->iMouseX, p_Globals->iMouseY })) {
+            if (ENTITY_WithinPoint(p_Current, (FPOINT_T) { p_Globals->iMouseX, p_Globals->iMouseY })) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // We want to make all the selected entities harvest THAT particular mineral field.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,7 +204,7 @@ void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // True, if I right clicked on a refinery.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (ENTITY_WithinPoint(p_Current, (FPOINT) { p_Globals->iMouseX, p_Globals->iMouseY })) {
+            if (ENTITY_WithinPoint(p_Current, (FPOINT_T) { p_Globals->iMouseX, p_Globals->iMouseY })) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // We want to make all the selected entities harvest THAT particular refinery.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,18 +212,18 @@ void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
             }
         }
         }
-        p_Current = (ENTITY*)p_Current->p_Next;
+        p_Current = (ENTITY_T*)p_Current->p_Next;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     USHORT usI;
     USHORT usAllocation;
-    FPOINT* p_DestinationPoints = NULL;
+    FPOINT_T* p_DestinationPoints = NULL;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // We did not click on a resource, therefore we have to move the selected entities.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!p_Resource) {
-        usAllocation = sizeof(FPOINT) * usMoveableCount;
-        p_DestinationPoints = (FPOINT*)malloc(usAllocation);
+        usAllocation = sizeof(FPOINT_T) * usMoveableCount;
+        p_DestinationPoints = (FPOINT_T*)malloc(usAllocation);
         p_Globals->iRunningHeap += usAllocation;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Future:
@@ -222,18 +233,18 @@ void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         USHORT usColumn = 1;
         USHORT usColumnLimit = sqrt(usMoveableCount);
-        FPOINT Placement = { p_Globals->iMouseX, p_Globals->iMouseY };
+        FPOINT_T Placement = { p_Globals->iMouseX, p_Globals->iMouseY };
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         for (usI = 0; usI < usMoveableCount; usI++) {
             p_DestinationPoints[usI] = Placement;
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (usColumn >= usColumnLimit) {
-                Placement.fY += p_Images->Worker[0].Bitmap.bmHeight;
+                Placement.fY += p_Assets->Worker[0].Bitmap.bmHeight;
                 Placement.fX = p_Globals->iMouseX;
                 usColumn = 1;
             }
             else {
-                Placement.fX += p_Images->Worker[0].Bitmap.bmWidth;
+                Placement.fX += p_Assets->Worker[0].Bitmap.bmWidth;
                 usColumn++;
             }
         }
@@ -249,7 +260,7 @@ void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
             p_Current->ubIsSelected = 0;
             if (p_Current->ubIsMovable) {
                 if (p_Resource) {
-                    p_Current->p_Operating = (struct ENTITY*)p_Resource;
+                    p_Current->p_Operating = (ENTITY_T*)p_Resource;
                 }
                 else {
                     p_Current->p_Operating = NULL;
@@ -257,7 +268,7 @@ void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
                 }
             }
         }
-        p_Current = (ENTITY*)p_Current->p_Next;
+        p_Current = (ENTITY_T*)p_Current->p_Next;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_DestinationPoints) {
@@ -267,11 +278,11 @@ void __cdecl WINPROC_SendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Images) {
+void __cdecl WINDOWS_PROCEDURE_DistributeAndSendWorkers(GLOBALS_T* p_Globals, ASSETS_T* p_Assets) {
     USHORT usMoveableCount = 0;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ENTITY* p_Resource = NULL;
-    ENTITY* p_Current = p_Globals->p_RootEntity;
+    ENTITY_T* p_Resource = NULL;
+    ENTITY_T* p_Current = p_Globals->p_RootEntity;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Loop through all of the entities and check to see if we right-clicked on a resource.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -289,7 +300,7 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // True, if I right clicked on a mineral field.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (ENTITY_WithinPoint(p_Current, (FPOINT) { p_Globals->iMouseX, p_Globals->iMouseY })) {
+            if (ENTITY_WithinPoint(p_Current, (FPOINT_T) { p_Globals->iMouseX, p_Globals->iMouseY })) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // We want to make all the selected entities harvest THAT particular mineral field.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,7 +312,7 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // True, if I right clicked on a refinery.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (ENTITY_WithinPoint(p_Current, (FPOINT) { p_Globals->iMouseX, p_Globals->iMouseY })) {
+            if (ENTITY_WithinPoint(p_Current, (FPOINT_T) { p_Globals->iMouseX, p_Globals->iMouseY })) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // We want to make all the selected entities harvest THAT particular refinery.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,14 +320,14 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
             }
         }
         }
-        p_Current = (ENTITY*)p_Current->p_Next;
+        p_Current = (ENTITY_T*)p_Current->p_Next;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // If we clicked on a resource, get a collection of pointers to available resources of that type, considering their distance.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     USHORT usFound = 0;
     int iRollingAllocationHeap = 0;
-    AI_CLOSEST* p_ClosestEntities = NULL;
+    AI_CLOSEST_T* p_ClosestEntities = NULL;
     if (p_Resource) {
         p_ClosestEntities = AI_FindClosestByDistance(p_Resource, p_Resource->usType, &iRollingAllocationHeap, &usFound, p_Globals);
     }
@@ -325,13 +336,13 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     USHORT usI = 0;
     USHORT usDestinationPointsAllocation = 0;
-    FPOINT* p_DestinationPoints = NULL;
+    FPOINT_T* p_DestinationPoints = NULL;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // We did not click on a resource, therefore we have to move the selected entities.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!p_Resource) {
-        usDestinationPointsAllocation = sizeof(FPOINT) * usMoveableCount;
-        p_DestinationPoints = (FPOINT*)malloc(usDestinationPointsAllocation);
+        usDestinationPointsAllocation = sizeof(FPOINT_T) * usMoveableCount;
+        p_DestinationPoints = (FPOINT_T*)malloc(usDestinationPointsAllocation);
         p_Globals->iRunningHeap += usDestinationPointsAllocation;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Future:
@@ -341,18 +352,18 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         USHORT usColumn = 1;
         USHORT usColumnLimit = sqrt(usMoveableCount);
-        FPOINT Placement = { p_Globals->iMouseX, p_Globals->iMouseY };
+        FPOINT_T Placement = { p_Globals->iMouseX, p_Globals->iMouseY };
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         for (usI = 0; usI < usMoveableCount; usI++) {
             p_DestinationPoints[usI] = Placement;
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (usColumn >= usColumnLimit) {
-                Placement.fY += p_Images->Worker[0].Bitmap.bmHeight + 20.0f;
+                Placement.fY += p_Assets->Worker[0].Bitmap.bmHeight + 20.0f;
                 Placement.fX = p_Globals->iMouseX;
                 usColumn = 1;
             }
             else {
-                Placement.fX += p_Images->Worker[0].Bitmap.bmWidth + 20.0f;
+                Placement.fX += p_Assets->Worker[0].Bitmap.bmWidth + 20.0f;
                 usColumn++;
             }
         }
@@ -372,7 +383,7 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Run through the resources ordered by their closest distance from the inquirer.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    p_Current->p_Operating = (struct ENTITY*)p_ClosestEntities[usDestinationResourceIndex++].p_Entity;
+                    p_Current->p_Operating = (ENTITY_T*)p_ClosestEntities[usDestinationResourceIndex++].p_Entity;
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // There will most likely be cases where there are more workers than available resources. Let's reset the
                     // index to recycle them.
@@ -387,7 +398,7 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
                 }
             }
         }
-        p_Current = (ENTITY*)p_Current->p_Next;
+        p_Current = (ENTITY_T*)p_Current->p_Next;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_DestinationPoints) {
@@ -402,7 +413,7 @@ void __cdecl WINPROC_DistributeAndSendWorkers(GLOBALS* p_Globals, IMAGES* p_Imag
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINPROC_CreateOrCaptureEntities(GLOBALS* p_Globals, IMAGES* p_Images) {
+void __cdecl WINDOWS_PROCEDURE_CreateOrCaptureEntities(GLOBALS_T* p_Globals, ASSETS_T* p_Assets) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // For mouse drag selection.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -413,11 +424,11 @@ void __cdecl WINPROC_CreateOrCaptureEntities(GLOBALS* p_Globals, IMAGES* p_Image
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_Globals->ubCreate) {
         ENTITY_Create(
-            (FPOINT) {
+            (FPOINT_T) {
             p_Globals->iMouseX, p_Globals->iMouseY
         },
             p_Globals->usBuildType,
-            p_Images,
+            p_Assets,
             p_Globals
         );
     }
@@ -426,19 +437,19 @@ void __cdecl WINPROC_CreateOrCaptureEntities(GLOBALS* p_Globals, IMAGES* p_Image
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else {
         UINT8 ubIsSomethingThere = 0;
-        ENTITY* p_Current = p_Globals->p_RootEntity;
+        ENTITY_T* p_Current = p_Globals->p_RootEntity;
         while (p_Current) {
-            if (ENTITY_WithinPoint(p_Current, (FPOINT) { p_Globals->iMouseX, p_Globals->iMouseY })) {
+            if (ENTITY_WithinPoint(p_Current, (FPOINT_T) { p_Globals->iMouseX, p_Globals->iMouseY })) {
                 p_Current->ubIsSelected = !p_Current->ubIsSelected;
                 ubIsSomethingThere = 1;
             }
-            p_Current = (ENTITY*)p_Current->p_Next;
+            p_Current = (ENTITY_T*)p_Current->p_Next;
         }
         if (!ubIsSomethingThere) {
             p_Current = p_Globals->p_RootEntity;
             while (p_Current) {
                 p_Current->ubIsSelected = 0;
-                p_Current = (ENTITY*)p_Current->p_Next;
+                p_Current = (ENTITY_T*)p_Current->p_Next;
             }
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -449,7 +460,7 @@ void __cdecl WINPROC_CreateOrCaptureEntities(GLOBALS* p_Globals, IMAGES* p_Image
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINPROC_SelectEntities(GLOBALS* p_Globals) {
+void __cdecl WINDOWS_PROCEDURE_SelectEntities(GLOBALS_T* p_Globals) {
     if (!p_Globals->ubCreate) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Allow the operation to work when the mouse is dragged from all directions.
@@ -468,7 +479,7 @@ void __cdecl WINPROC_SelectEntities(GLOBALS* p_Globals) {
             p_Globals->iOldMouseY = iHolder;
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY* p_Current = p_Globals->p_RootEntity;
+        ENTITY_T* p_Current = p_Globals->p_RootEntity;
         while (p_Current) {
             if (
                 p_Current->CenterPoint.fX >= p_Globals->iOldMouseX &&
@@ -478,7 +489,7 @@ void __cdecl WINPROC_SelectEntities(GLOBALS* p_Globals) {
                 ) {
                 p_Current->ubIsSelected = !p_Current->ubIsSelected;
             }
-            p_Current = (ENTITY*)p_Current->p_Next;
+            p_Current = (ENTITY_T*)p_Current->p_Next;
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Incase the points were swapped, reset the original values.
@@ -497,7 +508,7 @@ void __cdecl WINPROC_SelectEntities(GLOBALS* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINPROC_HandleKeyDown(HWND hWnd, WPARAM wParam, GLOBALS* p_Globals, MENU* p_Menu, DBLBUF* p_DblBuf) {
+void __cdecl WINDOWS_PROCEDURE_HandleKeyDown(HWND hWnd, WPARAM wParam, GLOBALS_T* p_Globals, MENU_T* p_Menu, DOUBLE_BUFFER_T* p_DoubleBuffer) {
     const float fLateralStep = TRANSLATION_STEP_AMOUNT;
     const float fVerticalStep = TRANSLATION_STEP_AMOUNT;
     float fAdjusted;
@@ -505,8 +516,8 @@ void __cdecl WINPROC_HandleKeyDown(HWND hWnd, WPARAM wParam, GLOBALS* p_Globals,
     // Arrow keys.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_Menu->ubEnableTranslations) {
-        LONG lBmWidth = p_Images->Terrain[p_Globals->usMapIndex].Bitmap.bmWidth;
-        LONG lBmHeight = p_Images->Terrain[p_Globals->usMapIndex].Bitmap.bmHeight;
+        LONG lBmWidth = p_Assets->Terrain[p_Globals->usMapIndex].Bitmap.bmWidth;
+        LONG lBmHeight = p_Assets->Terrain[p_Globals->usMapIndex].Bitmap.bmHeight;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         switch (wParam) {
         case VK_LEFT: {
@@ -518,7 +529,7 @@ void __cdecl WINPROC_HandleKeyDown(HWND hWnd, WPARAM wParam, GLOBALS* p_Globals,
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Globals->fLateralTranslation += fAdjusted;
-            PROC_ApplyTranslations(fAdjusted, 0.0f, p_Globals, p_Images);
+            PROCESS_ApplyTranslations(fAdjusted, 0.0f, p_Globals, p_Assets);
             break;
         }
         case VK_UP: {
@@ -530,31 +541,31 @@ void __cdecl WINPROC_HandleKeyDown(HWND hWnd, WPARAM wParam, GLOBALS* p_Globals,
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Globals->fVerticalTranslation += fAdjusted;
-            PROC_ApplyTranslations(0.0f, fAdjusted, p_Globals, p_Images);
+            PROCESS_ApplyTranslations(0.0f, fAdjusted, p_Globals, p_Assets);
             break;
         }
         case VK_RIGHT: {
-            if (p_Globals->fLateralTranslation >= -(lBmWidth - p_DblBuf->ClientArea.right - fLateralStep)) {
+            if (p_Globals->fLateralTranslation >= -(lBmWidth - p_DoubleBuffer->ClientArea.right - fLateralStep)) {
                 fAdjusted = -fLateralStep;
             }
             else {
-                fAdjusted = -(p_Globals->fLateralTranslation + (lBmWidth - p_DblBuf->ClientArea.right));
+                fAdjusted = -(p_Globals->fLateralTranslation + (lBmWidth - p_DoubleBuffer->ClientArea.right));
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Globals->fLateralTranslation += fAdjusted;
-            PROC_ApplyTranslations(fAdjusted, 0.0f, p_Globals, p_Images);
+            PROCESS_ApplyTranslations(fAdjusted, 0.0f, p_Globals, p_Assets);
             break;
         }
         case VK_DOWN: {
-            if (p_Globals->fVerticalTranslation >= -(lBmHeight - p_DblBuf->ClientArea.bottom - fVerticalStep)) {
+            if (p_Globals->fVerticalTranslation >= -(lBmHeight - p_DoubleBuffer->ClientArea.bottom - fVerticalStep)) {
                 fAdjusted = -fVerticalStep;
             }
             else {
-                fAdjusted = -(p_Globals->fVerticalTranslation + (lBmHeight - p_DblBuf->ClientArea.bottom));
+                fAdjusted = -(p_Globals->fVerticalTranslation + (lBmHeight - p_DoubleBuffer->ClientArea.bottom));
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Globals->fVerticalTranslation += fAdjusted;
-            PROC_ApplyTranslations(0.0f, fAdjusted, p_Globals, p_Images);
+            PROCESS_ApplyTranslations(0.0f, fAdjusted, p_Globals, p_Assets);
             break;
         }
         default:
@@ -578,7 +589,7 @@ void __cdecl WINPROC_HandleKeyDown(HWND hWnd, WPARAM wParam, GLOBALS* p_Globals,
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLOBALS* p_Globals) {
+void __cdecl WINDOWS_PROCEDURE_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU_T* p_Menu, GLOBALS_T* p_Globals) {
     switch (LOWORD(wParam)) {
     case MENU_SIMULATION_FREE: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -615,10 +626,10 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Stop each entity that was moving.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            ENTITY* p_Current = p_Globals->p_RootEntity;
+            ENTITY_T* p_Current = p_Globals->p_RootEntity;
             while (p_Current) {
                 p_Current->ubIsInMotion = 0;
-                p_Current = (ENTITY*)p_Current->p_Next;
+                p_Current = (ENTITY_T*)p_Current->p_Next;
             }
         }
         else {
@@ -664,42 +675,42 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
     }
     case MENU_BUILD_NONE: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        WINPROC_BuildHelper(ENTITY_NONE, p_Menu);
+        WINDOWS_PROCEDURE_BuildHelper(ENTITY_NONE, p_Menu);
         p_Globals->usBuildType = ENTITY_WORKER;
         p_Globals->ubCreate = 0;
         break;
     }
     case MENU_BUILD_WORKER: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        WINPROC_BuildHelper(ENTITY_WORKER, p_Menu);
+        WINDOWS_PROCEDURE_BuildHelper(ENTITY_WORKER, p_Menu);
         p_Globals->usBuildType = ENTITY_WORKER;
         p_Globals->ubCreate = 1;
         break;
     }
     case MENU_BUILD_COMMAND: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        WINPROC_BuildHelper(ENTITY_COMMAND, p_Menu);
+        WINDOWS_PROCEDURE_BuildHelper(ENTITY_COMMAND, p_Menu);
         p_Globals->usBuildType = ENTITY_COMMAND;
         p_Globals->ubCreate = 1;
         break;
     }
     case MENU_BUILD_MINERAL: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        WINPROC_BuildHelper(ENTITY_MINERAL, p_Menu);
+        WINDOWS_PROCEDURE_BuildHelper(ENTITY_MINERAL, p_Menu);
         p_Globals->usBuildType = ENTITY_MINERAL;
         p_Globals->ubCreate = 1;
         break;
     }
     case MENU_BUILD_SUPPLY: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        WINPROC_BuildHelper(ENTITY_SUPPLY, p_Menu);
+        WINDOWS_PROCEDURE_BuildHelper(ENTITY_SUPPLY, p_Menu);
         p_Globals->usBuildType = ENTITY_SUPPLY;
         p_Globals->ubCreate = 1;
         break;
     }
     case MENU_BUILD_REFINERY: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        WINPROC_BuildHelper(ENTITY_REFINERY, p_Menu);
+        WINDOWS_PROCEDURE_BuildHelper(ENTITY_REFINERY, p_Menu);
         p_Globals->usBuildType = ENTITY_REFINERY;
         p_Globals->ubCreate = 1;
         break;
@@ -835,11 +846,11 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             MISC_ResizeWindow(hWnd, INITIAL_CLIENT_WIDTH, INITIAL_CLIENT_HEIGHT);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            DBLBUF_Resize(p_DblBuf, hWnd, RGB(0, 0, 0), p_Globals);
+            DOUBLE_BUFFER_Resize(p_DoubleBuffer, hWnd, RGB(0, 0, 0), p_Globals);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Remember to reset the graphics mode to allow the rendering engine to work.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            RENDER_Init(p_DblBuf);
+            TRANSFORM_Init(p_DoubleBuffer);
         }
         else {
             CheckMenuItem(p_Menu->hMenu, MENU_OPTIONS_FULLSCREEN, MF_CHECKED);
@@ -854,11 +865,11 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             MoveWindow(hWnd, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 1);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            DBLBUF_Resize(p_DblBuf, hWnd, RGB(0, 0, 0), p_Globals);
+            DOUBLE_BUFFER_Resize(p_DoubleBuffer, hWnd, RGB(0, 0, 0), p_Globals);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Remember to reset the graphics mode to allow the rendering engine to work.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            RENDER_Init(p_DblBuf);
+            TRANSFORM_Init(p_DoubleBuffer);
         }
         break;
     }
@@ -922,10 +933,10 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
     }
     case MENU_CLEAR_SELECTED: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY* p_Current = p_Globals->p_RootEntity;
+        ENTITY_T* p_Current = p_Globals->p_RootEntity;
         while (p_Current) {
             p_Current->ubIsSelected = 0;
-            p_Current = (ENTITY*)p_Current->p_Next;
+            p_Current = (ENTITY_T*)p_Current->p_Next;
         }
         break;
     }
@@ -935,7 +946,7 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Clear minerals collected by the command centers.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY* p_Current = p_Globals->p_RootEntity;
+        ENTITY_T* p_Current = p_Globals->p_RootEntity;
         while (p_Current) {
             switch (p_Current->usType) {
             case ENTITY_COMMAND: {
@@ -943,7 +954,7 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
                 break;
             }
             }
-            p_Current = (ENTITY*)p_Current->p_Next;
+            p_Current = (ENTITY_T*)p_Current->p_Next;
         }
         break;
     }
@@ -953,7 +964,7 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Clear gas collected by the command centers.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY* p_Current = p_Globals->p_RootEntity;
+        ENTITY_T* p_Current = p_Globals->p_RootEntity;
         while (p_Current) {
             switch (p_Current->usType) {
             case ENTITY_COMMAND: {
@@ -961,7 +972,7 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
                 break;
             }
             }
-            p_Current = (ENTITY*)p_Current->p_Next;
+            p_Current = (ENTITY_T*)p_Current->p_Next;
         }
         break;
     }
@@ -972,7 +983,7 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Clear resources collected by the command centers.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY* p_Current = p_Globals->p_RootEntity;
+        ENTITY_T* p_Current = p_Globals->p_RootEntity;
         while (p_Current) {
             switch (p_Current->usType) {
             case ENTITY_COMMAND: {
@@ -981,7 +992,7 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
                 break;
             }
             }
-            p_Current = (ENTITY*)p_Current->p_Next;
+            p_Current = (ENTITY_T*)p_Current->p_Next;
         }
         break;
     }
@@ -1016,6 +1027,4 @@ void __cdecl WINPROC_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU* p_Menu, GLO
     }
     }
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

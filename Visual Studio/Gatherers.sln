@@ -43,6 +43,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
 		..\.gitignore = ..\.gitignore
+		..\Assets\BL\BB0.bmp = ..\Assets\BL\BB0.bmp
+		..\Assets\BL\BB1.bmp = ..\Assets\BL\BB1.bmp
+		..\Assets\BL\BG0.bmp = ..\Assets\BL\BG0.bmp
+		..\Assets\BL\BO0.bmp = ..\Assets\BL\BO0.bmp
+		..\Assets\BL\BP0.bmp = ..\Assets\BL\BP0.bmp
+		..\Assets\BL\BP1.bmp = ..\Assets\BL\BP1.bmp
+		..\Assets\BL\BR0.bmp = ..\Assets\BL\BR0.bmp
+		..\Assets\BL\BW0.bmp = ..\Assets\BL\BW0.bmp
+		..\Assets\BL\BY0.bmp = ..\Assets\BL\BY0.bmp
+		..\Assets\BL\B_M.bmp = ..\Assets\BL\B_M.bmp
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
@@ -55,133 +65,133 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dev-C++", "Dev-C++", "{B78C
 		..\Dev-C++\Makefile.win = ..\Dev-C++\Makefile.win
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{FC42459E-0115-4AAC-BC44-EB151BD08E07}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BL", "BL", "{897905FC-7F52-418F-BADA-294DC15547CA}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\BL\BB0.bmp = ..\Images\BL\BB0.bmp
-		..\Images\BL\BB1.bmp = ..\Images\BL\BB1.bmp
-		..\Images\BL\BG0.bmp = ..\Images\BL\BG0.bmp
-		..\Images\BL\BO0.bmp = ..\Images\BL\BO0.bmp
-		..\Images\BL\BP0.bmp = ..\Images\BL\BP0.bmp
-		..\Images\BL\BP1.bmp = ..\Images\BL\BP1.bmp
-		..\Images\BL\BR0.bmp = ..\Images\BL\BR0.bmp
-		..\Images\BL\BW0.bmp = ..\Images\BL\BW0.bmp
-		..\Images\BL\BY0.bmp = ..\Images\BL\BY0.bmp
-		..\Images\BL\B_M.bmp = ..\Images\BL\B_M.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CA", "CA", "{9333BB20-92B3-4673-B21C-9335C3B64EDE}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\CA\CA0.bmp = ..\Images\CA\CA0.bmp
-		..\Images\CA\CA1.bmp = ..\Images\CA\CA1.bmp
-		..\Images\CA\CA2.bmp = ..\Images\CA\CA2.bmp
-		..\Images\CA\CA3.bmp = ..\Images\CA\CA3.bmp
-		..\Images\CA\CC0.bmp = ..\Images\CA\CC0.bmp
-		..\Images\CA\MO0.bmp = ..\Images\CA\MO0.bmp
-		..\Images\CA\ST0.bmp = ..\Images\CA\ST0.bmp
-		..\Images\CA\WO0.bmp = ..\Images\CA\WO0.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CC", "CC", "{3C857786-040E-4A3D-908A-658AA0934507}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\CC\CC0.bmp = ..\Images\CC\CC0.bmp
-		..\Images\CC\CC0_M.bmp = ..\Images\CC\CC0_M.bmp
-		..\Images\CC\CC1.bmp = ..\Images\CC\CC1.bmp
-		..\Images\CC\CC10.bmp = ..\Images\CC\CC10.bmp
-		..\Images\CC\CC11.bmp = ..\Images\CC\CC11.bmp
-		..\Images\CC\CC12.bmp = ..\Images\CC\CC12.bmp
-		..\Images\CC\CC13.bmp = ..\Images\CC\CC13.bmp
-		..\Images\CC\CC14.bmp = ..\Images\CC\CC14.bmp
-		..\Images\CC\CC15.bmp = ..\Images\CC\CC15.bmp
-		..\Images\CC\CC16.bmp = ..\Images\CC\CC16.bmp
-		..\Images\CC\CC17.bmp = ..\Images\CC\CC17.bmp
-		..\Images\CC\CC18.bmp = ..\Images\CC\CC18.bmp
-		..\Images\CC\CC19.bmp = ..\Images\CC\CC19.bmp
-		..\Images\CC\CC2.bmp = ..\Images\CC\CC2.bmp
-		..\Images\CC\CC20.bmp = ..\Images\CC\CC20.bmp
-		..\Images\CC\CC21.bmp = ..\Images\CC\CC21.bmp
-		..\Images\CC\CC22.bmp = ..\Images\CC\CC22.bmp
-		..\Images\CC\CC23.bmp = ..\Images\CC\CC23.bmp
-		..\Images\CC\CC24.bmp = ..\Images\CC\CC24.bmp
-		..\Images\CC\CC25.bmp = ..\Images\CC\CC25.bmp
-		..\Images\CC\CC3.bmp = ..\Images\CC\CC3.bmp
-		..\Images\CC\CC4.bmp = ..\Images\CC\CC4.bmp
-		..\Images\CC\CC5.bmp = ..\Images\CC\CC5.bmp
-		..\Images\CC\CC6.bmp = ..\Images\CC\CC6.bmp
-		..\Images\CC\CC7.bmp = ..\Images\CC\CC7.bmp
-		..\Images\CC\CC8.bmp = ..\Images\CC\CC8.bmp
-		..\Images\CC\CC9.bmp = ..\Images\CC\CC9.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GA", "GA", "{F6A4B856-937E-4697-8742-F34C28DF1A56}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\GA\GA0.bmp = ..\Images\GA\GA0.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HU", "HU", "{EFF81BEF-D650-4872-9D3F-7FF3A00B76B4}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\HU\DI0.bmp = ..\Images\HU\DI0.bmp
-		..\Images\HU\HU0.bmp = ..\Images\HU\HU0.bmp
-		..\Images\HU\HU0_M.bmp = ..\Images\HU\HU0_M.bmp
-		..\Images\HU\HU1.bmp = ..\Images\HU\HU1.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "II", "II", "{333B96E0-5CDE-4550-ACAD-8F0286BD4642}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\II\Illusion Interactive.bmp = ..\Images\II\Illusion Interactive.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MF", "MF", "{DCFFFF50-6728-4652-B91B-8AF104E20DD2}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\MF\MF0.bmp = ..\Images\MF\MF0.bmp
-		..\Images\MF\MF0_M.bmp = ..\Images\MF\MF0_M.bmp
-		..\Images\MF\MF1.bmp = ..\Images\MF\MF1.bmp
-		..\Images\MF\MF1_M.bmp = ..\Images\MF\MF1_M.bmp
-		..\Images\MF\MF2.bmp = ..\Images\MF\MF2.bmp
-		..\Images\MF\MF2_M.bmp = ..\Images\MF\MF2_M.bmp
-		..\Images\MF\MF3.bmp = ..\Images\MF\MF3.bmp
-		..\Images\MF\MF3_M.bmp = ..\Images\MF\MF3_M.bmp
-		..\Images\MF\MF4.bmp = ..\Images\MF\MF4.bmp
-		..\Images\MF\MF4_M.bmp = ..\Images\MF\MF4_M.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MI", "MI", "{09CD011F-45EE-4D91-BC26-112941F8BD6F}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\MI\MI0.bmp = ..\Images\MI\MI0.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RE", "RE", "{5C4A611E-7028-4973-8162-56B074594A29}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\RE\RE0.bmp = ..\Images\RE\RE0.bmp
-		..\Images\RE\RE0_M.bmp = ..\Images\RE\RE0_M.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SU", "SU", "{DA044035-A165-4F9E-AEE9-5ADCE9C893CE}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\SU\SU0.bmp = ..\Images\SU\SU0.bmp
-		..\Images\SU\SU0_M.bmp = ..\Images\SU\SU0_M.bmp
-		..\Images\SU\SU1.bmp = ..\Images\SU\SU1.bmp
-		..\Images\SU\SU2.bmp = ..\Images\SU\SU2.bmp
-		..\Images\SU\SU3.bmp = ..\Images\SU\SU3.bmp
-		..\Images\SU\SU4.bmp = ..\Images\SU\SU4.bmp
-		..\Images\SU\SU5.bmp = ..\Images\SU\SU5.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TE", "TE", "{D03014F3-2557-4F00-A29C-98D522EAC255}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\TE\TE0.bmp = ..\Images\TE\TE0.bmp
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WO", "WO", "{3BF720D5-6513-4FE8-9FAE-ACE137AB1158}"
-	ProjectSection(SolutionItems) = preProject
-		..\Images\WO\WO0.bmp = ..\Images\WO\WO0.bmp
-		..\Images\WO\WO0_M.bmp = ..\Images\WO\WO0_M.bmp
-		..\Images\WO\WO1.bmp = ..\Images\WO\WO1.bmp
-		..\Images\WO\WO2.bmp = ..\Images\WO\WO2.bmp
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Gatherers", "Gatherers\Gatherers.vcxproj", "{4D56BDDF-9D81-4256-98B8-1A86C960B716}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{D41F381D-F5E6-4833-9B04-3ED6C3FE289A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BL", "BL", "{7F94F9AF-3C45-457F-B63C-6EA647648B53}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\BL\BB0.bmp = ..\Assets\BL\BB0.bmp
+		..\Assets\BL\BB1.bmp = ..\Assets\BL\BB1.bmp
+		..\Assets\BL\BG0.bmp = ..\Assets\BL\BG0.bmp
+		..\Assets\BL\BO0.bmp = ..\Assets\BL\BO0.bmp
+		..\Assets\BL\BP0.bmp = ..\Assets\BL\BP0.bmp
+		..\Assets\BL\BP1.bmp = ..\Assets\BL\BP1.bmp
+		..\Assets\BL\BR0.bmp = ..\Assets\BL\BR0.bmp
+		..\Assets\BL\BW0.bmp = ..\Assets\BL\BW0.bmp
+		..\Assets\BL\BY0.bmp = ..\Assets\BL\BY0.bmp
+		..\Assets\BL\B_M.bmp = ..\Assets\BL\B_M.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CA", "CA", "{955A6454-0C2F-44B8-B970-41B99D6C5363}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\CA\CA0.bmp = ..\Assets\CA\CA0.bmp
+		..\Assets\CA\CA1.bmp = ..\Assets\CA\CA1.bmp
+		..\Assets\CA\CA2.bmp = ..\Assets\CA\CA2.bmp
+		..\Assets\CA\CA3.bmp = ..\Assets\CA\CA3.bmp
+		..\Assets\CA\CC0.bmp = ..\Assets\CA\CC0.bmp
+		..\Assets\CA\MO0.bmp = ..\Assets\CA\MO0.bmp
+		..\Assets\CA\ST0.bmp = ..\Assets\CA\ST0.bmp
+		..\Assets\CA\WO0.bmp = ..\Assets\CA\WO0.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CC", "CC", "{141B69B2-A628-4B6B-8F44-3A2ECE3587F4}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\CC\CC0.bmp = ..\Assets\CC\CC0.bmp
+		..\Assets\CC\CC0_M.bmp = ..\Assets\CC\CC0_M.bmp
+		..\Assets\CC\CC1.bmp = ..\Assets\CC\CC1.bmp
+		..\Assets\CC\CC10.bmp = ..\Assets\CC\CC10.bmp
+		..\Assets\CC\CC11.bmp = ..\Assets\CC\CC11.bmp
+		..\Assets\CC\CC12.bmp = ..\Assets\CC\CC12.bmp
+		..\Assets\CC\CC13.bmp = ..\Assets\CC\CC13.bmp
+		..\Assets\CC\CC14.bmp = ..\Assets\CC\CC14.bmp
+		..\Assets\CC\CC15.bmp = ..\Assets\CC\CC15.bmp
+		..\Assets\CC\CC16.bmp = ..\Assets\CC\CC16.bmp
+		..\Assets\CC\CC17.bmp = ..\Assets\CC\CC17.bmp
+		..\Assets\CC\CC18.bmp = ..\Assets\CC\CC18.bmp
+		..\Assets\CC\CC19.bmp = ..\Assets\CC\CC19.bmp
+		..\Assets\CC\CC2.bmp = ..\Assets\CC\CC2.bmp
+		..\Assets\CC\CC20.bmp = ..\Assets\CC\CC20.bmp
+		..\Assets\CC\CC21.bmp = ..\Assets\CC\CC21.bmp
+		..\Assets\CC\CC22.bmp = ..\Assets\CC\CC22.bmp
+		..\Assets\CC\CC23.bmp = ..\Assets\CC\CC23.bmp
+		..\Assets\CC\CC24.bmp = ..\Assets\CC\CC24.bmp
+		..\Assets\CC\CC25.bmp = ..\Assets\CC\CC25.bmp
+		..\Assets\CC\CC3.bmp = ..\Assets\CC\CC3.bmp
+		..\Assets\CC\CC4.bmp = ..\Assets\CC\CC4.bmp
+		..\Assets\CC\CC5.bmp = ..\Assets\CC\CC5.bmp
+		..\Assets\CC\CC6.bmp = ..\Assets\CC\CC6.bmp
+		..\Assets\CC\CC7.bmp = ..\Assets\CC\CC7.bmp
+		..\Assets\CC\CC8.bmp = ..\Assets\CC\CC8.bmp
+		..\Assets\CC\CC9.bmp = ..\Assets\CC\CC9.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GA", "GA", "{395C81BC-2991-47BB-AF7D-9A9D63D99D60}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\GA\GA0.bmp = ..\Assets\GA\GA0.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HU", "HU", "{19A438DA-7FC7-4F11-8B6E-B2B6B5ED054A}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\HU\DI0.bmp = ..\Assets\HU\DI0.bmp
+		..\Assets\HU\HU0.bmp = ..\Assets\HU\HU0.bmp
+		..\Assets\HU\HU0_M.bmp = ..\Assets\HU\HU0_M.bmp
+		..\Assets\HU\HU1.bmp = ..\Assets\HU\HU1.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "II", "II", "{B4FEC885-314A-487F-B845-37B1F49CDB45}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\II\Illusion Interactive.bmp = ..\Assets\II\Illusion Interactive.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MF", "MF", "{6EC73D84-1635-4D4E-986A-BAA75090A5FC}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\MF\MF0.bmp = ..\Assets\MF\MF0.bmp
+		..\Assets\MF\MF0_M.bmp = ..\Assets\MF\MF0_M.bmp
+		..\Assets\MF\MF1.bmp = ..\Assets\MF\MF1.bmp
+		..\Assets\MF\MF1_M.bmp = ..\Assets\MF\MF1_M.bmp
+		..\Assets\MF\MF2.bmp = ..\Assets\MF\MF2.bmp
+		..\Assets\MF\MF2_M.bmp = ..\Assets\MF\MF2_M.bmp
+		..\Assets\MF\MF3.bmp = ..\Assets\MF\MF3.bmp
+		..\Assets\MF\MF3_M.bmp = ..\Assets\MF\MF3_M.bmp
+		..\Assets\MF\MF4.bmp = ..\Assets\MF\MF4.bmp
+		..\Assets\MF\MF4_M.bmp = ..\Assets\MF\MF4_M.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MI", "MI", "{DA5AD66F-2AB7-4F28-BA9F-204D2EFBB023}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\MI\MI0.bmp = ..\Assets\MI\MI0.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RE", "RE", "{3D732660-19F4-4760-AD09-E5224BF2E271}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\RE\RE0.bmp = ..\Assets\RE\RE0.bmp
+		..\Assets\RE\RE0_M.bmp = ..\Assets\RE\RE0_M.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SU", "SU", "{DC6A49E3-BDA1-418C-A91E-3A7CA077AA1B}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\SU\SU0.bmp = ..\Assets\SU\SU0.bmp
+		..\Assets\SU\SU0_M.bmp = ..\Assets\SU\SU0_M.bmp
+		..\Assets\SU\SU1.bmp = ..\Assets\SU\SU1.bmp
+		..\Assets\SU\SU2.bmp = ..\Assets\SU\SU2.bmp
+		..\Assets\SU\SU3.bmp = ..\Assets\SU\SU3.bmp
+		..\Assets\SU\SU4.bmp = ..\Assets\SU\SU4.bmp
+		..\Assets\SU\SU5.bmp = ..\Assets\SU\SU5.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TE", "TE", "{832C6805-1879-49F0-8729-BBE1D857BA64}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\TE\TE0.bmp = ..\Assets\TE\TE0.bmp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WO", "WO", "{731DD8FA-E3B9-4733-855A-DA410498BF6C}"
+	ProjectSection(SolutionItems) = preProject
+		..\Assets\WO\WO0.bmp = ..\Assets\WO\WO0.bmp
+		..\Assets\WO\WO0_M.bmp = ..\Assets\WO\WO0_M.bmp
+		..\Assets\WO\WO1.bmp = ..\Assets\WO\WO1.bmp
+		..\Assets\WO\WO2.bmp = ..\Assets\WO\WO2.bmp
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -209,18 +219,18 @@ Global
 		{CCD359DE-9340-4FDD-9538-3862B452029C} = {311B5209-CAC9-48E1-829F-A0A1205C1799}
 		{4609D6ED-AB27-487B-A331-C0C9EF4C1E8C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{55FF910A-E039-45D7-B08C-9ECC3B3A4CD5} = {4609D6ED-AB27-487B-A331-C0C9EF4C1E8C}
-		{897905FC-7F52-418F-BADA-294DC15547CA} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{9333BB20-92B3-4673-B21C-9335C3B64EDE} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{3C857786-040E-4A3D-908A-658AA0934507} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{F6A4B856-937E-4697-8742-F34C28DF1A56} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{EFF81BEF-D650-4872-9D3F-7FF3A00B76B4} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{333B96E0-5CDE-4550-ACAD-8F0286BD4642} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{DCFFFF50-6728-4652-B91B-8AF104E20DD2} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{09CD011F-45EE-4D91-BC26-112941F8BD6F} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{5C4A611E-7028-4973-8162-56B074594A29} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{DA044035-A165-4F9E-AEE9-5ADCE9C893CE} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{D03014F3-2557-4F00-A29C-98D522EAC255} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
-		{3BF720D5-6513-4FE8-9FAE-ACE137AB1158} = {FC42459E-0115-4AAC-BC44-EB151BD08E07}
+		{7F94F9AF-3C45-457F-B63C-6EA647648B53} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{955A6454-0C2F-44B8-B970-41B99D6C5363} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{141B69B2-A628-4B6B-8F44-3A2ECE3587F4} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{395C81BC-2991-47BB-AF7D-9A9D63D99D60} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{19A438DA-7FC7-4F11-8B6E-B2B6B5ED054A} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{B4FEC885-314A-487F-B845-37B1F49CDB45} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{6EC73D84-1635-4D4E-986A-BAA75090A5FC} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{DA5AD66F-2AB7-4F28-BA9F-204D2EFBB023} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{3D732660-19F4-4760-AD09-E5224BF2E271} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{DC6A49E3-BDA1-418C-A91E-3A7CA077AA1B} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{832C6805-1879-49F0-8729-BBE1D857BA64} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
+		{731DD8FA-E3B9-4733-855A-DA410498BF6C} = {D41F381D-F5E6-4833-9B04-3ED6C3FE289A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FB999500-8562-45BB-BEAC-60E04591E66F}

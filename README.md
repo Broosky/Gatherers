@@ -29,8 +29,13 @@ Active development continues here when time allows — see the historic repo for
 - New assets...
 - `#include` dependency graph organization.
 - Use stack allocations instead of repetitive pointer dereferences.
-- Add forward declaration for internally referenced structs (e.g. `struct ENTITY* p_Next`, `p_Operating`).
+- Add forward declaration for internally referenced structs (e.g. `struct ENTITY_T* p_Next`, `p_Operating`).
 - Crossplatform support: Refactor IO, clock, etc...
+- Single vs multiple instances.
+- 4K support (large map).
+- Borderless windowed mode (toggleable).
+- Images -> Assets (renamed).
+- Doxygen documentation.
 
 ---
 

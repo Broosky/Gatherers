@@ -3,18 +3,18 @@
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef _TIMEBASE_C_
-#define _TIMEBASE_C_
+#include "../Headers/common.h"
+#include "../Headers/globals.h"
+#include "../Headers/timebase.h"
+#include <stdlib.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "../Headers/types.h"
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl TIMEBASE_Zero(TIMEBASE* p_Timebase) {
-    ZeroMemory(p_Timebase, sizeof(TIMEBASE));
+void __cdecl TIMEBASE_Zero(TIMEBASE_T* p_Timebase) {
+    ZeroMemory(p_Timebase, sizeof(TIMEBASE_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TIMEBASE* __cdecl TIMEBASE_Create(float fRate, GLOBALS* p_Globals) {
-    TIMEBASE* p_Timebase = (TIMEBASE*)malloc(sizeof(TIMEBASE));
-    p_Globals->iRunningHeap += sizeof(TIMEBASE);
+TIMEBASE_T* __cdecl TIMEBASE_Create(float fRate, GLOBALS_T* p_Globals) {
+    TIMEBASE_T* p_Timebase = (TIMEBASE_T*)malloc(sizeof(TIMEBASE_T));
+    p_Globals->iRunningHeap += sizeof(TIMEBASE_T);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     TIMEBASE_Zero(p_Timebase);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ TIMEBASE* __cdecl TIMEBASE_Create(float fRate, GLOBALS* p_Globals) {
     return p_Timebase;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT8 __cdecl TIMEBASE_Tick(TIMEBASE* p_Timebase) {
+UINT8 __cdecl TIMEBASE_Tick(TIMEBASE_T* p_Timebase) {
     QueryPerformanceCounter((LARGE_INTEGER*)&p_Timebase->iCountNow);
     p_Timebase->fDifference = (p_Timebase->iCountNow - p_Timebase->iStartCount) / (float)p_Timebase->iFreq;
     if (p_Timebase->fDifference >= p_Timebase->fMsPerFrame) {
@@ -35,23 +35,21 @@ UINT8 __cdecl TIMEBASE_Tick(TIMEBASE* p_Timebase) {
     return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl TIMEBASE_StartTimer(TIMEBASE* p_Timebase) {
+void __cdecl TIMEBASE_StartTimer(TIMEBASE_T* p_Timebase) {
     TIMEBASE_Zero(p_Timebase);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     QueryPerformanceFrequency((LARGE_INTEGER*)&p_Timebase->iFreq);
     QueryPerformanceCounter((LARGE_INTEGER*)&p_Timebase->iStartCount);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float __cdecl TIMEBASE_EndTimer(TIMEBASE* p_Timebase) {
+float __cdecl TIMEBASE_EndTimer(TIMEBASE_T* p_Timebase) {
     QueryPerformanceCounter((LARGE_INTEGER*)&p_Timebase->iCountNow);
     p_Timebase->fDifference = (p_Timebase->iCountNow - p_Timebase->iStartCount) / (float)p_Timebase->iFreq;
     return p_Timebase->fDifference;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl TIMEBASE_Kill(TIMEBASE* p_Timebase, GLOBALS* p_Globals) {
+void __cdecl TIMEBASE_Kill(TIMEBASE_T* p_Timebase, GLOBALS_T* p_Globals) {
     free(p_Timebase);
-    p_Globals->iRunningHeap -= sizeof(TIMEBASE);
+    p_Globals->iRunningHeap -= sizeof(TIMEBASE_T);
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

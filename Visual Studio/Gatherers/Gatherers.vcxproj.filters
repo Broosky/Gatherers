@@ -18,13 +18,13 @@
     <ClCompile Include="..\..\Source\ai.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\bench.c">
+    <ClCompile Include="..\..\Source\benchmark.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\card.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\dblbuf.c">
+    <ClCompile Include="..\..\Source\double_buffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\engine.c">
@@ -36,7 +36,7 @@
     <ClCompile Include="..\..\Source\globals.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\images.c">
+    <ClCompile Include="..\..\Source\assets.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\load.c">
@@ -60,7 +60,7 @@
     <ClCompile Include="..\..\Source\process.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\render.c">
+    <ClCompile Include="..\..\Source\transform.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\settings.c">
@@ -69,7 +69,7 @@
     <ClCompile Include="..\..\Source\timebase.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\winproc.c">
+    <ClCompile Include="..\..\Source\windows_procedure.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\log.c">
@@ -77,16 +77,73 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Headers\main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Headers\constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Headers\functions.h">
+    <ClInclude Include="..\..\Headers\common_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Headers\types.h">
+    <ClInclude Include="..\..\Headers\ai.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\benchmark.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\card.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\double_buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\assets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\picture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\process.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\timebase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\windows_procedure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\windows_macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

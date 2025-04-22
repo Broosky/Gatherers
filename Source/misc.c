@@ -3,12 +3,13 @@
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef _MISC_C_
-#define _MISC_C_
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "../Headers/common.h"
+#include "../Headers/common_types.h"
 #include "../Headers/constants.h"
-#include "../Headers/types.h"
-#include <wtypes.h>
+#include "../Headers/windows_macros.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int __cdecl MISC_RandomNumber(int iMinimum, int iMax) {
     return rand() % (iMax - iMinimum + 1) + iMinimum;
@@ -36,9 +37,9 @@ void __cdecl MISC_ResizeWindow(HWND hWnd, UINT uiClientWidth, UINT uiClientHeigh
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Position the window to the center of the screen.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    IPOINT WindowSize = { WindowArea.right - WindowArea.left, WindowArea.bottom - WindowArea.top };
-    IPOINT HalfWindowSize = { WindowSize.iX >> 1, WindowSize.iY >> 1 };
-    IPOINT MidScreen = { GetSystemMetrics(SM_CXSCREEN) >> 1, GetSystemMetrics(SM_CYSCREEN) >> 1 };
+    IPOINT_T WindowSize = { WindowArea.right - WindowArea.left, WindowArea.bottom - WindowArea.top };
+    IPOINT_T HalfWindowSize = { WindowSize.iX >> 1, WindowSize.iY >> 1 };
+    IPOINT_T MidScreen = { GetSystemMetrics(SM_CXSCREEN) >> 1, GetSystemMetrics(SM_CYSCREEN) >> 1 };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     MoveWindow(hWnd, MidScreen.iX - HalfWindowSize.iX, MidScreen.iY - HalfWindowSize.iY, WindowSize.iX, WindowSize.iY, 1);
 }
@@ -51,6 +52,4 @@ void __cdecl MISC_FormatTime(ULONG ulSecondsTick, char* p_szBuffer, size_t p_szB
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     snprintf(p_szBuffer, p_szBufferSize, "%02lud %02luh %02lum %02lus", ulDays, ulHours, ulMinutes, ulSeconds);
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

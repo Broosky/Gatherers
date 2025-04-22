@@ -3,21 +3,20 @@
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef _LOG_C_
-#define _LOG_C_
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "../Headers/functions.h"
-#include "../Headers/types.h"
+#include "../Headers/common.h"
+#include "../Headers/globals.h"
+#include "../Headers/log.h"
 #include <io.h>
+#include <stdlib.h>
 #include <time.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl LOG_Zero(LOG* p_Log) {
-    ZeroMemory(p_Log, sizeof(LOG));
+void __cdecl LOG_Zero(LOG_T* p_Log) {
+    ZeroMemory(p_Log, sizeof(LOG_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LOG* __cdecl LOG_Create(const char* p_szFileName, GLOBALS* p_Globals) {
-    size_t stAlloc = sizeof(LOG);
-    LOG* p_Log = (LOG*)malloc(stAlloc);
+LOG_T* __cdecl LOG_Create(const char* p_szFileName, GLOBALS_T* p_Globals) {
+    size_t stAlloc = sizeof(LOG_T);
+    LOG_T* p_Log = (LOG_T*)malloc(stAlloc);
     if (!p_Log) {
         // This is the only fail fast that writes to console, all others will write to the log.
         printf("LOG_Create(): malloc failed for size: %zu bytes\n", stAlloc);
@@ -47,14 +46,14 @@ LOG* __cdecl LOG_Create(const char* p_szFileName, GLOBALS* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl LOG_Append(LOG* p_Log, const char* p_szMessage) {
+void __cdecl LOG_Append(LOG_T* p_Log, const char* p_szMessage) {
     char szTimestamp[64] = { 0 };
     LOG_PopulateTimestamp(szTimestamp, sizeof(szTimestamp));
     fprintf(p_Log->p_LogFile, "[%s] %s\n", szTimestamp, p_szMessage);
     LOG_Flush(p_Log, 1);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl LOG_Flush(LOG* p_Log, UINT8 ubGuarantee) {
+void __cdecl LOG_Flush(LOG_T* p_Log, UINT8 ubGuarantee) {
     fflush(p_Log->p_LogFile);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (ubGuarantee) {
@@ -73,7 +72,7 @@ void __cdecl LOG_PopulateTimestamp(char* p_szBuffer, size_t stBufferSize) {
     strftime(p_szBuffer, stBufferSize, "%Y-%m-%d %H:%M:%S", LocalTime);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl LOG_Kill(LOG* p_Log, GLOBALS* p_Globals) {
+void __cdecl LOG_Kill(LOG_T* p_Log, GLOBALS_T* p_Globals) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Bookend log and free.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,9 +85,7 @@ void __cdecl LOG_Kill(LOG* p_Log, GLOBALS* p_Globals) {
     }
     if (p_Log) {
         free(p_Log);
-        p_Globals->iRunningHeap -= sizeof(LOG);
+        p_Globals->iRunningHeap -= sizeof(LOG_T);
     }
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
