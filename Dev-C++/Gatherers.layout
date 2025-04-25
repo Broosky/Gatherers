@@ -4,7 +4,7 @@
     <ActiveTarget name="" />
 </CodeBlocks_layout_file>
 [Editors]
-Order=23,19,21,17,4,7,18,42,31,27,49,142,28,140,0,141,1,35,2,30,33,32,29,41,43
+Order=23,19,21,17,4,7,18,42,31,27,49,142,28,140,0,141,1,35,2,30,33,32,29,41,43,8,10
 Focused=30
 [Editor_111]
 CursorCol=25
@@ -47,9 +47,9 @@ CursorRow=1
 TopLine=1
 LeftChar=1
 [Editor_2]
-CursorCol=10
-CursorRow=83
-TopLine=124
+CursorCol=78
+CursorRow=459
+TopLine=439
 LeftChar=1
 [Editor_7]
 CursorCol=22
@@ -57,9 +57,9 @@ CursorRow=46
 TopLine=1
 LeftChar=1
 [Editor_8]
-CursorCol=1
-CursorRow=1
-TopLine=1
+CursorCol=7
+CursorRow=67
+TopLine=24
 LeftChar=1
 [Editor_9]
 CursorCol=1

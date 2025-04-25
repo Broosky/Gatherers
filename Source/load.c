@@ -49,13 +49,13 @@ INT_PTR CALLBACK WINDOWS_PROCEDURE_DlgLoad(HWND hWnd, UINT uiMsg, WPARAM wParam,
     }
     case WM_TIMER: {
         SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading program settings...");
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SETTINGS_InitFromFile(p_Settings);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Ready.");
         SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading images...");
+        ASSETS_LoadBitmaps(p_Assets, hWnd);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ASSETS_InitFromFile(p_Assets, hWnd);
+        SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Creating brushes...");
+        ASSETS_CreateBrushes(p_Assets);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Ready.");
         PostMessage(hWnd, WM_CLOSE, 0, 0);

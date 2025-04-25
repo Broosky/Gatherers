@@ -7,8 +7,11 @@
 #include "../Headers/assets.h"
 #include "../Headers/common.h"
 #include "../Headers/constants.h"
+#include "../Headers/double_buffer.h"
 #include "../Headers/entity.h"
 #include "../Headers/globals.h"
+#include "../Headers/log.h"
+#include "../Headers/main.h"
 #include "../Headers/message.h"
 #include <math.h>
 #include <stdio.h>
@@ -22,14 +25,22 @@ void __cdecl ENTITY_Zero(ENTITY_T* p_Entity) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // - Pass in the global structure. I use it more than once in this function.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log, DOUBLE_BUFFER_T* p_DoubleBuffer) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // If there are no manufacturing restrictions, and no entity overlap, allow creation.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!ENTITY_Overlap(usType, p_Assets, p_Globals) && !ENTITY_Restrict(usType, p_Globals)) {
+    if (!ENTITY_Overlap(usType, p_Assets, p_Globals, p_Log, p_DoubleBuffer) && !ENTITY_Restrict(usType, p_Globals, p_Log)) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY_T* p_Entity = (ENTITY_T*)malloc(sizeof(ENTITY_T));
-        p_Globals->iRunningHeap += sizeof(ENTITY_T);
+        size_t stAllocation = sizeof(ENTITY_T);
+        ENTITY_T* p_Entity = malloc(stAllocation);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (!p_Entity) {
+            LOG_AppendParams(p_Log, "ENTITY_Create(): malloc failed for size: %zu bytes\n", stAllocation);
+            UINT8 _discard = MAIN_FailFast(p_Globals, p_Log);
+            return;
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_Globals->stAllocations += stAllocation;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ENTITY_Zero(p_Entity);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +59,7 @@ void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets,
         case ENTITY_WORKER: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Worker[0];
-            p_Entity->MovementSpeed = (FPOINT_T){ WORKER_MOVE_SPEED, WORKER_MOVE_SPEED };
+            p_Entity->MovementSpeed = (FDELTA_T){ WORKER_MOVE_SPEED, WORKER_MOVE_SPEED };
             p_Entity->ubIsMovable = 1;
             p_Entity->usState = ANIMATE_WORKER_NORMAL;
             break;
@@ -57,14 +68,14 @@ void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets,
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Mineral[0];
             p_Entity->iMineralCount = MINERALS_ON_CREATION;
-            p_Entity->MovementSpeed = (FPOINT_T){ MINERAL_MOVE_SPEED, MINERAL_MOVE_SPEED };
+            p_Entity->MovementSpeed = (FDELTA_T){ MINERAL_MOVE_SPEED, MINERAL_MOVE_SPEED };
             p_Entity->ubIsObstacle = 1;
             break;
         }
         case ENTITY_COMMAND: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Command[0];
-            p_Entity->MovementSpeed = (FPOINT_T){ COMMAND_MOVE_SPEED, COMMAND_MOVE_SPEED };
+            p_Entity->MovementSpeed = (FDELTA_T){ COMMAND_MOVE_SPEED, COMMAND_MOVE_SPEED };
             p_Entity->ubIsObstacle = 1;
             p_Entity->usState = ANIMATE_COMMAND_CREATING;
             break;
@@ -72,7 +83,7 @@ void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets,
         case ENTITY_SUPPLY: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Supply[0];
-            p_Entity->MovementSpeed = (FPOINT_T){ SUPPLY_MOVE_SPEED, SUPPLY_MOVE_SPEED };
+            p_Entity->MovementSpeed = (FDELTA_T){ SUPPLY_MOVE_SPEED, SUPPLY_MOVE_SPEED };
             p_Entity->ubIsObstacle = 1;
             p_Entity->usState = ANIMATE_SUPPLY_NORMAL;
             break;
@@ -81,7 +92,7 @@ void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets,
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Refinery[0];
             p_Entity->iGasCount = GAS_ON_CREATION;
-            p_Entity->MovementSpeed = (FPOINT_T){ REFINERY_MOVE_SPEED, REFINERY_MOVE_SPEED };
+            p_Entity->MovementSpeed = (FDELTA_T){ REFINERY_MOVE_SPEED, REFINERY_MOVE_SPEED };
             p_Entity->ubIsObstacle = 1;
             break;
         }
@@ -90,16 +101,16 @@ void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets,
         }
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        p_Entity->Size.fX = (*p_Entity->p_Picture).Bitmap.bmWidth;
-        p_Entity->Size.fY = (*p_Entity->p_Picture).Bitmap.bmHeight;
+        p_Entity->Size.fDx = (*p_Entity->p_Picture).Bitmap.bmWidth;
+        p_Entity->Size.fDy = (*p_Entity->p_Picture).Bitmap.bmHeight;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        p_Entity->HalfSize.fX = (*p_Entity->p_Picture).Bitmap.bmWidth >> 1;
-        p_Entity->HalfSize.fY = (*p_Entity->p_Picture).Bitmap.bmHeight >> 1;
+        p_Entity->HalfSize.fDx = (*p_Entity->p_Picture).Bitmap.bmWidth >> 1;
+        p_Entity->HalfSize.fDy = (*p_Entity->p_Picture).Bitmap.bmHeight >> 1;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        p_Entity->Location.fX = p_Entity->CenterPoint.fX - p_Entity->HalfSize.fX;
-        p_Entity->Location.fY = p_Entity->CenterPoint.fY - p_Entity->HalfSize.fY;
+        p_Entity->Location.fX = p_Entity->CenterPoint.fX - p_Entity->HalfSize.fDx;
+        p_Entity->Location.fY = p_Entity->CenterPoint.fY - p_Entity->HalfSize.fDy;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        p_Entity->fRadius = (p_Entity->HalfSize.fX + p_Entity->HalfSize.fY) / 2.0f;
+        p_Entity->fRadius = (p_Entity->HalfSize.fDx + p_Entity->HalfSize.fDy) / 2.0f;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (!p_Globals->p_RootEntity) {
             p_Entity->p_Next = NULL;
@@ -114,7 +125,7 @@ void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets,
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT8 __cdecl ENTITY_Restrict(USHORT usType, GLOBALS_T* p_Globals) {
+UINT8 __cdecl ENTITY_Restrict(USHORT usType, GLOBALS_T* p_Globals, LOG_T* p_Log) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // This function will return 0 if there are no manufacturing restrictions, otherwise it will return 1.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,12 +143,12 @@ UINT8 __cdecl ENTITY_Restrict(USHORT usType, GLOBALS_T* p_Globals) {
                 return 0;
             }
             else {
-                MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
+                MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
                 return 1;
             }
         }
         else {
-            MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
+            MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
             return 1;
         }
     }
@@ -154,17 +165,17 @@ UINT8 __cdecl ENTITY_Restrict(USHORT usType, GLOBALS_T* p_Globals) {
                     return 0;
                 }
                 else {
-                    MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
+                    MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
                     return 1;
                 }
             }
             else {
-                MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
+                MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
                 return 1;
             }
         }
         else {
-            MESSAGE_Create("Not enough supplies!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
+            MESSAGE_Create("Not enough supplies!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
             return 1;
         }
     }
@@ -183,12 +194,12 @@ UINT8 __cdecl ENTITY_Restrict(USHORT usType, GLOBALS_T* p_Globals) {
                 return 0;
             }
             else {
-                MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
+                MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
                 return 1;
             }
         }
         else {
-            MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
+            MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
             return 1;
         }
     }
@@ -203,12 +214,12 @@ UINT8 __cdecl ENTITY_Restrict(USHORT usType, GLOBALS_T* p_Globals) {
                 return 0;
             }
             else {
-                MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
+                MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
                 return 1;
             }
         }
         else {
-            MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
+            MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
             return 1;
         }
     }
@@ -219,34 +230,34 @@ UINT8 __cdecl ENTITY_Restrict(USHORT usType, GLOBALS_T* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT8 __cdecl ENTITY_Overlap(USHORT usType, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+UINT8 __cdecl ENTITY_Overlap(USHORT usType, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log, DOUBLE_BUFFER_T* p_DoubleBuffer) {
     FPOINT_T Position = { 15.0f, 85.0f };
+    FDELTA_T Size = { 0.0f, 0.0f };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FPOINT_T Size = { 0.0f, 0.0f };
     switch (usType) {
     case ENTITY_WORKER: {
-        Size.fX = p_Assets->Worker[0].Bitmap.bmWidth;
-        Size.fY = p_Assets->Worker[0].Bitmap.bmHeight;
+        Size.fDx = p_Assets->Worker[0].Bitmap.bmWidth;
+        Size.fDy = p_Assets->Worker[0].Bitmap.bmHeight;
         break;
     }
     case ENTITY_MINERAL: {
-        Size.fX = p_Assets->Mineral[0].Bitmap.bmWidth;
-        Size.fY = p_Assets->Mineral[0].Bitmap.bmHeight;
+        Size.fDx = p_Assets->Mineral[0].Bitmap.bmWidth;
+        Size.fDy = p_Assets->Mineral[0].Bitmap.bmHeight;
         break;
     }
     case ENTITY_COMMAND: {
-        Size.fX = p_Assets->Command[0].Bitmap.bmWidth;
-        Size.fY = p_Assets->Command[0].Bitmap.bmHeight;
+        Size.fDx = p_Assets->Command[0].Bitmap.bmWidth;
+        Size.fDy = p_Assets->Command[0].Bitmap.bmHeight;
         break;
     }
     case ENTITY_SUPPLY: {
-        Size.fX = p_Assets->Supply[0].Bitmap.bmWidth;
-        Size.fY = p_Assets->Supply[0].Bitmap.bmHeight;
+        Size.fDx = p_Assets->Supply[0].Bitmap.bmWidth;
+        Size.fDy = p_Assets->Supply[0].Bitmap.bmHeight;
         break;
     }
     case ENTITY_REFINERY: {
-        Size.fX = p_Assets->Refinery[0].Bitmap.bmWidth;
-        Size.fY = p_Assets->Refinery[0].Bitmap.bmHeight;
+        Size.fDx = p_Assets->Refinery[0].Bitmap.bmWidth;
+        Size.fDy = p_Assets->Refinery[0].Bitmap.bmHeight;
         break;
     }
     default: {
@@ -254,30 +265,46 @@ UINT8 __cdecl ENTITY_Overlap(USHORT usType, ASSETS_T* p_Assets, GLOBALS_T* p_Glo
     }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FPOINT_T EntityALocation = { p_Globals->iMouseX - Size.fX / 2.0f, p_Globals->iMouseY - Size.fY / 2.0f };
-    FPOINT_T EntityADelta = { EntityALocation.fX + Size.fX, EntityALocation.fY + Size.fY };
+    FPOINT_T EntityALocation = { p_Globals->iMouseX - Size.fDx / 2.0f, p_Globals->iMouseY - Size.fDy / 2.0f };
+    FDELTA_T EntityADelta = { EntityALocation.fX + Size.fDx, EntityALocation.fY + Size.fDy };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ENTITY_T* Current = p_Globals->p_RootEntity;
-    while (Current) {
-        FPOINT_T EntityBLocation = {
-            Current->Location.fX - p_Assets->Worker[0].Bitmap.bmWidth,
-            Current->Location.fY - p_Assets->Worker[0].Bitmap.bmHeight
-        };
-        FPOINT_T EntityBDelta = {
-            EntityBLocation.fX + Current->Size.fX + (p_Assets->Worker[0].Bitmap.bmWidth << 1),
-            EntityBLocation.fY + Current->Size.fY + (p_Assets->Worker[0].Bitmap.bmHeight << 1)
-        };
+    // Check for screen out-of-bounds.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (EntityALocation.fX < 0.0f || EntityADelta.fDx > p_DoubleBuffer->ClientArea.right ||
+        EntityALocation.fY < 0.0f || EntityADelta.fDy > p_DoubleBuffer->ClientArea.bottom) {
+        MESSAGE_Create("You can't build there!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
+        return 1;
+    }
+    else {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (
-            !(EntityALocation.fX > EntityBDelta.fX) &&
-            !(EntityADelta.fX < EntityBLocation.fX) &&
-            !(EntityALocation.fY > EntityBDelta.fY) &&
-            !(EntityADelta.fY < EntityBLocation.fY)
-            ) {
-            MESSAGE_Create("You can't build there!", Position, MESSAGE_GENERAL_WARNING, p_Globals);
-            return 1;
+        // Check for intersections with other entities.
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        int iLessX = p_Assets->Worker[0].Bitmap.bmWidth;
+        int iLessY = p_Assets->Worker[0].Bitmap.bmHeight;
+        int iMoreX = iLessX << 1;
+        int iMoreY = iLessY << 1;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ENTITY_T* p_Current = p_Globals->p_RootEntity;
+        while (p_Current) {
+            FPOINT_T EntityBLocation = {
+                p_Current->Location.fX - iLessX,
+                p_Current->Location.fY - iLessY
+            };
+            FDELTA_T EntityBDelta = {
+                EntityBLocation.fX + p_Current->Size.fDx + iMoreX,
+                EntityBLocation.fY + p_Current->Size.fDy + iMoreY
+            };
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if ((EntityALocation.fX < EntityBDelta.fDx) &&
+                (EntityADelta.fDx > EntityBLocation.fX) &&
+                (EntityALocation.fY < EntityBDelta.fDy) &&
+                (EntityADelta.fDy > EntityBLocation.fY)
+                ) {
+                MESSAGE_Create("You can't build there!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
+                return 1;
+            }
+            p_Current = (ENTITY_T*)p_Current->p_Next;
         }
-        Current = (ENTITY_T*)Current->p_Next;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // No overlap exists.
@@ -312,35 +339,43 @@ UINT8 __cdecl ENTITY_CollidedWith(ENTITY_T* p_Source, ENTITY_T* p_Destination) {
 UINT8 __cdecl ENTITY_WithinPoint(ENTITY_T* p_Inquirer, FPOINT_T Location) {
     if (
         Location.fX >= p_Inquirer->Location.fX &&
-        Location.fX <= p_Inquirer->Location.fX + p_Inquirer->Size.fX &&
+        Location.fX <= p_Inquirer->Location.fX + p_Inquirer->Size.fDx &&
         Location.fY >= p_Inquirer->Location.fY &&
-        Location.fY <= p_Inquirer->Location.fY + p_Inquirer->Size.fY
+        Location.fY <= p_Inquirer->Location.fY + p_Inquirer->Size.fDy
         ) {
         return 1;
     }
     return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+FDELTA_T __cdecl ENTITY_CalculateVector(FPOINT_T Start, FPOINT_T Destination) {
+    FDELTA_T Vector = { Destination.fX - Start.fX, Destination.fY - Start.fY };
+    return Vector;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+FDELTA_T __cdecl ENTITY_CalculateUnitVector(FDELTA_T Vector) {
+    float fMagnitude = sqrtf(Vector.fDx * Vector.fDx + Vector.fDy * Vector.fDy);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FDELTA_T UnitVector = {
+        Vector.fDx / fMagnitude,
+        Vector.fDy / fMagnitude
+    };
+    return UnitVector;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ENTITY_MoveTo(ENTITY_T* p_Source, ENTITY_T* p_Destination, GLOBALS_T* p_Globals) {
     ENTITY_MoveToPoint(p_Source, p_Destination->CenterPoint, p_Globals);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_MoveToPoint(ENTITY_T* p_Source, FPOINT_T CenterPoint, GLOBALS_T* p_Globals) {
+void __cdecl ENTITY_MoveToPoint(ENTITY_T* p_Source, FPOINT_T DestinationCenterPoint, GLOBALS_T* p_Globals) {
     p_Source->ubIsInMotion = 1;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Calculate the absolute destination data. This is the major vector.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Source->MajorDestinationCenterPoint = CenterPoint;
-    p_Source->MajorVector.fX = CenterPoint.fX - p_Source->CenterPoint.fX;
-    p_Source->MajorVector.fY = CenterPoint.fY - p_Source->CenterPoint.fY;
-    p_Source->MajorUnitVector.fX = p_Source->MajorVector.fX / sqrt(
-        p_Source->MajorVector.fX * p_Source->MajorVector.fX +
-        p_Source->MajorVector.fY * p_Source->MajorVector.fY
-    );
-    p_Source->MajorUnitVector.fY = p_Source->MajorVector.fY / sqrt(
-        p_Source->MajorVector.fX * p_Source->MajorVector.fX +
-        p_Source->MajorVector.fY * p_Source->MajorVector.fY
-    );
+    p_Source->MajorDestinationCenterPoint = DestinationCenterPoint;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Source->MajorVector = ENTITY_CalculateVector(p_Source->CenterPoint, p_Source->MajorDestinationCenterPoint);
+    p_Source->MajorUnitVector = ENTITY_CalculateUnitVector(p_Source->MajorVector);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Calculate the path-finding destination data. These are the minor vectors needed to reach the major vector.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -357,16 +392,9 @@ void __cdecl ENTITY_FindMinorVector(ENTITY_T* p_Source, GLOBALS_T* p_Globals) {
     // Minor vector will initially equal the major vector. What if nothing is in the way?
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Source->MinorDestinationCenterPoint = p_Source->MajorDestinationCenterPoint;
-    p_Source->MinorVector.fX = p_Source->MinorDestinationCenterPoint.fX - CurrentPoint.fX;
-    p_Source->MinorVector.fY = p_Source->MinorDestinationCenterPoint.fY - CurrentPoint.fY;
-    p_Source->MinorUnitVector.fX = p_Source->MinorVector.fX / sqrt(
-        p_Source->MinorVector.fX * p_Source->MinorVector.fX +
-        p_Source->MinorVector.fY * p_Source->MinorVector.fY
-    );
-    p_Source->MinorUnitVector.fY = p_Source->MinorVector.fY / sqrt(
-        p_Source->MinorVector.fX * p_Source->MinorVector.fX +
-        p_Source->MinorVector.fY * p_Source->MinorVector.fY
-    );
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Source->MinorVector = ENTITY_CalculateVector(CurrentPoint, p_Source->MinorDestinationCenterPoint);
+    p_Source->MinorUnitVector = ENTITY_CalculateUnitVector(p_Source->MinorVector);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Iterate along the vector to see if I need to change my course.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,8 +403,8 @@ void __cdecl ENTITY_FindMinorVector(ENTITY_T* p_Source, GLOBALS_T* p_Globals) {
         abs(p_Source->MinorDestinationCenterPoint.fY - CurrentPoint.fY) >= SUFFICIENTLY_CLOSE
         ) {
         if (ENTITY_WithinPoint(p_Source, CurrentPoint)) {
-            CurrentPoint.fX += p_Source->MinorUnitVector.fX;
-            CurrentPoint.fY += p_Source->MinorUnitVector.fY;
+            CurrentPoint.fX += p_Source->MinorUnitVector.fDx;
+            CurrentPoint.fY += p_Source->MinorUnitVector.fDy;
             continue;
         }
         else {
@@ -387,18 +415,10 @@ void __cdecl ENTITY_FindMinorVector(ENTITY_T* p_Source, GLOBALS_T* p_Globals) {
                         return;
                     }
                     else {
-                        p_Source->MinorDestinationCenterPoint = ENTITY_MinorVectorHead(p_Source, p_Current, p_Globals);
+                        p_Source->MinorDestinationCenterPoint = ENTITY_FindMinorVectorHead(p_Source, p_Current, p_Globals);
                         /////////////////////////////////////////////////////////////////////////////////////////////////////
-                        p_Source->MinorVector.fX = p_Source->MinorDestinationCenterPoint.fX - p_Source->CenterPoint.fX;
-                        p_Source->MinorVector.fY = p_Source->MinorDestinationCenterPoint.fY - p_Source->CenterPoint.fY;
-                        p_Source->MinorUnitVector.fX = p_Source->MinorVector.fX / sqrt(
-                            p_Source->MinorVector.fX * p_Source->MinorVector.fX +
-                            p_Source->MinorVector.fY * p_Source->MinorVector.fY
-                        );
-                        p_Source->MinorUnitVector.fY = p_Source->MinorVector.fY / sqrt(
-                            p_Source->MinorVector.fX * p_Source->MinorVector.fX +
-                            p_Source->MinorVector.fY * p_Source->MinorVector.fY
-                        );
+                        p_Source->MinorVector = ENTITY_CalculateVector(p_Source->CenterPoint, p_Source->MinorDestinationCenterPoint);
+                        p_Source->MinorUnitVector = ENTITY_CalculateUnitVector(p_Source->MinorVector);
                         return;
                     }
                 }
@@ -407,36 +427,21 @@ void __cdecl ENTITY_FindMinorVector(ENTITY_T* p_Source, GLOBALS_T* p_Globals) {
                 }
             }
         }
-        CurrentPoint.fX += p_Source->MinorUnitVector.fX;
-        CurrentPoint.fY += p_Source->MinorUnitVector.fY;
+        CurrentPoint.fX += p_Source->MinorUnitVector.fDx;
+        CurrentPoint.fY += p_Source->MinorUnitVector.fDy;
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-FPOINT_T __cdecl ENTITY_MinorVectorHead(ENTITY_T* p_Source, ENTITY_T* p_Current, GLOBALS_T* p_Globals) {
+FPOINT_T __cdecl ENTITY_FindMinorVectorHead(ENTITY_T* p_Source, ENTITY_T* p_Current, GLOBALS_T* p_Globals) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Entities are rectangular.
+    // Top left, right, bottom left, right.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FPOINT_T CornerPoints[4];
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Top left.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CornerPoints[0].fX = p_Current->CenterPoint.fX - p_Current->HalfSize.fX - p_Source->HalfSize.fX;
-    CornerPoints[0].fY = p_Current->CenterPoint.fY - p_Current->HalfSize.fY - p_Source->HalfSize.fY;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Top right.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CornerPoints[1].fX = p_Current->CenterPoint.fX + p_Current->HalfSize.fX + p_Source->HalfSize.fX;
-    CornerPoints[1].fY = p_Current->CenterPoint.fY - p_Current->HalfSize.fY - p_Source->HalfSize.fY;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Bottom left.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CornerPoints[2].fX = p_Current->CenterPoint.fX - p_Current->HalfSize.fX - p_Source->HalfSize.fX;
-    CornerPoints[2].fY = p_Current->CenterPoint.fY + p_Current->HalfSize.fY + p_Source->HalfSize.fY;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Bottom right.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CornerPoints[3].fX = p_Current->CenterPoint.fX + p_Current->HalfSize.fX + p_Source->HalfSize.fX;
-    CornerPoints[3].fY = p_Current->CenterPoint.fY + p_Current->HalfSize.fY + p_Source->HalfSize.fY;
+    FPOINT_T CornerPoints[4] = {
+        { p_Current->CenterPoint.fX - p_Current->HalfSize.fDx - p_Source->HalfSize.fDx, p_Current->CenterPoint.fY - p_Current->HalfSize.fDy - p_Source->HalfSize.fDy },
+        { p_Current->CenterPoint.fX + p_Current->HalfSize.fDx + p_Source->HalfSize.fDx, p_Current->CenterPoint.fY - p_Current->HalfSize.fDy - p_Source->HalfSize.fDy },
+        { p_Current->CenterPoint.fX - p_Current->HalfSize.fDx - p_Source->HalfSize.fDx, p_Current->CenterPoint.fY + p_Current->HalfSize.fDy + p_Source->HalfSize.fDy },
+        { p_Current->CenterPoint.fX + p_Current->HalfSize.fDx + p_Source->HalfSize.fDx, p_Current->CenterPoint.fY + p_Current->HalfSize.fDy + p_Source->HalfSize.fDy }
+    };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Calculate the distances to the points, and order the points from closest to farthest from the major destination.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -478,16 +483,11 @@ FPOINT_T __cdecl ENTITY_MinorVectorHead(ENTITY_T* p_Source, ENTITY_T* p_Current,
     for (ubI = 0; ubI < 4; ubI++) {
         UINT8 ubIsBisection = 0;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        FPOINT_T Vector;
-        FPOINT_T UnitVector;
         FPOINT_T EndPosition = CornerPoints[ubI];
         FPOINT_T CurrentPoint = p_Source->CenterPoint;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        Vector.fX = EndPosition.fX - CurrentPoint.fX;
-        Vector.fY = EndPosition.fY - CurrentPoint.fY;
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        UnitVector.fX = Vector.fX / sqrt(Vector.fX * Vector.fX + Vector.fY * Vector.fY);
-        UnitVector.fY = Vector.fY / sqrt(Vector.fX * Vector.fX + Vector.fY * Vector.fY);
+        FDELTA_T Vector = ENTITY_CalculateVector(CurrentPoint, EndPosition);
+        FDELTA_T UnitVector = ENTITY_CalculateUnitVector(Vector);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         while (
             abs(EndPosition.fX - CurrentPoint.fX) >= SUFFICIENTLY_CLOSE ||
@@ -500,8 +500,8 @@ FPOINT_T __cdecl ENTITY_MinorVectorHead(ENTITY_T* p_Source, ENTITY_T* p_Current,
                 ubIsBisection = 1;
                 break;
             }
-            CurrentPoint.fX += UnitVector.fX;
-            CurrentPoint.fY += UnitVector.fY;
+            CurrentPoint.fX += UnitVector.fDx;
+            CurrentPoint.fY += UnitVector.fDy;
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // This is the correct head to travel to, but it may contain additional obstacles.
@@ -511,32 +511,29 @@ FPOINT_T __cdecl ENTITY_MinorVectorHead(ENTITY_T* p_Source, ENTITY_T* p_Current,
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             EndPosition = CornerPoints[ubI];
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            Vector.fX = EndPosition.fX - CurrentPoint.fX;
-            Vector.fY = EndPosition.fY - CurrentPoint.fY;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            UnitVector.fX = Vector.fX / sqrt(Vector.fX * Vector.fX + Vector.fY * Vector.fY);
-            UnitVector.fY = Vector.fY / sqrt(Vector.fX * Vector.fX + Vector.fY * Vector.fY);
+            Vector = ENTITY_CalculateVector(CurrentPoint, EndPosition);
+            UnitVector = ENTITY_CalculateUnitVector(Vector);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             while (
                 abs(EndPosition.fX - CurrentPoint.fX) >= SUFFICIENTLY_CLOSE ||
                 abs(EndPosition.fY - CurrentPoint.fY) >= SUFFICIENTLY_CLOSE
                 ) {
                 if (ENTITY_WithinPoint(p_Source, CurrentPoint)) {
-                    CurrentPoint.fX += UnitVector.fX;
-                    CurrentPoint.fY += UnitVector.fY;
+                    CurrentPoint.fX += UnitVector.fDx;
+                    CurrentPoint.fY += UnitVector.fDy;
                     continue;
                 }
                 else {
                     ENTITY_T* p_NewObstacle = p_Globals->p_RootEntity;
                     while (p_NewObstacle && p_NewObstacle->ubIsObstacle) {
                         if (ENTITY_WithinPoint(p_NewObstacle, CurrentPoint)) {
-                            return ENTITY_MinorVectorHead(p_Source, p_NewObstacle, p_Globals);
+                            return ENTITY_FindMinorVectorHead(p_Source, p_NewObstacle, p_Globals);
                         }
                         p_NewObstacle = (ENTITY_T*)p_NewObstacle->p_Next;
                     }
                 }
-                CurrentPoint.fX += UnitVector.fX;
-                CurrentPoint.fY += UnitVector.fY;
+                CurrentPoint.fX += UnitVector.fDx;
+                CurrentPoint.fY += UnitVector.fDy;
             }
             return CornerPoints[ubI];
         }
@@ -548,10 +545,11 @@ FPOINT_T __cdecl ENTITY_MinorVectorHead(ENTITY_T* p_Source, ENTITY_T* p_Current,
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ENTITY_UpdatePosition(ENTITY_T* p_Entity, GLOBALS_T* p_Globals) {
-    p_Entity->Location.fX += p_Entity->MinorUnitVector.fX * p_Entity->MovementSpeed.fX;
-    p_Entity->Location.fY += p_Entity->MinorUnitVector.fY * p_Entity->MovementSpeed.fY;
-    p_Entity->CenterPoint.fX = p_Entity->Location.fX + p_Entity->HalfSize.fX;
-    p_Entity->CenterPoint.fY = p_Entity->Location.fY + p_Entity->HalfSize.fY;
+    p_Entity->Location.fX += p_Entity->MinorUnitVector.fDx * p_Entity->MovementSpeed.fDx;
+    p_Entity->Location.fY += p_Entity->MinorUnitVector.fDy * p_Entity->MovementSpeed.fDy;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Entity->CenterPoint.fX = p_Entity->Location.fX + p_Entity->HalfSize.fDx;
+    p_Entity->CenterPoint.fY = p_Entity->Location.fY + p_Entity->HalfSize.fDy;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Minor vectors...
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -560,18 +558,18 @@ void __cdecl ENTITY_UpdatePosition(ENTITY_T* p_Entity, GLOBALS_T* p_Globals) {
         abs(p_Entity->CenterPoint.fY - p_Entity->MinorDestinationCenterPoint.fY) <= SUFFICIENTLY_CLOSE
         ) {
         p_Entity->CenterPoint = p_Entity->MinorDestinationCenterPoint;
-        p_Entity->Location.fX = p_Entity->MinorDestinationCenterPoint.fX - p_Entity->HalfSize.fX;
-        p_Entity->Location.fY = p_Entity->MinorDestinationCenterPoint.fY - p_Entity->HalfSize.fY;
+        p_Entity->Location.fX = p_Entity->MinorDestinationCenterPoint.fX - p_Entity->HalfSize.fDx;
+        p_Entity->Location.fY = p_Entity->MinorDestinationCenterPoint.fY - p_Entity->HalfSize.fDy;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Major vector...
+        // Major vector; we've reached our destination...
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (
             abs(p_Entity->CenterPoint.fX - p_Entity->MajorDestinationCenterPoint.fX) <= SUFFICIENTLY_CLOSE &&
             abs(p_Entity->CenterPoint.fY - p_Entity->MajorDestinationCenterPoint.fY) <= SUFFICIENTLY_CLOSE
             ) {
             p_Entity->CenterPoint = p_Entity->MajorDestinationCenterPoint;
-            p_Entity->Location.fX = p_Entity->MajorDestinationCenterPoint.fX - p_Entity->HalfSize.fX;
-            p_Entity->Location.fY = p_Entity->MajorDestinationCenterPoint.fY - p_Entity->HalfSize.fY;
+            p_Entity->Location.fX = p_Entity->MajorDestinationCenterPoint.fX - p_Entity->HalfSize.fDx;
+            p_Entity->Location.fY = p_Entity->MajorDestinationCenterPoint.fY - p_Entity->HalfSize.fDy;
             p_Entity->ubIsInMotion = 0;
         }
         else {
@@ -608,6 +606,14 @@ void __cdecl ENTITY_Redefine(USHORT usType, GLOBALS_T* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ENTITY_SelectAll(GLOBALS_T* p_Globals) {
+    ENTITY_T* p_Current = p_Globals->p_RootEntity;
+    while (p_Current) {
+        p_Current->ubIsSelected = 1;
+        p_Current = (ENTITY_T*)p_Current->p_Next;
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ENTITY_DeleteAll(GLOBALS_T* p_Globals) {
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
     while (p_Current) {
@@ -620,7 +626,7 @@ void __cdecl ENTITY_DeleteAll(GLOBALS_T* p_Globals) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         p_Temp->ubIsAlive = 0;
         free(p_Temp);
-        p_Globals->iRunningHeap -= sizeof(ENTITY_T);
+        p_Globals->stAllocations -= sizeof(ENTITY_T);
     }
     p_Globals->p_RootEntity = NULL;
 }
@@ -639,7 +645,7 @@ void __cdecl ENTITY_DeleteSelected(GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
                 free(p_Current);
-                p_Globals->iRunningHeap -= sizeof(ENTITY_T);
+                p_Globals->stAllocations -= sizeof(ENTITY_T);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current = p_Globals->p_RootEntity;
                 continue;
@@ -654,7 +660,7 @@ void __cdecl ENTITY_DeleteSelected(GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
                 free(p_Current);
-                p_Globals->iRunningHeap -= sizeof(ENTITY_T);
+                p_Globals->stAllocations -= sizeof(ENTITY_T);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current = p_Ahead;
             }
@@ -682,7 +688,7 @@ void __cdecl ENTITY_DeleteSpecific(ENTITY_T* p_Entity, GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
                 free(p_Current);
-                p_Globals->iRunningHeap -= sizeof(ENTITY_T);
+                p_Globals->stAllocations -= sizeof(ENTITY_T);
                 break;
             }
             else {
@@ -694,7 +700,7 @@ void __cdecl ENTITY_DeleteSpecific(ENTITY_T* p_Entity, GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
                 free(p_Current);
-                p_Globals->iRunningHeap -= sizeof(ENTITY_T);
+                p_Globals->stAllocations -= sizeof(ENTITY_T);
                 break;
             }
         }
@@ -719,7 +725,7 @@ void __cdecl ENTITY_DeleteEntityType(USHORT usType, GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
                 free(p_Current);
-                p_Globals->iRunningHeap -= sizeof(ENTITY_T);
+                p_Globals->stAllocations -= sizeof(ENTITY_T);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current = p_Globals->p_RootEntity;
                 continue;
@@ -734,7 +740,7 @@ void __cdecl ENTITY_DeleteEntityType(USHORT usType, GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
                 free(p_Current);
-                p_Globals->iRunningHeap -= sizeof(ENTITY_T);
+                p_Globals->stAllocations -= sizeof(ENTITY_T);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current = p_Ahead;
             }
@@ -746,102 +752,79 @@ void __cdecl ENTITY_DeleteEntityType(USHORT usType, GLOBALS_T* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Using 'goto' statements in this function because I wanted to sort different entity types in one central place.
+// Double pointer for original pointer manupulations (advancing).
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ENTITY_Sort(ENTITY_T** pp_Previous, ENTITY_T** pp_Current, GLOBALS_T* p_Globals) {
+    ENTITY_T* p_Current = *pp_Current;
+    ENTITY_T* p_Previous = *pp_Previous;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_Current == p_Globals->p_RootEntity) {
+        *pp_Previous = p_Current;
+        *pp_Current = (ENTITY_T*)p_Current->p_Next;
+    }
+    else {
+        ENTITY_T* p_Ahead = (ENTITY_T*)p_Current->p_Next;
+        ENTITY_T* p_SavedRoot = p_Globals->p_RootEntity;
+        p_Globals->p_RootEntity = p_Current;
+        p_Current->p_Next = (ENTITY_T*)p_SavedRoot;
+        p_Previous->p_Next = (ENTITY_T*)p_Ahead;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Adjusting ahead to make sorting linear.
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        *pp_Current = p_Ahead;
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ENTITY_SkipSort(ENTITY_T** pp_Previous, ENTITY_T** pp_Current) {
+    *pp_Previous = *pp_Current;
+    *pp_Current = (ENTITY_T*)(*pp_Current)->p_Next;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+UINT8 __cdecl ENTITY_ConsiderSortToFront(ENTITY_T* p_Entity, USHORT usCondition) {
+    UINT8 ubShouldSort = 0;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    switch (usCondition) {
+    case WORKERS_TO_FRONT: {
+        ubShouldSort = p_Entity->usType == ENTITY_WORKER;
+        break;
+    }
+    case MINERALS_TO_FRONT: {
+        ubShouldSort = p_Entity->usType == ENTITY_MINERAL;
+        break;
+    }
+    case COMMANDS_TO_FRONT: {
+        ubShouldSort = p_Entity->usType == ENTITY_COMMAND;
+        break;
+    }
+    case SUPPLIES_TO_FRONT: {
+        ubShouldSort = p_Entity->usType == ENTITY_SUPPLY;
+        break;
+    }
+    case REFINERIES_TO_FRONT: {
+        ubShouldSort = p_Entity->usType == ENTITY_REFINERY;
+        break;
+    }
+    case OBSTACLES_TO_FRONT: {
+        ubShouldSort = p_Entity->ubIsObstacle;
+        break;
+    }
+    default:
+        printf("ENTITY_ConsiderSortToFront(): Unknown case.\n");
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return ubShouldSort;
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ENTITY_SortToFront(USHORT usCondition, GLOBALS_T* p_Globals) {
     ENTITY_T* p_Previous = NULL;
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
     while (p_Current) {
-        switch (usCondition) {
-        case WORKERS_TO_FRONT: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->usType == ENTITY_WORKER) {
-                goto Sort;
-            }
-            else {
-                goto Next;
-            }
-        }
-        case MINERALS_TO_FRONT: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->usType == ENTITY_MINERAL) {
-                goto Sort;
-            }
-            else {
-                goto Next;
-            }
-        }
-        case COMMANDS_TO_FRONT: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->usType == ENTITY_COMMAND) {
-                goto Sort;
-            }
-            else {
-                goto Next;
-            }
-        }
-        case SUPPLIES_TO_FRONT: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->usType == ENTITY_SUPPLY) {
-                goto Sort;
-            }
-            else {
-                goto Next;
-            }
-        }
-        case REFINERIES_TO_FRONT: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->usType == ENTITY_REFINERY) {
-                goto Sort;
-            }
-            else {
-                goto Next;
-            }
-        }
-        case OBSTACLES_TO_FRONT: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->ubIsObstacle) {
-                goto Sort;
-            }
-            else {
-                goto Next;
-            }
-        }
-        default: {
-            printf("ENTITY_SortToFront(): Invalid condition.\n");
-            return;
-        }
-        }
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Sort: {
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (p_Current == p_Globals->p_RootEntity) {
-            p_Previous = p_Current;
-            p_Current = (ENTITY_T*)p_Current->p_Next;
-            continue;
+        if (ENTITY_ConsiderSortToFront(p_Current, usCondition)) {
+            ENTITY_Sort(&p_Previous, &p_Current, p_Globals);
         }
         else {
-            ENTITY_T* p_Ahead = (ENTITY_T*)p_Current->p_Next;
-            ENTITY_T* p_SavedRoot = p_Globals->p_RootEntity;
-            p_Globals->p_RootEntity = p_Current;
-            p_Current->p_Next = (ENTITY_T*)p_SavedRoot;
-            p_Previous->p_Next = (ENTITY_T*)p_Ahead;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // To make sorting linear.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            p_Current = p_Ahead;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // To prevent fall-through.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            continue;
+            ENTITY_SkipSort(&p_Previous, &p_Current);
         }
-        }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-Next: {
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Previous = p_Current;
-    p_Current = (ENTITY_T*)p_Current->p_Next;
-    }
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

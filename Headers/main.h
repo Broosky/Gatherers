@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Program Name: Gatherers (C)                                                                                             //
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
@@ -34,9 +34,10 @@ extern LOG_T* p_Log;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int     CALLBACK    WinMain                 (_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow);
 void    __cdecl     MAIN_LaunchConsole      (void);
-void    __cdecl     MAIN_ConsiderEngine     (TIMEBASE_T*, TIMEBASE_T*, CARD_T*, DOUBLE_BUFFER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*);
+void    __cdecl     MAIN_ConsiderEngine     (TIMEBASE_T*, TIMEBASE_T*, CARD_T*, DOUBLE_BUFFER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*, LOG_T*);
 void    __cdecl     MAIN_HandleQuit         (DOUBLE_BUFFER_T*, TIMEBASE_T*, TIMEBASE_T*, CARD_T*, HWND, GLOBALS_T*, ASSETS_T*, MENU_T*, SETTINGS_T*, LOG_T*);
-void    __cdecl     MAIN_Kill               (GLOBALS_T*);
+UINT    __cdecl     MAIN_FailFast           (GLOBALS_T*, LOG_T*);
+void    __cdecl     MAIN_Finalize           (GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

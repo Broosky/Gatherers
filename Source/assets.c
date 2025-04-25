@@ -7,22 +7,30 @@
 #include "../Headers/common.h"
 #include "../Headers/constants.h"
 #include "../Headers/globals.h"
+#include "../Headers/log.h"
 #include <stdlib.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ASSETS_Zero(ASSETS_T* p_Assets) {
     ZeroMemory(p_Assets, sizeof(ASSETS_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ASSETS_T* __cdecl ASSETS_Create(GLOBALS_T* p_Globals) {
-    ASSETS_T* p_Assets = (ASSETS_T*)malloc(sizeof(ASSETS_T));
-    p_Globals->iRunningHeap += sizeof(ASSETS_T);
+ASSETS_T* __cdecl ASSETS_Create(GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    size_t stAllocation = sizeof(ASSETS_T);
+    ASSETS_T* p_Assets = malloc(stAllocation);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!p_Assets) {
+        LOG_AppendParams(p_Log, "ASSETS_Create(): malloc failed for size: %zu bytes\n", stAllocation);
+        return NULL;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->stAllocations += stAllocation;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ASSETS_Zero(p_Assets);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     return p_Assets;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ASSETS_InitFromFile(ASSETS_T* p_Assets, HWND hWnd) {
+void __cdecl ASSETS_LoadBitmaps(ASSETS_T* p_Assets, HWND hWnd) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Blitter images.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +131,7 @@ void __cdecl ASSETS_InitFromFile(ASSETS_T* p_Assets, HWND hWnd) {
     // Minimap images.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading minimap image(s)...");
-    PICTURE_Load(&p_Assets->Minimap[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/MI/MI0.bmp", "../../Assets/MI/MI0.bmp"); // Regular grass.
+    PICTURE_Load(&p_Assets->Minimap[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/MI/MI0.bmp", "../../Assets/MI/MI0.bmp"); // Regular sized grass.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Gas images.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +141,8 @@ void __cdecl ASSETS_InitFromFile(ASSETS_T* p_Assets, HWND hWnd) {
     // Terrain images.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading terrain image(s)...");
-    PICTURE_Load(&p_Assets->Terrain[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/TE/TE0.bmp", "../../Assets/TE/TE0.bmp"); // Regular grass.
+    // Multiple large image files can cause erratic behaviour.
+    PICTURE_Load(&p_Assets->Terrain[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/TE/TE0.bmp", "../../Assets/TE/TE0.bmp"); // Regular sized grass.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Command card images.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,7 +153,79 @@ void __cdecl ASSETS_InitFromFile(ASSETS_T* p_Assets, HWND hWnd) {
     PICTURE_Load(&p_Assets->Card[3], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CA/CA3.bmp", "../../Assets/CA/CA3.bmp"); // Specific worker.
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ASSETS_Kill(ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+void __cdecl ASSETS_CreateBrushes(ASSETS_T* p_Assets) {
+    p_Assets->hBrushSelected = CreateSolidBrush(RGB(0, 255, 0));
+    p_Assets->hBrushHighlighted = CreateSolidBrush(RGB(100, 0, 100));
+    p_Assets->hBrushWorker = CreateSolidBrush(RGB(255, 255, 255));
+    p_Assets->hBrushCommand = CreateSolidBrush(RGB(255, 0, 0));
+    p_Assets->hBrushMineral = CreateSolidBrush(RGB(110, 175, 225));
+    p_Assets->hBrushSupply = CreateSolidBrush(RGB(255, 255, 0));
+    p_Assets->hBrushRefinery = CreateSolidBrush(RGB(0, 175, 0));
+    p_Assets->hBrushBufferClear = CreateSolidBrush(RGB(0, 0, 0));
+    p_Assets->hBrushClear = CreateSolidBrush(RGB(0, 0, 0));
+    p_Assets->hBrush100r0g0b = CreateSolidBrush(RGB(100, 0, 0));
+    p_Assets->hBrush0r100g0b = CreateSolidBrush(RGB(0, 100, 0));
+    p_Assets->hBrush0r0g100b = CreateSolidBrush(RGB(0, 0, 100));
+    p_Assets->hBrush100r100g0b = CreateSolidBrush(RGB(100, 100, 0));
+    p_Assets->hBrush0r100g100b = CreateSolidBrush(RGB(0, 100, 100));
+    p_Assets->hBrush100r0g100b = CreateSolidBrush(RGB(100, 0, 100));
+    p_Assets->hBrush100r100g100b = CreateSolidBrush(RGB(100, 100, 100));
+    p_Assets->hBrushWhite = CreateSolidBrush(RGB(255, 255, 255));
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Assets->hPenSelected = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+    p_Assets->hPenHighlighted = CreatePen(PS_SOLID, 1, RGB(100, 0, 100));
+    p_Assets->hPenWorker = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+    p_Assets->hPenCommand = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+    p_Assets->hPenMineral = CreatePen(PS_SOLID, 1, RGB(110, 175, 225));
+    p_Assets->hPenSupply = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
+    p_Assets->hPenRefinery = CreatePen(PS_SOLID, 1, RGB(0, 175, 0));
+    p_Assets->hPenViewport = CreatePen(PS_SOLID, 1, RGB(200, 200, 200));
+    p_Assets->hPenSelectionArea = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+    p_Assets->hPenBuildLimits = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+    p_Assets->hPenBuildType = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+    p_Assets->hPenTranslation = CreatePen(PS_SOLID, 1, RGB(200, 200, 200));
+    p_Assets->hPenMinorVector = CreatePen(PS_SOLID, 1, RGB(255, 165, 0));
+    p_Assets->hPenMajorVector = CreatePen(PS_SOLID, 1, RGB(0, 255, 255));
+    p_Assets->hPenWhite = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_KillBrushes(ASSETS_T* p_Assets) {
+    DeleteObject(p_Assets->hBrushSelected);
+    DeleteObject(p_Assets->hBrushHighlighted);
+    DeleteObject(p_Assets->hBrushWorker);
+    DeleteObject(p_Assets->hBrushCommand);
+    DeleteObject(p_Assets->hBrushMineral);
+    DeleteObject(p_Assets->hBrushSupply);
+    DeleteObject(p_Assets->hBrushRefinery);
+    DeleteObject(p_Assets->hBrushBufferClear);
+    DeleteObject(p_Assets->hBrushClear);
+    DeleteObject(p_Assets->hBrush100r0g0b);
+    DeleteObject(p_Assets->hBrush0r100g0b);
+    DeleteObject(p_Assets->hBrush0r0g100b);
+    DeleteObject(p_Assets->hBrush100r100g0b);
+    DeleteObject(p_Assets->hBrush0r100g100b);
+    DeleteObject(p_Assets->hBrush100r0g100b);
+    DeleteObject(p_Assets->hBrush100r100g100b);
+    DeleteObject(p_Assets->hBrushWhite);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DeleteObject(p_Assets->hPenSelected);
+    DeleteObject(p_Assets->hPenHighlighted);
+    DeleteObject(p_Assets->hPenWorker);
+    DeleteObject(p_Assets->hPenCommand);
+    DeleteObject(p_Assets->hPenMineral);
+    DeleteObject(p_Assets->hPenSupply);
+    DeleteObject(p_Assets->hPenRefinery);
+    DeleteObject(p_Assets->hPenViewport);
+    DeleteObject(p_Assets->hPenSelectionArea);
+    DeleteObject(p_Assets->hPenBuildLimits);
+    DeleteObject(p_Assets->hPenBuildType);
+    DeleteObject(p_Assets->hPenTranslation);
+    DeleteObject(p_Assets->hPenMinorVector);
+    DeleteObject(p_Assets->hPenMajorVector);
+    DeleteObject(p_Assets->hPenWhite);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_KillBitmaps(ASSETS_T* p_Assets) {
     UINT8 ubI;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     for (ubI = 0; ubI < 9; ubI++) {
@@ -190,8 +271,15 @@ void __cdecl ASSETS_Kill(ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
     for (ubI = 0; ubI < 5; ubI++) {
         PICTURE_Kill(&p_Assets->Card[ubI]);
     }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    free(p_Assets);
-    p_Globals->iRunningHeap -= sizeof(ASSETS_T);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_Kill(ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+    if (p_Assets) {
+        ASSETS_KillBrushes(p_Assets);
+        ASSETS_KillBitmaps(p_Assets);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        free(p_Assets);
+        p_Globals->stAllocations -= sizeof(ASSETS_T);
+    }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -8,6 +8,8 @@
 #include "../Headers/constants.h"
 #include "../Headers/entity.h"
 #include "../Headers/globals.h"
+#include "../Headers/log.h"
+#include "../Headers/main.h"
 #include "../Headers/message.h"
 #include "../Headers/misc.h"
 #include <math.h>
@@ -36,7 +38,7 @@ ENTITY_T* __cdecl AI_FindClosest(ENTITY_T* p_Inquirer, USHORT usType, GLOBALS_T*
                 p_Closest = p_Current;
             }
         }
-        p_Current = (ENTITY_T*)p_Current->p_Next;
+        p_Current = p_Current->p_Next;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Returns null if no entities of a specific type were found.
@@ -46,13 +48,20 @@ ENTITY_T* __cdecl AI_FindClosest(ENTITY_T* p_Inquirer, USHORT usType, GLOBALS_T*
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Allocation adjustments include an extra element to detect a null pointer during enumerations.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AI_CLOSEST_T* __cdecl AI_FindClosestByDistance(ENTITY_T* p_Inquirer, USHORT usType, int* p_iRollingAllocationHeap, USHORT* p_usFound, GLOBALS_T* p_Globals) {
+AI_CLOSEST_T* __cdecl AI_FindClosestByDistance(ENTITY_T* p_Inquirer, USHORT usType, size_t* p_stAllocationRolling, USHORT* p_usFound, GLOBALS_T* p_Globals, LOG_T* p_Log) {
     USHORT usResizeThresholdCapacity = 5;
     USHORT usCurrentAllocationCount = 0;
-    *p_iRollingAllocationHeap = sizeof(AI_CLOSEST_T) * (usResizeThresholdCapacity + 1);
+    *p_stAllocationRolling = sizeof(AI_CLOSEST_T) * (usResizeThresholdCapacity + 1);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    AI_CLOSEST_T* p_ClosestEntities = (AI_CLOSEST_T*)malloc(*p_iRollingAllocationHeap);
-    p_Globals->iRunningHeap += *p_iRollingAllocationHeap;
+    AI_CLOSEST_T* p_ClosestEntities = malloc(*p_stAllocationRolling);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!p_ClosestEntities) {
+        LOG_AppendParams(p_Log, "AI_FindClosestByDistance(): malloc failed for size: %zu bytes\n", *p_stAllocationRolling);
+        UINT _discard = MAIN_FailFast(p_Globals, p_Log);
+        return NULL;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->stAllocations += *p_stAllocationRolling;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,13 +77,21 @@ AI_CLOSEST_T* __cdecl AI_FindClosestByDistance(ENTITY_T* p_Inquirer, USHORT usTy
             // Resize dynamically.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (usCurrentAllocationCount >= usResizeThresholdCapacity) {
-                p_Globals->iRunningHeap -= *p_iRollingAllocationHeap;
+                p_Globals->stAllocations -= *p_stAllocationRolling;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 usResizeThresholdCapacity <<= 1;
-                *p_iRollingAllocationHeap = sizeof(AI_CLOSEST_T) * (usResizeThresholdCapacity + 1);
-                AI_CLOSEST_T* p_ClosestEntitiesResized = (AI_CLOSEST_T*)realloc(p_ClosestEntities, *p_iRollingAllocationHeap);
+                *p_stAllocationRolling = sizeof(AI_CLOSEST_T) * (usResizeThresholdCapacity + 1);
+                AI_CLOSEST_T* p_ClosestEntitiesResized = realloc(p_ClosestEntities, *p_stAllocationRolling);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                p_Globals->iRunningHeap += *p_iRollingAllocationHeap;
+                if (!p_ClosestEntitiesResized) {
+                    // We've already decremented the heap couter prior to the resize.
+                    free(p_ClosestEntities);
+                    LOG_AppendParams(p_Log, "AI_FindClosestByDistance(): realloc failed for size: %zu bytes\n", *p_stAllocationRolling);
+                    UINT _discard = MAIN_FailFast(p_Globals, p_Log);
+                    return NULL;
+                }
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                p_Globals->stAllocations += *p_stAllocationRolling;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_ClosestEntities = p_ClosestEntitiesResized;
             }
@@ -84,7 +101,7 @@ AI_CLOSEST_T* __cdecl AI_FindClosestByDistance(ENTITY_T* p_Inquirer, USHORT usTy
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             usCurrentAllocationCount++;
         }
-        p_Current = (ENTITY_T*)p_Current->p_Next;
+        p_Current = p_Current->p_Next;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Sort ascending.
@@ -101,7 +118,7 @@ AI_CLOSEST_T* __cdecl AI_FindClosestByDistance(ENTITY_T* p_Inquirer, USHORT usTy
     return p_ClosestEntities;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
+void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals, LOG_T* p_Log) {
     if (p_Worker->ubIsCarrying) {
         ENTITY_T* p_ComCenter = AI_FindClosest(p_Worker, ENTITY_COMMAND, p_Globals);
         if (p_ComCenter) {
@@ -120,7 +137,7 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
                     }
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     snprintf(p_Globals->szBuffer, sizeof(p_Globals->szBuffer), "%d", p_Worker->iMineralCount);
-                    MESSAGE_Create(p_Globals->szBuffer, p_Worker->CenterPoint, usMessageStyle, p_Globals);
+                    MESSAGE_Create(p_Globals->szBuffer, p_Worker->CenterPoint, usMessageStyle, p_Globals, p_Log);
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     p_Globals->iMineralCount += p_Worker->iMineralCount;
                     p_ComCenter->iMineralCount += p_Worker->iMineralCount;
@@ -145,7 +162,7 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
                     }
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     snprintf(p_Globals->szBuffer, sizeof(p_Globals->szBuffer), "%d", p_Worker->iGasCount);
-                    MESSAGE_Create(p_Globals->szBuffer, p_Worker->CenterPoint, usMessageStyle, p_Globals);
+                    MESSAGE_Create(p_Globals->szBuffer, p_Worker->CenterPoint, usMessageStyle, p_Globals, p_Log);
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     p_Globals->iGasCount += p_Worker->iGasCount;
                     p_ComCenter->iGasCount += p_Worker->iGasCount;
@@ -161,7 +178,7 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Reset the workers movement speed.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                p_Worker->MovementSpeed = (FPOINT_T){ WORKER_MOVE_SPEED, WORKER_MOVE_SPEED };
+                p_Worker->MovementSpeed = (FDELTA_T){ WORKER_MOVE_SPEED, WORKER_MOVE_SPEED };
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Allow the animation engine to draw particular images.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,27 +200,27 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // True, if the worker has collided with what it was operating on.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (ENTITY_CollidedWith(p_Worker, (ENTITY_T*)p_Worker->p_Operating)) {
+        if (ENTITY_CollidedWith(p_Worker, p_Worker->p_OperatingTarget)) {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // What resource did I collide with?
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            switch ((*(ENTITY_T*)p_Worker->p_Operating).usType) {
+            switch ((*(ENTITY_T*)p_Worker->p_OperatingTarget).usType) {
             case ENTITY_MINERAL: {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // True, if there is enough minerals to grab.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if ((*(ENTITY_T*)p_Worker->p_Operating).iMineralCount >= MINERALS_PER_GRAB) {
+                if ((*(ENTITY_T*)p_Worker->p_OperatingTarget).iMineralCount >= MINERALS_PER_GRAB) {
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Add minerals grabbed to specific entities.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    (*(ENTITY_T*)p_Worker->p_Operating).iMineralCount -= MINERALS_PER_GRAB;
+                    (*(ENTITY_T*)p_Worker->p_OperatingTarget).iMineralCount -= MINERALS_PER_GRAB;
                     p_Worker->iMineralCount += MINERALS_PER_GRAB;
                     p_Worker->ubIsCarrying = 1;
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Slow the workers movement speed.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     p_Worker->MovementSpeed =
-                        (FPOINT_T){
+                        (FDELTA_T){
                             WORKER_MOVE_SPEED / WORKER_MINERAL_DIVISOR,
                             WORKER_MOVE_SPEED / WORKER_MINERAL_DIVISOR
                     };
@@ -215,22 +232,22 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
                     // Keep them there for a period of time.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     ENTITY_Pause(p_Worker, MINERALS_PAUSE);
-                    ENTITY_Pause((ENTITY_T*)p_Worker->p_Operating, MINERALS_PAUSE);
+                    ENTITY_Pause((ENTITY_T*)p_Worker->p_OperatingTarget, MINERALS_PAUSE);
                 }
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // There was NOT enough minerals to grab.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 else {
-                    ENTITY_DeleteSpecific((ENTITY_T*)p_Worker->p_Operating, p_Globals);
+                    ENTITY_DeleteSpecific((ENTITY_T*)p_Worker->p_OperatingTarget, p_Globals);
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Instead of sitting around doing nothing, find them another field to harvest.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     ENTITY_T* p_MinField = AI_FindClosest(p_Worker, ENTITY_MINERAL, p_Globals);
                     if (p_MinField) {
-                        p_Worker->p_Operating = (ENTITY_T*)p_MinField;
+                        p_Worker->p_OperatingTarget = (ENTITY_T*)p_MinField;
                     }
                     else {
-                        p_Worker->p_Operating = NULL;
+                        p_Worker->p_OperatingTarget = NULL;
                     }
                 }
                 break;
@@ -239,18 +256,18 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // True, if there is enough gas to grab.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if ((*(ENTITY_T*)p_Worker->p_Operating).iGasCount >= GAS_PER_GRAB) {
+                if ((*(ENTITY_T*)p_Worker->p_OperatingTarget).iGasCount >= GAS_PER_GRAB) {
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Add gas grabbed to specific entities.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    (*(ENTITY_T*)p_Worker->p_Operating).iGasCount -= GAS_PER_GRAB;
+                    (*(ENTITY_T*)p_Worker->p_OperatingTarget).iGasCount -= GAS_PER_GRAB;
                     p_Worker->iGasCount += GAS_PER_GRAB;
                     p_Worker->ubIsCarrying = 1;
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Slow the workers movement speed.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     p_Worker->MovementSpeed =
-                        (FPOINT_T){
+                        (FDELTA_T){
                             WORKER_MOVE_SPEED / WORKER_GAS_DIVISOR,
                             WORKER_MOVE_SPEED / WORKER_GAS_DIVISOR
                     };
@@ -262,7 +279,7 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
                     // Keep them there for a period of time.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     ENTITY_Pause(p_Worker, REFINERY_PAUSE);
-                    ENTITY_Pause((ENTITY_T*)p_Worker->p_Operating, REFINERY_PAUSE);
+                    ENTITY_Pause((ENTITY_T*)p_Worker->p_OperatingTarget, REFINERY_PAUSE);
                 }
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // There was NOT enough gas to grab.
@@ -273,10 +290,10 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     ENTITY_T* p_Refinery = AI_FindClosest(p_Worker, ENTITY_REFINERY, p_Globals);
                     if (p_Refinery) {
-                        p_Worker->p_Operating = (ENTITY_T*)p_Refinery;
+                        p_Worker->p_OperatingTarget = (ENTITY_T*)p_Refinery;
                     }
                     else {
-                        p_Worker->p_Operating = NULL;
+                        p_Worker->p_OperatingTarget = NULL;
                     }
                 }
             }
@@ -286,7 +303,7 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals) {
         // The worker has NOT collided with what it was operating on.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         else {
-            ENTITY_MoveTo(p_Worker, (ENTITY_T*)p_Worker->p_Operating, p_Globals);
+            ENTITY_MoveTo(p_Worker, (ENTITY_T*)p_Worker->p_OperatingTarget, p_Globals);
         }
     }
 }

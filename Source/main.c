@@ -47,22 +47,33 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         printf("Current working directory: %s\n", szCurrentWorkingDirectory);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Globals = (GLOBALS_T*)GLOBALS_Create();
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Special case fail-fast for the log system.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Log = (LOG_T*)LOG_Create("Gatherers.log", p_Globals);
-    if (!p_Log) {
-        // Unable to create the log file.
-        LOG_Kill(p_Log, p_Globals);
-        MAIN_Kill(p_Globals);
-        TerminateProcess(GetCurrentProcess(), EXIT_FAILURE);
+    p_Globals = GLOBALS_Create();
+    if (!p_Globals) {
+        return MAIN_FailFast(p_Globals, p_Log);
     }
-    LOG_Append(p_Log, "File hook successful...");
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Settings = (SETTINGS_T*)SETTINGS_Create(p_Globals);
-    p_Assets = (ASSETS_T*)ASSETS_Create(p_Globals);
-    p_Menu = (MENU_T*)MENU_Create(p_Globals);
+    p_Log = LOG_Create("Gatherers.log", p_Globals);
+    if (!p_Log) {
+        return MAIN_FailFast(p_Globals, p_Log);
+    } 
+    else {
+        LOG_Append(p_Log, "File hook successful...");
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Settings = SETTINGS_Create(p_Globals, p_Log);
+    if (!p_Settings) {
+        return MAIN_FailFast(p_Globals, p_Log);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Assets = ASSETS_Create(p_Globals, p_Log);
+    if (!p_Assets) {
+        return MAIN_FailFast(p_Globals, p_Log);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Menu = MENU_Create(p_Globals, p_Log);
+    if (!p_Menu) {
+        return MAIN_FailFast(p_Globals, p_Log);
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SetConsoleTitle(APP_NAME);
     srand(GetTickCount64());
@@ -109,47 +120,95 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     MISC_ResizeWindow(hWnd, INITIAL_CLIENT_WIDTH, INITIAL_CLIENT_HEIGHT);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_DoubleBuffer = DOUBLE_BUFFER_Create(hWnd, p_Globals);
+    p_DoubleBuffer = DOUBLE_BUFFER_Create(hWnd, p_Globals, p_Log);
+    if (!p_DoubleBuffer) {
+        return MAIN_FailFast(p_Globals, p_Log);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     DOUBLE_BUFFER_SetBlitter(p_DoubleBuffer, &p_Assets->Blitter[0]);
-    DOUBLE_BUFFER_Clear(p_DoubleBuffer, RGB(0, 0, 0));
+    DOUBLE_BUFFER_Clear(p_DoubleBuffer, p_Assets);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ShowWindow(hWnd, nCmdShow);
+    TIMEBASE_T* p_Engine = TIMEBASE_Create(ENGINE_FPS, p_Globals, p_Log);
+    if (!p_Engine) {
+        return MAIN_FailFast(p_Globals, p_Log);
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    TIMEBASE_T* p_Engine = (TIMEBASE_T*)TIMEBASE_Create(ENGINE_FPS, p_Globals);
-    TIMEBASE_T* p_Seconds = (TIMEBASE_T*)TIMEBASE_Create(1.0f, p_Globals);
+    TIMEBASE_T* p_Seconds = TIMEBASE_Create(1.0f, p_Globals, p_Log);
+    if (!p_Seconds) {
+        return MAIN_FailFast(p_Globals, p_Log);
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     TRANSFORM_Init(p_DoubleBuffer);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CARD_T* p_Card = (CARD_T*)CARD_Create(p_Globals, p_Assets);
+    CARD_T* p_Card = CARD_Create(p_Globals, p_Assets, p_Log);
+    if (!p_Card) {
+        return MAIN_FailFast(p_Globals, p_Log);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ShowWindow(hWnd, nCmdShow);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     MSG Msg;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     while (1) {
         if (PeekMessage(&Msg, hWnd, 0, 0, PM_REMOVE)) {
             if (Msg.message == WM_QUIT) {
-                MAIN_HandleQuit(p_DoubleBuffer, p_Engine, p_Seconds, p_Card, hWnd, p_Globals, p_Assets, p_Menu, p_Settings, p_Log);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                MAIN_HandleQuit(
+                    p_DoubleBuffer,
+                    p_Engine,
+                    p_Seconds,
+                    p_Card,
+                    hWnd,
+                    p_Globals,
+                    p_Assets,
+                    p_Menu,
+                    p_Settings,
+                    p_Log);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 break;
             }
             else {
                 TranslateMessage(&Msg);
                 DispatchMessage(&Msg);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                MAIN_ConsiderEngine(p_Engine, p_Seconds, p_Card, p_DoubleBuffer, p_Globals, p_Assets, p_Menu);
+                MAIN_ConsiderEngine(
+                    p_Engine, 
+                    p_Seconds, 
+                    p_Card, 
+                    p_DoubleBuffer, 
+                    p_Globals, 
+                    p_Assets, 
+                    p_Menu, 
+                    p_Log);
             }
         }
         else {
-            MAIN_ConsiderEngine(p_Engine, p_Seconds, p_Card, p_DoubleBuffer, p_Globals, p_Assets, p_Menu);
+            MAIN_ConsiderEngine(p_Engine, 
+                p_Seconds, 
+                p_Card, 
+                p_DoubleBuffer, 
+                p_Globals, 
+                p_Assets, 
+                p_Menu, 
+                p_Log);
         }
     }
     return Msg.wParam;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl MAIN_ConsiderEngine(TIMEBASE_T* p_Engine, TIMEBASE_T* p_Seconds, CARD_T* p_Card, DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, MENU_T* p_Menu) {
+void __cdecl MAIN_ConsiderEngine(
+    TIMEBASE_T* p_Engine,
+    TIMEBASE_T* p_Seconds,
+    CARD_T* p_Card,
+    DOUBLE_BUFFER_T* p_DoubleBuffer,
+    GLOBALS_T* p_Globals,
+    ASSETS_T* p_Assets,
+    MENU_T* p_Menu,
+    LOG_T* p_Log) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (TIMEBASE_Tick(p_Engine)) {
-        ENGINE_ProcessScene(p_DoubleBuffer, p_Globals, p_Assets, p_Card, p_Menu);
+        ENGINE_ProcessScene(p_DoubleBuffer, p_Globals, p_Assets, p_Card, p_Menu, p_Log);
     }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (TIMEBASE_Tick(p_Seconds)) {
         p_Globals->ulSecondsTick++;
         p_Globals->fFramesPerSecond = (float)p_Globals->ulFrameCount / p_Globals->ulSecondsTick;
@@ -157,9 +216,32 @@ void __cdecl MAIN_ConsiderEngine(TIMEBASE_T* p_Engine, TIMEBASE_T* p_Seconds, CA
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl MAIN_HandleQuit(DOUBLE_BUFFER_T* p_DoubleBuffer, TIMEBASE_T* p_Engine, TIMEBASE_T* p_Seconds, CARD_T* p_Card, HWND hWnd, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, MENU_T* p_Menu, SETTINGS_T* p_Settings, LOG_T* p_Log) {
+// Main fail-fast function. This is called when a critical error occurs. Any subsequent returns are to silence null pointer warnings.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+UINT __cdecl MAIN_FailFast(GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    UINT uiCode = EXIT_FAILURE;
+    // Log struct could have been created, but not a log file.
+    if (p_Globals && p_Log) {
+        LOG_Kill(p_Log, p_Globals);
+    }
+    TerminateProcess(GetCurrentProcess(), uiCode);
+    // Unreachable; propagate a return to silence null pointer warnings.
+    return uiCode;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl MAIN_HandleQuit(
+    DOUBLE_BUFFER_T* p_DoubleBuffer,
+    TIMEBASE_T* p_Engine,
+    TIMEBASE_T* p_Seconds,
+    CARD_T* p_Card,
+    HWND hWnd,
+    GLOBALS_T* p_Globals,
+    ASSETS_T* p_Assets,
+    MENU_T* p_Menu,
+    SETTINGS_T* p_Settings,
+    LOG_T* p_Log) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Destroy everything the program uses.
+    // Destroy everything the program uses. Some pointers may be null depending on what systems were fully initialized.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ENTITY_DeleteAll(p_Globals);
     MESSAGE_DeleteAll(p_Globals);
@@ -170,15 +252,16 @@ void __cdecl MAIN_HandleQuit(DOUBLE_BUFFER_T* p_DoubleBuffer, TIMEBASE_T* p_Engi
     CARD_Kill(p_Card, p_Globals);
     SETTINGS_Kill(p_Settings, p_Globals);
     MENU_Kill(p_Menu, p_Globals);
+    // Last for flushing.
     LOG_Kill(p_Log, p_Globals);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     DestroyMenu(p_Menu->hMenu);
     DestroyWindow(hWnd);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MAIN_Kill(p_Globals);
+    MAIN_Finalize(p_Globals);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl MAIN_Kill(GLOBALS_T* p_Globals) {
+void __cdecl MAIN_Finalize(GLOBALS_T* p_Globals) {
     int iRemainingHeap = GLOBALS_Kill(p_Globals);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (iRemainingHeap) {
@@ -188,7 +271,7 @@ void __cdecl MAIN_Kill(GLOBALS_T* p_Globals) {
         printf("Heap successfully freed.\n");
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Sleep(1750);
+    Sleep(2000);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl MAIN_LaunchConsole(void) {

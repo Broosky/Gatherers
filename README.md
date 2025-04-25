@@ -18,24 +18,18 @@ Active development continues here when time allows — see the historic repo for
   - Selectable renderer: GDI32/SDL/Direct2D...
   - Networking...
   - Sound...
+- Crossplatform support: Refactor IO, clock, etc...
 - Mouse wheel zoom in or out.
 - Change constant `#define`s types.
 - Load settings from file/hot reload.
 - Replace classic `char` buffer copying with modern safer alternatives.
-- Fail fast on bad `malloc`s.
-- When building, if the entity extends past the client area, disallow it.
-- All functions to reference passed pointers & variables instead of global declarations/externs (where applicable).
 - Double check and update `const` parameters.
-- New assets...
-- `#include` dependency graph organization.
 - Use stack allocations instead of repetitive pointer dereferences.
-- Add forward declaration for internally referenced structs (e.g. `struct ENTITY_T* p_Next`, `p_Operating`).
-- Crossplatform support: Refactor IO, clock, etc...
 - Single vs multiple instances.
-- 4K support (large map).
-- Borderless windowed mode (toggleable).
-- Images -> Assets (renamed).
 - Doxygen documentation.
+- Don't allow workers to move inside an entity.
+- Restructure `DOUBLE_BUFFER_` to `RENDERER_` and allow it to operate on a implementation strategy (GDI single/double buffer, SDL, Direct2D, ...), quasi DI.
+- New assets...
 
 ---
 
@@ -52,9 +46,21 @@ Active development continues here when time allows — see the historic repo for
 - Introduced a logging system.
 - Added Visual Studio 2022 solution/project setup and formatting rules.
 - Configured debug/release flags for MSVC.
-- Partial organization of `#include` dependency graph.
 - Menu structure refinements.
 - Reviewed local function types.
+- Images -> Assets (renamed + consolidated GDI brushes/pens).
+- `#include` dependency graph organization.
+- All functions to reference passed pointers & variables instead of global declarations/externs (where applicable).
+- Fail fast on bad `malloc`s.
+- Bump map size.
+- Borderless windowed mode (escape toggleable) + other chord QoL keys.
+- Consolidate MoveTo/LineTo's.
+- Replace I/FPOINT structs with I/FDELTA structs where applicable.
+- When building, if the entity extends past the client area, disallow it.
+- Right-click -> build none.
+- Comma print large positive numbers.
+- Clean up sorting.
+- Render + slight pathfinding optimizations.
 
 ---
 

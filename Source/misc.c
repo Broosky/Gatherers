@@ -6,6 +6,7 @@
 #include "../Headers/common.h"
 #include "../Headers/common_types.h"
 #include "../Headers/constants.h"
+#include "../Headers/globals.h"
 #include "../Headers/windows_macros.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,11 +38,11 @@ void __cdecl MISC_ResizeWindow(HWND hWnd, UINT uiClientWidth, UINT uiClientHeigh
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Position the window to the center of the screen.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    IPOINT_T WindowSize = { WindowArea.right - WindowArea.left, WindowArea.bottom - WindowArea.top };
-    IPOINT_T HalfWindowSize = { WindowSize.iX >> 1, WindowSize.iY >> 1 };
+    IDELTA_T WindowSize = { WindowArea.right - WindowArea.left, WindowArea.bottom - WindowArea.top };
+    IDELTA_T HalfWindowSize = { WindowSize.iDx >> 1, WindowSize.iDy >> 1 };
     IPOINT_T MidScreen = { GetSystemMetrics(SM_CXSCREEN) >> 1, GetSystemMetrics(SM_CYSCREEN) >> 1 };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MoveWindow(hWnd, MidScreen.iX - HalfWindowSize.iX, MidScreen.iY - HalfWindowSize.iY, WindowSize.iX, WindowSize.iY, 1);
+    MoveWindow(hWnd, MidScreen.iX - HalfWindowSize.iDx, MidScreen.iY - HalfWindowSize.iDy, WindowSize.iDx, WindowSize.iDy, 1);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl MISC_FormatTime(ULONG ulSecondsTick, char* p_szBuffer, size_t p_szBufferSize) {
@@ -51,5 +52,21 @@ void __cdecl MISC_FormatTime(ULONG ulSecondsTick, char* p_szBuffer, size_t p_szB
     ULONG ulDays = ulSecondsTick / 86400;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     snprintf(p_szBuffer, p_szBufferSize, "%02lud %02luh %02lum %02lus", ulDays, ulHours, ulMinutes, ulSeconds);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl MISC_FormatWithCommas(char* p_szFormatted, size_t stFormattedSize, unsigned long long ullNumber) {
+    char szTemp[32];
+    snprintf(szTemp, sizeof(szTemp), "%llu", ullNumber);
+    int szLength = strlen(szTemp);
+    int iFormattedIndex = 0;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	int i;
+    for (i = 0; i < szLength && iFormattedIndex < (int)stFormattedSize - 1; ++i) {
+        p_szFormatted[iFormattedIndex++] = szTemp[i];
+        if ((szLength - i - 1) % 3 == 0 && i != szLength - 1 && iFormattedIndex < (int)stFormattedSize - 1) {
+            p_szFormatted[iFormattedIndex++] = ',';
+        }
+    }
+    p_szFormatted[iFormattedIndex] = '\0';
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -22,11 +22,10 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // - Put frequently used variables that are accessed via dereferencing onto the stack.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl PROCESS_DrawSelectionArea(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, COLORREF PenColour) {
+void __cdecl PROCESS_DrawSelectionArea(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets) {
     if (p_Globals->ubDrawSelectionRect && !p_Globals->ubCreate) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        HPEN hPen = CreatePen(PS_SOLID, 1, PenColour);
-        HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
+        HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenSelectionArea);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         IPOINT_T OldMousePosition = { p_Globals->iOldMouseX, p_Globals->iOldMouseY };
         IPOINT_T CurrentMousePosition = { p_Globals->iMouseX, p_Globals->iMouseY };
@@ -35,15 +34,11 @@ void __cdecl PROCESS_DrawSelectionArea(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         MoveToEx(p_DoubleBuffer->hDCMem, OldMousePosition.iX, OldMousePosition.iY, NULL);
         LineTo(p_DoubleBuffer->hDCMem, CurrentMousePosition.iX, OldMousePosition.iY);
-        MoveToEx(p_DoubleBuffer->hDCMem, CurrentMousePosition.iX, OldMousePosition.iY, NULL);
         LineTo(p_DoubleBuffer->hDCMem, CurrentMousePosition.iX, CurrentMousePosition.iY);
-        MoveToEx(p_DoubleBuffer->hDCMem, CurrentMousePosition.iX, CurrentMousePosition.iY, NULL);
         LineTo(p_DoubleBuffer->hDCMem, OldMousePosition.iX, CurrentMousePosition.iY);
-        MoveToEx(p_DoubleBuffer->hDCMem, OldMousePosition.iX, CurrentMousePosition.iY, NULL);
         LineTo(p_DoubleBuffer->hDCMem, OldMousePosition.iX, OldMousePosition.iY);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
-        DeleteObject(hPen);
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,15 +237,20 @@ void __cdecl PROCESS_CaptureAndApplyTranslations(DOUBLE_BUFFER_T* p_DoubleBuffer
             }
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Accumulate the global translations when interacting with the boundaries. Translations can also be modified by
-        // clicking directly on the minimap.
+        // Don't process translations if there's no delta.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        p_Globals->fLateralTranslation += fLateralBoundaryTranslation;
-        p_Globals->fVerticalTranslation += fVerticalBoundaryTranslation;
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Apply only the delta to everything present on the main view.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        PROCESS_ApplyTranslations(fLateralBoundaryTranslation, fVerticalBoundaryTranslation, p_Globals, p_Assets);
+        if (fLateralBoundaryTranslation != 0.0f || fVerticalBoundaryTranslation != 0.0f) {
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Accumulate the global translations when interacting with the boundaries. Translations can also be modified by
+            // clicking directly on the minimap.
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            p_Globals->fLateralTranslation += fLateralBoundaryTranslation;
+            p_Globals->fVerticalTranslation += fVerticalBoundaryTranslation;
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Apply only the delta to everything present on the main view.
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            PROCESS_ApplyTranslations(fLateralBoundaryTranslation, fVerticalBoundaryTranslation, p_Globals, p_Assets);
+        }
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -314,7 +314,7 @@ void __cdecl PROCESS_DrawBackground(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* 
     DOUBLE_BUFFER_CropDrawPictureAt(p_DoubleBuffer, &p_Assets->Terrain[p_Globals->usMapIndex], CropStart, CropDelta, 0);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl PROCESS_ProcessEntities(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, MENU_T* p_Menu) {
+void __cdecl PROCESS_ProcessEntities(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, MENU_T* p_Menu, LOG_T* p_Log) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
     while (p_Current) {
@@ -323,8 +323,8 @@ void __cdecl PROCESS_ProcessEntities(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T*
         switch (p_Current->usType) {
         case ENTITY_WORKER: {
             if (p_Menu->ubToggleSimulation) {
-                if (p_Current->p_Operating) {
-                    AI_HandleWorkers(p_Current, p_Globals);
+                if (p_Current->p_OperatingTarget) {
+                    AI_HandleWorkers(p_Current, p_Globals, p_Log);
                 }
             }
             break;
@@ -397,19 +397,19 @@ void __cdecl PROCESS_ProcessEntities(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T*
             if (p_Menu->ubDrawStatuses) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 if (p_Current->ubIsPaused) {
-                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, RGB(255, 255, 255), RGB(100, 0, 0));
+                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, p_Assets->hPenWhite, p_Assets->hBrush100r0g0b);
                 }
                 else if (!p_Current->ubIsAlive) {
-                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, RGB(255, 255, 255), RGB(0, 100, 0));
+                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, p_Assets->hPenWhite, p_Assets->hBrush0r100g0b);
                 }
                 else if (!p_Current->p_Next) {
-                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, RGB(255, 255, 255), RGB(0, 0, 100));
+                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, p_Assets->hPenWhite, p_Assets->hBrush0r0g100b);
                 }
                 else if (p_Current == p_Globals->p_RootEntity) {
-                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, RGB(255, 255, 255), RGB(100, 100, 0));
+                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, p_Assets->hPenWhite, p_Assets->hBrush100r100g0b);
                 }
                 else if (p_Current->ubIsCarrying) {
-                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, RGB(255, 255, 255), RGB(0, 100, 100));
+                    DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, p_Assets->hPenWhite, p_Assets->hBrush0r100g100b);
                 }
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -417,24 +417,24 @@ void __cdecl PROCESS_ProcessEntities(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T*
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (ENTITY_WithinPoint(p_Current, (FPOINT_T) { p_Globals->iMouseX, p_Globals->iMouseY })) {
                 p_Current->ubIsHighlighted = 1;
-                DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, RGB(255, 255, 255), RGB(100, 0, 100));
+                DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, p_Assets->hPenWhite, p_Assets->hBrush100r0g100b);
             }
             else {
                 p_Current->ubIsHighlighted = 0;
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (p_Menu->ubDrawMinor) {
-                DOUBLE_BUFFER_DrawEntityMinorVector(p_DoubleBuffer, p_Current, RGB(255, 127, 255));
+                DOUBLE_BUFFER_DrawEntityMinorVector(p_DoubleBuffer, p_Current, p_Assets);
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (p_Menu->ubDrawMajor) {
-                DOUBLE_BUFFER_DrawEntityMajorVector(p_DoubleBuffer, p_Current, RGB(0, 255, 127));
+                DOUBLE_BUFFER_DrawEntityMajorVector(p_DoubleBuffer, p_Current, p_Assets);
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Entity selection has priority.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (p_Current->ubIsSelected) {
-                DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, RGB(255, 255, 255), RGB(100, 100, 100));
+                DOUBLE_BUFFER_DrawEntityEllipse(p_DoubleBuffer, p_Current, p_Assets->hPenWhite, p_Assets->hBrush100r100g100b);
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (p_Menu->ubDrawResources) {
@@ -740,7 +740,7 @@ void __cdecl PROCESS_DrawDiagnostics(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T*
         );
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         p_Globals->fClientBottomY -= 20.0f;
-        snprintf(p_DoubleBuffer->szBlitter, sizeof(p_DoubleBuffer->szBlitter), "H: %d B", p_Globals->iRunningHeap);
+        snprintf(p_DoubleBuffer->szBlitter, sizeof(p_DoubleBuffer->szBlitter), "H: %zu B", p_Globals->stAllocations);
         DOUBLE_BUFFER_Blitter(
             p_DoubleBuffer,
             p_DoubleBuffer->szBlitter,
@@ -805,29 +805,22 @@ void __cdecl PROCESS_DrawDiagnostics(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T*
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Draw the translation threshold boundaries.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        HPEN hPen = CreatePen(PS_SOLID, 1, RGB(200, 200, 200));
-        HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
+        HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenTranslation);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Left, bottom, right, top.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(p_DoubleBuffer->hDCMem, p_Globals->usThreshold, 0, NULL);
-        LineTo(p_DoubleBuffer->hDCMem, p_Globals->usThreshold, p_DoubleBuffer->ClientArea.bottom);
+        USHORT usLeft = p_Globals->usThreshold;
+        USHORT usTop = p_Globals->usThreshold;
+        USHORT usRight = p_DoubleBuffer->ClientArea.right - p_Globals->usThreshold;
+        USHORT usBottom = p_DoubleBuffer->ClientArea.bottom - p_Globals->usThreshold;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(p_DoubleBuffer->hDCMem, 0, p_DoubleBuffer->ClientArea.bottom - p_Globals->usThreshold, NULL);
-        LineTo(p_DoubleBuffer->hDCMem, p_DoubleBuffer->ClientArea.right, p_DoubleBuffer->ClientArea.bottom - p_Globals->usThreshold);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(
-            p_DoubleBuffer->hDCMem,
-            p_DoubleBuffer->ClientArea.right - p_Globals->usThreshold,
-            p_DoubleBuffer->ClientArea.bottom, NULL
-        );
-        LineTo(p_DoubleBuffer->hDCMem, p_DoubleBuffer->ClientArea.right - p_Globals->usThreshold, 0);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(p_DoubleBuffer->hDCMem, 0, p_Globals->usThreshold, NULL);
-        LineTo(p_DoubleBuffer->hDCMem, p_DoubleBuffer->ClientArea.right, p_Globals->usThreshold);
+        MoveToEx(p_DoubleBuffer->hDCMem, usLeft, usTop, NULL);
+        LineTo(p_DoubleBuffer->hDCMem, usRight, usTop);
+        LineTo(p_DoubleBuffer->hDCMem, usRight, usBottom);
+        LineTo(p_DoubleBuffer->hDCMem, usLeft, usBottom);
+        LineTo(p_DoubleBuffer->hDCMem, usLeft, usTop);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
-        DeleteObject(hPen);
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -859,7 +852,7 @@ void __cdecl PROCESS_DrawResourceBar(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T*
     // Mineral text with blue font colour.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     DOUBLE_BUFFER_SetBlitter(p_DoubleBuffer, &(p_Assets->Blitter[0]));
-    snprintf(p_DoubleBuffer->szBlitter, sizeof(p_DoubleBuffer->szBlitter), "%d", p_Globals->iMineralCount);
+    MISC_FormatWithCommas(p_DoubleBuffer->szBlitter, sizeof(p_DoubleBuffer->szBlitter), p_Globals->iMineralCount);
     DOUBLE_BUFFER_Blitter(
         p_DoubleBuffer,
         p_DoubleBuffer->szBlitter,
@@ -883,7 +876,7 @@ void __cdecl PROCESS_DrawResourceBar(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T*
     // Gas text with green font colour.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     DOUBLE_BUFFER_SetBlitter(p_DoubleBuffer, &(p_Assets->Blitter[2]));
-    snprintf(p_DoubleBuffer->szBlitter, sizeof(p_DoubleBuffer->szBlitter), "%d", p_Globals->iGasCount);
+    MISC_FormatWithCommas(p_DoubleBuffer->szBlitter, sizeof(p_DoubleBuffer->szBlitter), p_Globals->iGasCount);
     DOUBLE_BUFFER_Blitter(
         p_DoubleBuffer,
         p_DoubleBuffer->szBlitter, (FPOINT_T) { 175.0f, p_Globals->fClientBottomY - 40.0f },
@@ -942,22 +935,15 @@ void __cdecl PROCESS_DrawTaskbar(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_G
     );
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Future:
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// - Change to FPOINT_T and IPOINT_T structures.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl PROCESS_HandleMinimap(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets) {
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Minimap origin.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT_T MinimapOrigin;
-    FPOINT_T MinimapDelta;
+    FDELTA_T MinimapDelta;
     PROCESS_PopulateMinimapDimensions(&MinimapOrigin, &MinimapDelta, p_DoubleBuffer, p_Assets);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PROCESS_DrawMinimapPicture(p_DoubleBuffer, p_Globals, p_Assets, MinimapOrigin);
-    PROCESS_DrawMinimapEntities(p_DoubleBuffer, p_Globals, MinimapOrigin);
+    PROCESS_DrawMinimapEntities(p_DoubleBuffer, p_Globals, MinimapOrigin, p_Assets);
     PROCESS_DrawMinimapViewport(p_DoubleBuffer, p_Globals, p_Assets, MinimapOrigin);
-    PROCESS_DrawMinimapSelectionArea(p_DoubleBuffer, p_Globals, MinimapOrigin);
+    PROCESS_DrawMinimapSelectionArea(p_DoubleBuffer, p_Globals, MinimapOrigin, p_Assets);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl PROCESS_DrawMinimapPicture(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, FPOINT_T MinimapOrigin) {
@@ -977,7 +963,7 @@ void __cdecl PROCESS_DrawMinimapPicture(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS
     DOUBLE_BUFFER_DrawPictureAt(p_DoubleBuffer, &p_Assets->Minimap[p_Globals->usMapIndex], MinimapOrigin, 0);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl PROCESS_DrawMinimapEntities(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, FPOINT_T MinimapOrigin) {
+void __cdecl PROCESS_DrawMinimapEntities(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, FPOINT_T MinimapOrigin, ASSETS_T* p_Assets) {
     HPEN hPen = NULL;
     HBRUSH hBrush = NULL;
     HGDIOBJ hPenTemp = NULL;
@@ -991,143 +977,188 @@ void __cdecl PROCESS_DrawMinimapEntities(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBAL
         // The maps are square, and the locations are a ratio the map size!
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         FPOINT_T EntityLocation = {
-            (p_Current->CenterPoint.fX - p_Current->HalfSize.fX - p_Globals->fLateralTranslation) / MAP_SIZE,
-            (p_Current->CenterPoint.fY - p_Current->HalfSize.fY - p_Globals->fVerticalTranslation) / MAP_SIZE
+            (p_Current->CenterPoint.fX - p_Current->HalfSize.fDx - p_Globals->fLateralTranslation) / MAP_SIZE,
+            (p_Current->CenterPoint.fY - p_Current->HalfSize.fDy - p_Globals->fVerticalTranslation) / MAP_SIZE
         };
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        FPOINT_T EntityDelta = {
-            (p_Current->CenterPoint.fX + p_Current->HalfSize.fX - p_Globals->fLateralTranslation) / MAP_SIZE,
-            (p_Current->CenterPoint.fY + p_Current->HalfSize.fY - p_Globals->fVerticalTranslation) / MAP_SIZE
+        FDELTA_T EntityDelta = {
+            (p_Current->CenterPoint.fX + p_Current->HalfSize.fDx - p_Globals->fLateralTranslation) / MAP_SIZE,
+            (p_Current->CenterPoint.fY + p_Current->HalfSize.fDy - p_Globals->fVerticalTranslation) / MAP_SIZE
         };
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         FPOINT_T MinimapEntityLocation = { MINIMAP_SIZE * EntityLocation.fX, MINIMAP_SIZE * EntityLocation.fY };
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        FPOINT_T MinimapEntityDelta = { MINIMAP_SIZE * EntityDelta.fX, MINIMAP_SIZE * EntityDelta.fY };
+        FDELTA_T MinimapEntityDelta = { MINIMAP_SIZE * EntityDelta.fDx, MINIMAP_SIZE * EntityDelta.fDy };
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        switch (p_Current->usType) {
-        case ENTITY_WORKER: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->ubIsSelected) {
-                hBrush = CreateSolidBrush(RGB(0, 255, 0));
-                hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
-            }
-            else if (p_Current->ubIsHighlighted) {
-                hBrush = CreateSolidBrush(RGB(100, 0, 100));
-                hPen = CreatePen(PS_SOLID, 1, RGB(100, 0, 100));
-            }
-            else {
-                hBrush = CreateSolidBrush(RGB(255, 255, 255));
-                hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            hBrushTemp = SelectObject(p_DoubleBuffer->hDCMem, hBrush);
-            hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
-            break;
+        if (p_Current->ubIsSelected) {
+            hBrush = p_Assets->hBrushSelected;
+            hPen = p_Assets->hPenSelected;
         }
-        case ENTITY_COMMAND: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->ubIsSelected) {
-                hBrush = CreateSolidBrush(RGB(0, 255, 0));
-                hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
-            }
-            else if (p_Current->ubIsHighlighted) {
-                hBrush = CreateSolidBrush(RGB(100, 0, 100));
-                hPen = CreatePen(PS_SOLID, 1, RGB(100, 0, 100));
-            }
-            else {
-                hBrush = CreateSolidBrush(RGB(255, 0, 0));
-                hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            hBrushTemp = SelectObject(p_DoubleBuffer->hDCMem, hBrush);
-            hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
-            break;
+        else if (p_Current->ubIsHighlighted) {
+            hBrush = p_Assets->hBrushHighlighted;
+            hPen = p_Assets->hPenHighlighted;
         }
-        case ENTITY_MINERAL: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->ubIsSelected) {
-                hBrush = CreateSolidBrush(RGB(0, 255, 0));
-                hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+        else {
+            switch (p_Current->usType) {
+            case ENTITY_WORKER:
+                hBrush = p_Assets->hBrushWorker;
+                hPen = p_Assets->hPenWorker;
+                break;
+            case ENTITY_COMMAND:
+                hBrush = p_Assets->hBrushCommand;
+                hPen = p_Assets->hPenCommand;
+                break;
+            case ENTITY_MINERAL:
+                hBrush = p_Assets->hBrushMineral;
+                hPen = p_Assets->hPenMineral;
+                break;
+            case ENTITY_SUPPLY:
+                hBrush = p_Assets->hBrushSupply;
+                hPen = p_Assets->hPenSupply;
+                break;
+            case ENTITY_REFINERY:
+                hBrush = p_Assets->hBrushRefinery;
+                hPen = p_Assets->hPenRefinery;
+                break;
+            default: {
+                printf("PROCESS_DrawMinimapEntities(): Unknown entity type.\n");
+                return;
             }
-            else if (p_Current->ubIsHighlighted) {
-                hBrush = CreateSolidBrush(RGB(100, 0, 100));
-                hPen = CreatePen(PS_SOLID, 1, RGB(100, 0, 100));
             }
-            else {
-                hBrush = CreateSolidBrush(RGB(110, 175, 225));
-                hPen = CreatePen(PS_SOLID, 1, RGB(110, 175, 225));
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            hBrushTemp = SelectObject(p_DoubleBuffer->hDCMem, hBrush);
-            hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
-            break;
         }
-        case ENTITY_SUPPLY: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->ubIsSelected) {
-                hBrush = CreateSolidBrush(RGB(0, 255, 0));
-                hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
-            }
-            else if (p_Current->ubIsHighlighted) {
-                hBrush = CreateSolidBrush(RGB(100, 0, 100));
-                hPen = CreatePen(PS_SOLID, 1, RGB(100, 0, 100));
-            }
-            else {
-                hBrush = CreateSolidBrush(RGB(255, 255, 0));
-                hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            hBrushTemp = SelectObject(p_DoubleBuffer->hDCMem, hBrush);
-            hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
-            break;
-        }
-        case ENTITY_REFINERY: {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Current->ubIsSelected) {
-                hBrush = CreateSolidBrush(RGB(0, 255, 0));
-                hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
-            }
-            else if (p_Current->ubIsHighlighted) {
-                hBrush = CreateSolidBrush(RGB(100, 0, 100));
-                hPen = CreatePen(PS_SOLID, 1, RGB(100, 0, 100));
-            }
-            else {
-                hBrush = CreateSolidBrush(RGB(0, 175, 0));
-                hPen = CreatePen(PS_SOLID, 1, RGB(0, 175, 0));
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            hBrushTemp = SelectObject(p_DoubleBuffer->hDCMem, hBrush);
-            hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
-            break;
-        }
-        default: {
-            printf("PROCESS_DrawMinimapEntities(): Unknown entity type.\n");
-        }
-        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        hBrushTemp = SelectObject(p_DoubleBuffer->hDCMem, hBrush);
+        hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         Rectangle(
             p_DoubleBuffer->hDCMem,
             MinimapOrigin.fX + MinimapEntityLocation.fX,
             MinimapOrigin.fY + MinimapEntityLocation.fY,
-            MinimapOrigin.fX + MinimapEntityDelta.fX,
-            MinimapOrigin.fY + MinimapEntityDelta.fY
+            MinimapOrigin.fX + MinimapEntityDelta.fDx,
+            MinimapOrigin.fY + MinimapEntityDelta.fDy
         );
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SelectObject(p_DoubleBuffer->hDCMem, hBrushTemp);
         SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
-        DeleteObject(hBrush);
-        DeleteObject(hPen);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         p_Current = (ENTITY_T*)p_Current->p_Next;
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl PROCESS_PopulateViewportRelativity(FPOINT_T* p_ViewportRelativeLocation, FPOINT_T* p_ViewportRelativeDelta, FPOINT_T* p_ViewportActualLocation, FPOINT_T* p_ViewportActualDelta, DOUBLE_BUFFER_T* p_DoubleBuffer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+void __cdecl PROCESS_DrawMinimapViewport(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, FPOINT_T MinimapOrigin) {
+    HGDIOBJ hPenTemp = NULL;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Render the viewport box.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FPOINT_T ViewportRelativeLocation;
+    FDELTA_T ViewportRelativeDelta;
+    FPOINT_T ViewportActualLocation;
+    FDELTA_T ViewportActualDelta;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PROCESS_PopulateViewportRelativity(&ViewportRelativeLocation, &ViewportRelativeDelta, &ViewportActualLocation, &ViewportActualDelta, p_DoubleBuffer, p_Assets, p_Globals);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FPOINT_T TopLeft = {
+    MinimapOrigin.fX + ViewportActualLocation.fX,
+    MinimapOrigin.fY + ViewportActualLocation.fY
+    };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FPOINT_T TopRight = {
+        MinimapOrigin.fX + ViewportActualLocation.fX + ViewportActualDelta.fDx,
+        MinimapOrigin.fY + ViewportActualLocation.fY
+    };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FPOINT_T BottomRight = {
+        MinimapOrigin.fX + ViewportActualLocation.fX + ViewportActualDelta.fDx,
+        MinimapOrigin.fY + ViewportActualLocation.fY + ViewportActualDelta.fDy
+    };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FPOINT_T BottomLeft = {
+        MinimapOrigin.fX + ViewportActualLocation.fX,
+        MinimapOrigin.fY + ViewportActualLocation.fY + ViewportActualDelta.fDy
+    };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenViewport);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Top, right, bottom, left.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MoveToEx(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY, NULL);
+    LineTo(p_DoubleBuffer->hDCMem, TopRight.fX, TopRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomRight.fX, BottomRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomLeft.fX, BottomLeft.fY);
+    LineTo(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl PROCESS_DrawMinimapSelectionArea(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, FPOINT_T MinimapOrigin, ASSETS_T* p_Assets) {
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Prevent rendering of the minimap selection area during the initial mouse down coordinates.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_Globals->iCaptureCurrentX > 0 || p_Globals->iCaptureCurrentY > 0) {
+        HGDIOBJ hPenTemp = NULL;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Render the selection area. Note: lateral and vertical translations are already inclusive to the selection coordinates.
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T SelectionAreaStartLocation = {
+            p_Globals->iCaptureStartX / MAP_SIZE,
+            p_Globals->iCaptureStartY / MAP_SIZE
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T SelectionAreaEndLocation = {
+            p_Globals->iCaptureCurrentX / MAP_SIZE,
+            p_Globals->iCaptureCurrentY / MAP_SIZE
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Downscale the coordinates to the minimap size.
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T MinimapSelectionAreaStartLocation = {
+            MINIMAP_SIZE * SelectionAreaStartLocation.fX,
+            MINIMAP_SIZE * SelectionAreaStartLocation.fY };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T MinimapSelectionAreaEndLocation = {
+            MINIMAP_SIZE * SelectionAreaEndLocation.fX,
+            MINIMAP_SIZE * SelectionAreaEndLocation.fY };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Create rectangle coordinates.
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T TopLeft = {
+            MinimapOrigin.fX + MinimapSelectionAreaStartLocation.fX,
+            MinimapOrigin.fY + MinimapSelectionAreaStartLocation.fY
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T TopRight = {
+            MinimapOrigin.fX + MinimapSelectionAreaEndLocation.fX,
+            MinimapOrigin.fY + MinimapSelectionAreaStartLocation.fY
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T BottomRight = {
+            MinimapOrigin.fX + MinimapSelectionAreaEndLocation.fX,
+            MinimapOrigin.fY + MinimapSelectionAreaEndLocation.fY
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T BottomLeft = {
+            MinimapOrigin.fX + MinimapSelectionAreaStartLocation.fX,
+            MinimapOrigin.fY + MinimapSelectionAreaEndLocation.fY
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenSelectionArea);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        MoveToEx(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY, NULL);
+        LineTo(p_DoubleBuffer->hDCMem, TopRight.fX, TopRight.fY);
+        LineTo(p_DoubleBuffer->hDCMem, BottomRight.fX, BottomRight.fY);
+        LineTo(p_DoubleBuffer->hDCMem, BottomLeft.fX, BottomLeft.fY);
+        LineTo(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl PROCESS_PopulateViewportRelativity(FPOINT_T* p_ViewportRelativeLocation, FDELTA_T* p_ViewportRelativeDelta, FPOINT_T* p_ViewportActualLocation, FDELTA_T* p_ViewportActualDelta, DOUBLE_BUFFER_T* p_DoubleBuffer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
     FPOINT_T ViewportRelativeLocation = {
         (0.0f - p_Globals->fLateralTranslation) / p_Assets->Terrain[p_Globals->usMapIndex].Bitmap.bmWidth,
         (0.0f - p_Globals->fVerticalTranslation) / p_Assets->Terrain[p_Globals->usMapIndex].Bitmap.bmHeight
     };
-    FPOINT_T ViewportRelativeDelta = {
+    FDELTA_T ViewportRelativeDelta = {
         (float)p_DoubleBuffer->ClientArea.right / p_Assets->Terrain[p_Globals->usMapIndex].Bitmap.bmWidth,
         (float)p_DoubleBuffer->ClientArea.bottom / p_Assets->Terrain[p_Globals->usMapIndex].Bitmap.bmHeight
     };
@@ -1136,9 +1167,9 @@ void __cdecl PROCESS_PopulateViewportRelativity(FPOINT_T* p_ViewportRelativeLoca
         ViewportRelativeLocation.fX * MINIMAP_SIZE,
         ViewportRelativeLocation.fY * MINIMAP_SIZE
     };
-    FPOINT_T ViewportActualDelta = {
-        ViewportRelativeDelta.fX * MINIMAP_SIZE,
-        ViewportRelativeDelta.fY * MINIMAP_SIZE
+    FDELTA_T ViewportActualDelta = {
+        ViewportRelativeDelta.fDx * MINIMAP_SIZE,
+        ViewportRelativeDelta.fDy * MINIMAP_SIZE
     };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     *p_ViewportRelativeLocation = ViewportRelativeLocation;
@@ -1148,12 +1179,12 @@ void __cdecl PROCESS_PopulateViewportRelativity(FPOINT_T* p_ViewportRelativeLoca
     *p_ViewportActualDelta = ViewportActualDelta;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl PROCESS_PopulateMinimapDimensions(FPOINT_T* p_MinimapOrigin, FPOINT_T* p_MinimapDelta, DOUBLE_BUFFER_T* p_DoubleBuffer, ASSETS_T* p_Assets) {
+void __cdecl PROCESS_PopulateMinimapDimensions(FPOINT_T* p_MinimapOrigin, FDELTA_T* p_MinimapDelta, DOUBLE_BUFFER_T* p_DoubleBuffer, ASSETS_T* p_Assets) {
     FPOINT_T MinimapOrigin = {
         p_DoubleBuffer->ClientArea.right - p_Assets->HUD[1].Bitmap.bmWidth + 15.0f,
         p_DoubleBuffer->ClientArea.bottom - p_Assets->HUD[1].Bitmap.bmHeight + 15.0f
     };
-    FPOINT_T MinimapDelta = {
+    FDELTA_T MinimapDelta = {
         MINIMAP_SIZE,
         MINIMAP_SIZE
     };
@@ -1164,12 +1195,12 @@ void __cdecl PROCESS_PopulateMinimapDimensions(FPOINT_T* p_MinimapOrigin, FPOINT
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 UINT8 __cdecl PROCESS_IsMinimapClicked(DOUBLE_BUFFER_T* p_DoubleBuffer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
     FPOINT_T MinimapOrigin;
-    FPOINT_T MinimapDelta;
+    FDELTA_T MinimapDelta;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PROCESS_PopulateMinimapDimensions(&MinimapOrigin, &MinimapDelta, p_DoubleBuffer, p_Assets);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (p_Globals->iMouseX >= MinimapOrigin.fX && p_Globals->iMouseX <= MinimapOrigin.fX + MinimapDelta.fX &&
-        p_Globals->iMouseY >= MinimapOrigin.fY && p_Globals->iMouseY <= MinimapOrigin.fY + MinimapDelta.fY) {
+    if (p_Globals->iMouseX >= MinimapOrigin.fX && p_Globals->iMouseX <= MinimapOrigin.fX + MinimapDelta.fDx &&
+        p_Globals->iMouseY >= MinimapOrigin.fY && p_Globals->iMouseY <= MinimapOrigin.fY + MinimapDelta.fDy) {
         return 1;
     }
     else {
@@ -1178,9 +1209,8 @@ UINT8 __cdecl PROCESS_IsMinimapClicked(DOUBLE_BUFFER_T* p_DoubleBuffer, ASSETS_T
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl PROCESS_AdjustMinimapViewport(GLOBALS_T* p_Globals, DOUBLE_BUFFER_T* p_DoubleBuffer, ASSETS_T* p_Assets) {
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT_T MinimapOrigin;
-    FPOINT_T MinimapDelta;
+    FDELTA_T MinimapDelta;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PROCESS_PopulateMinimapDimensions(&MinimapOrigin, &MinimapDelta, p_DoubleBuffer, p_Assets);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1190,9 +1220,9 @@ void __cdecl PROCESS_AdjustMinimapViewport(GLOBALS_T* p_Globals, DOUBLE_BUFFER_T
     };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT_T ViewportRelativeLocation;
-    FPOINT_T ViewportRelativeDelta;
+    FDELTA_T ViewportRelativeDelta;
     FPOINT_T ViewportActualLocation;
-    FPOINT_T ViewportActualDelta;
+    FDELTA_T ViewportActualDelta;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PROCESS_PopulateViewportRelativity(&ViewportRelativeLocation, &ViewportRelativeDelta, &ViewportActualLocation, &ViewportActualDelta, p_DoubleBuffer, p_Assets, p_Globals);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1201,8 +1231,8 @@ void __cdecl PROCESS_AdjustMinimapViewport(GLOBALS_T* p_Globals, DOUBLE_BUFFER_T
     // Capture the new actual and relative dimensions.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT_T NewViewportActualLocation = {
-         MinimapClickOrigin.fX - (ViewportActualDelta.fX / 2),
-         MinimapClickOrigin.fY - (ViewportActualDelta.fY / 2),
+         MinimapClickOrigin.fX - (ViewportActualDelta.fDx / 2),
+         MinimapClickOrigin.fY - (ViewportActualDelta.fDy / 2),
     };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Ensuring we're within bounds in the minimap will also reflect we're in bounds in the main view.
@@ -1213,11 +1243,11 @@ void __cdecl PROCESS_AdjustMinimapViewport(GLOBALS_T* p_Globals, DOUBLE_BUFFER_T
     if (NewViewportActualLocation.fY <= 0.0f) {
         NewViewportActualLocation.fY = 0.0f;
     }
-    if (NewViewportActualLocation.fX + ViewportActualDelta.fX >= MINIMAP_SIZE) {
-        NewViewportActualLocation.fX = MINIMAP_SIZE - ViewportActualDelta.fX;
+    if (NewViewportActualLocation.fX + ViewportActualDelta.fDx >= MINIMAP_SIZE) {
+        NewViewportActualLocation.fX = MINIMAP_SIZE - ViewportActualDelta.fDx;
     }
-    if (NewViewportActualLocation.fY + ViewportActualDelta.fY >= MINIMAP_SIZE) {
-        NewViewportActualLocation.fY = MINIMAP_SIZE - ViewportActualDelta.fY;
+    if (NewViewportActualLocation.fY + ViewportActualDelta.fDy >= MINIMAP_SIZE) {
+        NewViewportActualLocation.fY = MINIMAP_SIZE - ViewportActualDelta.fDy;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Relative dimensions to upscale.
@@ -1239,161 +1269,11 @@ void __cdecl PROCESS_AdjustMinimapViewport(GLOBALS_T* p_Globals, DOUBLE_BUFFER_T
     float fNewMainViewLateralTranslationDelta = -NewMainViewActualLocation.fX - p_Globals->fLateralTranslation;
     float fNewMainViewVerticalTranslationDelta = -NewMainViewActualLocation.fY - p_Globals->fVerticalTranslation;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Globals->fLateralTranslation += fNewMainViewLateralTranslationDelta;
-    p_Globals->fVerticalTranslation += fNewMainViewVerticalTranslationDelta;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PROCESS_ApplyTranslations(fNewMainViewLateralTranslationDelta, fNewMainViewVerticalTranslationDelta, p_Globals, p_Assets);
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl PROCESS_DrawMinimapViewport(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, FPOINT_T MinimapOrigin) {
-    HPEN hPen = NULL;
-    HGDIOBJ hPenTemp = NULL;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Render the viewport box.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FPOINT_T ViewportRelativeLocation;
-    FPOINT_T ViewportRelativeDelta;
-    FPOINT_T ViewportActualLocation;
-    FPOINT_T ViewportActualDelta;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PROCESS_PopulateViewportRelativity(&ViewportRelativeLocation, &ViewportRelativeDelta, &ViewportActualLocation, &ViewportActualDelta, p_DoubleBuffer, p_Assets, p_Globals);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    hPen = CreatePen(PS_SOLID, 1, RGB(200, 200, 200));
-    hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Top, right, bottom, left.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MoveToEx(
-        p_DoubleBuffer->hDCMem,
-        MinimapOrigin.fX + ViewportActualLocation.fX,
-        MinimapOrigin.fY + ViewportActualLocation.fY,
-        NULL
-    );
-    LineTo(
-        p_DoubleBuffer->hDCMem,
-        MinimapOrigin.fX + ViewportActualLocation.fX + ViewportActualDelta.fX,
-        MinimapOrigin.fY + ViewportActualLocation.fY
-    );
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MoveToEx(
-        p_DoubleBuffer->hDCMem,
-        MinimapOrigin.fX + ViewportActualLocation.fX + ViewportActualDelta.fX,
-        MinimapOrigin.fY + ViewportActualLocation.fY,
-        NULL
-    );
-    LineTo(
-        p_DoubleBuffer->hDCMem,
-        MinimapOrigin.fX + ViewportActualLocation.fX + ViewportActualDelta.fX,
-        MinimapOrigin.fY + ViewportActualLocation.fY + ViewportActualDelta.fY
-    );
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MoveToEx(
-        p_DoubleBuffer->hDCMem,
-        MinimapOrigin.fX + ViewportActualLocation.fX + ViewportActualDelta.fX,
-        MinimapOrigin.fY + ViewportActualLocation.fY + ViewportActualDelta.fY,
-        NULL
-    );
-    LineTo(
-        p_DoubleBuffer->hDCMem,
-        MinimapOrigin.fX + ViewportActualLocation.fX,
-        MinimapOrigin.fY + ViewportActualLocation.fY + ViewportActualDelta.fY
-    );
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MoveToEx(
-        p_DoubleBuffer->hDCMem,
-        MinimapOrigin.fX + ViewportActualLocation.fX,
-        MinimapOrigin.fY + ViewportActualLocation.fY + ViewportActualDelta.fY,
-        NULL
-    );
-    LineTo(
-        p_DoubleBuffer->hDCMem,
-        MinimapOrigin.fX + ViewportActualLocation.fX,
-        MinimapOrigin.fY + ViewportActualLocation.fY
-    );
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
-    DeleteObject(hPen);
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl PROCESS_DrawMinimapSelectionArea(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, FPOINT_T MinimapOrigin) {
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Prevent rendering of the minimap selection area during the initial mouse down coordinates.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (p_Globals->iCaptureCurrentX > 0 || p_Globals->iCaptureCurrentY > 0) {
-        HPEN hPen = NULL;
-        HGDIOBJ hPenTemp = NULL;
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Render the selection area. Note: lateral and vertical translations are already inclusive to the selection coordinates.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        FPOINT_T SelectionAreaStartLocation = {
-            p_Globals->iCaptureStartX / MAP_SIZE,
-            p_Globals->iCaptureStartY / MAP_SIZE
-        };
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        FPOINT_T SelectionAreaEndLocation = {
-            p_Globals->iCaptureCurrentX / MAP_SIZE,
-            p_Globals->iCaptureCurrentY / MAP_SIZE
-        };
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        FPOINT_T MinimapSelectionAreaStartLocation = { MINIMAP_SIZE * SelectionAreaStartLocation.fX, MINIMAP_SIZE * SelectionAreaStartLocation.fY };
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        FPOINT_T MinimapSelectionAreaEndLocation = { MINIMAP_SIZE * SelectionAreaEndLocation.fX, MINIMAP_SIZE * SelectionAreaEndLocation.fY };
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        hPen = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
-        hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Top, right, bottom, left.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(
-            p_DoubleBuffer->hDCMem,
-            MinimapOrigin.fX + MinimapSelectionAreaStartLocation.fX,
-            MinimapOrigin.fY + MinimapSelectionAreaStartLocation.fY,
-            NULL
-        );
-        LineTo(
-            p_DoubleBuffer->hDCMem,
-            MinimapOrigin.fX + MinimapSelectionAreaEndLocation.fX,
-            MinimapOrigin.fY + MinimapSelectionAreaStartLocation.fY
-        );
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(
-            p_DoubleBuffer->hDCMem,
-            MinimapOrigin.fX + MinimapSelectionAreaEndLocation.fX,
-            MinimapOrigin.fY + MinimapSelectionAreaStartLocation.fY,
-            NULL
-        );
-        LineTo(
-            p_DoubleBuffer->hDCMem,
-            MinimapOrigin.fX + MinimapSelectionAreaEndLocation.fX,
-            MinimapOrigin.fY + MinimapSelectionAreaEndLocation.fY
-        );
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(
-            p_DoubleBuffer->hDCMem,
-            MinimapOrigin.fX + MinimapSelectionAreaEndLocation.fX,
-            MinimapOrigin.fY + MinimapSelectionAreaEndLocation.fY,
-            NULL
-        );
-        LineTo(
-            p_DoubleBuffer->hDCMem,
-            MinimapOrigin.fX + MinimapSelectionAreaStartLocation.fX,
-            MinimapOrigin.fY + MinimapSelectionAreaEndLocation.fY
-        );
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(
-            p_DoubleBuffer->hDCMem,
-            MinimapOrigin.fX + MinimapSelectionAreaStartLocation.fX,
-            MinimapOrigin.fY + MinimapSelectionAreaEndLocation.fY,
-            NULL
-        );
-        LineTo(
-            p_DoubleBuffer->hDCMem,
-            MinimapOrigin.fX + MinimapSelectionAreaStartLocation.fX,
-            MinimapOrigin.fY + MinimapSelectionAreaStartLocation.fY
-        );
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
-        DeleteObject(hPen);
+    if (fNewMainViewLateralTranslationDelta != 0.0f || fNewMainViewVerticalTranslationDelta != 0.0f) {
+        p_Globals->fLateralTranslation += fNewMainViewLateralTranslationDelta;
+        p_Globals->fVerticalTranslation += fNewMainViewVerticalTranslationDelta;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        PROCESS_ApplyTranslations(fNewMainViewLateralTranslationDelta, fNewMainViewVerticalTranslationDelta, p_Globals, p_Assets);
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1404,29 +1284,26 @@ void __cdecl PROCESS_HandleHud(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Glo
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl PROCESS_DrawBuildLimits(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {
-    HPEN hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-    HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
+    HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenBuildLimits);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT_T Buffer = { p_Assets->Worker[0].Bitmap.bmWidth, p_Assets->Worker[0].Bitmap.bmHeight };
     FPOINT_T Location = { p_Entity->Location.fX, p_Entity->Location.fY };
-    FPOINT_T Delta = { p_Entity->Size.fX, p_Entity->Size.fY };
+    FDELTA_T Delta = { p_Entity->Size.fDx, p_Entity->Size.fDy };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FPOINT_T TopLeft = { Location.fX - Buffer.fX, Location.fY - Buffer.fY };
+    FPOINT_T TopRight = { Location.fX + Delta.fDx + Buffer.fX, Location.fY - Buffer.fY };
+    FPOINT_T BottomRight = { Location.fX + Delta.fDx + Buffer.fX, Location.fY + Delta.fDy + Buffer.fY };
+    FPOINT_T BottomLeft = { Location.fX - Buffer.fX, Location.fY + Delta.fDy + Buffer.fY };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Top, right, bottom, left.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MoveToEx(p_DoubleBuffer->hDCMem, Location.fX - Buffer.fX, Location.fY - Buffer.fY, NULL);
-    LineTo(p_DoubleBuffer->hDCMem, Location.fX + Delta.fX + Buffer.fX, Location.fY - Buffer.fY);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MoveToEx(p_DoubleBuffer->hDCMem, Location.fX + Delta.fX + Buffer.fX, Location.fY - Buffer.fY, NULL);
-    LineTo(p_DoubleBuffer->hDCMem, Location.fX + Delta.fX + Buffer.fX, Location.fY + Delta.fY + Buffer.fY);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MoveToEx(p_DoubleBuffer->hDCMem, Location.fX + Delta.fX + Buffer.fX, Location.fY + Delta.fY + Buffer.fY, NULL);
-    LineTo(p_DoubleBuffer->hDCMem, Location.fX - Buffer.fX, Location.fY + Delta.fY + Buffer.fY);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    MoveToEx(p_DoubleBuffer->hDCMem, Location.fX - Buffer.fX, Location.fY + Delta.fY + Buffer.fY, NULL);
-    LineTo(p_DoubleBuffer->hDCMem, Location.fX - Buffer.fX, Location.fY - Buffer.fY);
+    MoveToEx(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY, NULL);
+    LineTo(p_DoubleBuffer->hDCMem, TopRight.fX, TopRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomRight.fX, BottomRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomLeft.fX, BottomLeft.fY);
+    LineTo(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
-    DeleteObject(hPen);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl PROCESS_DrawBuildType(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets, MENU_T* p_Menu) {
@@ -1442,85 +1319,47 @@ void __cdecl PROCESS_DrawBuildType(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         FPOINT_T Location = { 0.0f, 0.0f };
-        FPOINT_T Delta = { 0.0f, 0.0f };
+        PICTURE_T* p_Picture = NULL;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Draw the buildings image, then the placement restrictions.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         switch (p_Globals->usBuildType) {
-        case ENTITY_COMMAND: {
-            Location.fX = p_Globals->iMouseX - (p_Assets->Command[0].Bitmap.bmWidth >> 1);
-            Location.fY = p_Globals->iMouseY - (p_Assets->Command[0].Bitmap.bmHeight >> 1);
-            Delta.fX = p_Assets->Command[0].Bitmap.bmWidth;
-            Delta.fY = p_Assets->Command[0].Bitmap.bmHeight;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            DOUBLE_BUFFER_DrawPictureAt(p_DoubleBuffer, &p_Assets->Command[0], Location, p_Menu->ubEnableMasking);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            break;
-        }
-        case ENTITY_WORKER: {
-            Location.fX = p_Globals->iMouseX - (p_Assets->Worker[0].Bitmap.bmWidth >> 1);
-            Location.fY = p_Globals->iMouseY - (p_Assets->Worker[0].Bitmap.bmHeight >> 1);
-            Delta.fX = p_Assets->Worker[0].Bitmap.bmWidth;
-            Delta.fY = p_Assets->Worker[0].Bitmap.bmHeight;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            DOUBLE_BUFFER_DrawPictureAt(p_DoubleBuffer, &p_Assets->Worker[0], Location, p_Menu->ubEnableMasking);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            break;
-        }
-        case ENTITY_MINERAL: {
-            Location.fX = p_Globals->iMouseX - (p_Assets->Mineral[0].Bitmap.bmWidth >> 1);
-            Location.fY = p_Globals->iMouseY - (p_Assets->Mineral[0].Bitmap.bmHeight >> 1);
-            Delta.fX = p_Assets->Mineral[0].Bitmap.bmWidth;
-            Delta.fY = p_Assets->Mineral[0].Bitmap.bmHeight;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            DOUBLE_BUFFER_DrawPictureAt(p_DoubleBuffer, &p_Assets->Mineral[0], Location, p_Menu->ubEnableMasking);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            break;
-        }
-        case ENTITY_SUPPLY: {
-            Location.fX = p_Globals->iMouseX - (p_Assets->Supply[0].Bitmap.bmWidth >> 1);
-            Location.fY = p_Globals->iMouseY - (p_Assets->Supply[0].Bitmap.bmHeight >> 1);
-            Delta.fX = p_Assets->Supply[0].Bitmap.bmWidth;
-            Delta.fY = p_Assets->Supply[0].Bitmap.bmHeight;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            DOUBLE_BUFFER_DrawPictureAt(p_DoubleBuffer, &p_Assets->Supply[0], Location, p_Menu->ubEnableMasking);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            break;
-        }
-        case ENTITY_REFINERY: {
-            Location.fX = p_Globals->iMouseX - (p_Assets->Refinery[0].Bitmap.bmWidth >> 1);
-            Location.fY = p_Globals->iMouseY - (p_Assets->Refinery[0].Bitmap.bmHeight >> 1);
-            Delta.fX = p_Assets->Refinery[0].Bitmap.bmWidth;
-            Delta.fY = p_Assets->Refinery[0].Bitmap.bmHeight;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            DOUBLE_BUFFER_DrawPictureAt(p_DoubleBuffer, &p_Assets->Refinery[0], Location, p_Menu->ubEnableMasking);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            break;
-        }
+        case ENTITY_COMMAND: { p_Picture = &p_Assets->Command[0]; break; }
+        case ENTITY_WORKER: { p_Picture = &p_Assets->Worker[0]; break; }
+        case ENTITY_MINERAL: { p_Picture = &p_Assets->Mineral[0]; break; }
+        case ENTITY_SUPPLY: { p_Picture = &p_Assets->Supply[0]; break; }
+        case ENTITY_REFINERY: { p_Picture = &p_Assets->Refinery[0]; break; }
         default: {
             printf("PROCESS_DrawBuildType(): Unknown entity type.\n");
         }
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        HPEN hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-        HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Top, right, bottom, left.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(p_DoubleBuffer->hDCMem, Location.fX, Location.fY, NULL);
-        LineTo(p_DoubleBuffer->hDCMem, Location.fX + Delta.fX, Location.fY);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(p_DoubleBuffer->hDCMem, Location.fX + Delta.fX, Location.fY, NULL);
-        LineTo(p_DoubleBuffer->hDCMem, Location.fX + Delta.fX, Location.fY + Delta.fY);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(p_DoubleBuffer->hDCMem, Location.fX + Delta.fX, Location.fY + Delta.fY, NULL);
-        LineTo(p_DoubleBuffer->hDCMem, Location.fX, Location.fY + Delta.fY);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        MoveToEx(p_DoubleBuffer->hDCMem, Location.fX, Location.fY + Delta.fY, NULL);
-        LineTo(p_DoubleBuffer->hDCMem, Location.fX, Location.fY);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
-        DeleteObject(hPen);
+        if (p_Picture) {
+            LONG width = p_Picture->Bitmap.bmWidth;
+            LONG height = p_Picture->Bitmap.bmHeight;
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            Location.fX = p_Globals->iMouseX - (width >> 1);
+            Location.fY = p_Globals->iMouseY - (height >> 1);
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            DOUBLE_BUFFER_DrawPictureAt(p_DoubleBuffer, p_Picture, Location, p_Menu->ubEnableMasking);
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenBuildType);
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            int iLeft = (int)Location.fX;
+            int iTop = (int)Location.fY;
+            int iRight = (int)(Location.fX + width);
+            int iBottom = (int)(Location.fY + height);
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Top, right, bottom, left.
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            MoveToEx(p_DoubleBuffer->hDCMem, iLeft, iTop, NULL);
+            LineTo(p_DoubleBuffer->hDCMem, iRight, iTop);
+            LineTo(p_DoubleBuffer->hDCMem, iRight, iBottom);
+            LineTo(p_DoubleBuffer->hDCMem, iLeft, iBottom);
+            LineTo(p_DoubleBuffer->hDCMem, iLeft, iTop);
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+        }
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

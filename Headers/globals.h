@@ -39,12 +39,13 @@ typedef struct GLOBALS {
     USHORT usBuildType;
     USHORT usEntityCount;
     USHORT usMessageCount;
-    int iRunningHeap;
+    size_t stAllocations;
     ULONG ulSecondsTick;
     UINT8 ubAnimate;
     UINT8 ubDrawSelectionRect;
     UINT8 ubClickOriginFromMinimap;
     UINT8 ubCreate;
+    UINT8 ubIsBorderless;
     char szBuffer[128];
     float fEngineTime;
     float fEngineTimeSum;

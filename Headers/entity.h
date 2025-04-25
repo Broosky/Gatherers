@@ -19,6 +19,8 @@ typedef struct GLOBALS GLOBALS_T;
 typedef struct PATH_NODE PATH_NODE_T;
 typedef struct ENTITY ENTITY_T;
 typedef struct AI_CLOSEST AI_CLOSEST_T;
+typedef struct LOG LOG_T;
+typedef struct DOUBLE_BUFFER DOUBLE_BUFFER_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,43 +48,51 @@ typedef struct ENTITY {
     float fPauseCount;
     float fPauseTime;
     float fRadius;
-    FPOINT_T Size;
-    FPOINT_T HalfSize;
+    FDELTA_T Size;
+    FDELTA_T HalfSize;
     FPOINT_T Location;
     FPOINT_T CenterPoint;
-    FPOINT_T MovementSpeed;
-    FPOINT_T MinorVector;
-    FPOINT_T MinorUnitVector;
+    FDELTA_T MovementSpeed;
+    FDELTA_T MinorVector;
+    FDELTA_T MinorUnitVector;
     FPOINT_T MinorDestinationCenterPoint;
-    FPOINT_T MajorVector;
-    FPOINT_T MajorUnitVector;
+    FDELTA_T MajorVector;
+    FDELTA_T MajorUnitVector;
     FPOINT_T MajorDestinationCenterPoint;
     PICTURE_T* p_Picture;
     struct ENTITY* p_Next;
-    struct ENTITY* p_Operating;
+    struct ENTITY* p_OperatingTarget; // Resource interaction traversal.
+    struct ENTITY* p_OperatingSubject;
     PATH_NODE_T* p_Path;
 } ENTITY_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void                __cdecl     ENTITY_Zero                         (ENTITY_T*);
-void                __cdecl     ENTITY_Create                       (FPOINT_T, USHORT, ASSETS_T*, GLOBALS_T*);
-UINT8               __cdecl     ENTITY_Restrict                     (USHORT, GLOBALS_T*);
-UINT8               __cdecl     ENTITY_Overlap                      (USHORT, ASSETS_T*, GLOBALS_T*);
+void                __cdecl     ENTITY_Create                       (FPOINT_T, USHORT, ASSETS_T*, GLOBALS_T*, LOG_T*, DOUBLE_BUFFER_T*);
+UINT8               __cdecl     ENTITY_Restrict                     (USHORT, GLOBALS_T*, LOG_T*);
+UINT8               __cdecl     ENTITY_Overlap                      (USHORT, ASSETS_T*, GLOBALS_T*, LOG_T*, DOUBLE_BUFFER_T*);
 void                __cdecl     ENTITY_Pause                        (ENTITY_T*, float);
 UINT8               __cdecl     ENTITY_CollidedWith                 (ENTITY_T*, ENTITY_T*);
 UINT8               __cdecl     ENTITY_WithinPoint                  (ENTITY_T*, FPOINT_T);
 void                __cdecl     ENTITY_MoveTo                       (ENTITY_T*, ENTITY_T*, GLOBALS_T*);
 void                __cdecl     ENTITY_MoveToPoint                  (ENTITY_T*, FPOINT_T, GLOBALS_T*);
+FDELTA_T            __cdecl     ENTITY_CalculateVector              (FPOINT_T, FPOINT_T);
+FDELTA_T            __cdecl     ENTITY_CalculateUnitVector          (FDELTA_T);
+void                __cdecl     ENTITY_PopulateUnitVector           (ENTITY_T*);
 void                __cdecl     ENTITY_FindMinorVector              (ENTITY_T*, GLOBALS_T*);
-FPOINT_T            __cdecl     ENTITY_MinorVectorHead              (ENTITY_T*, ENTITY_T*, GLOBALS_T*);
+FPOINT_T            __cdecl     ENTITY_FindMinorVectorHead          (ENTITY_T*, ENTITY_T*, GLOBALS_T*);
 void                __cdecl     ENTITY_UpdatePosition               (ENTITY_T*, GLOBALS_T*);
 void                __cdecl     ENTITY_Redefine                     (USHORT, GLOBALS_T*);
+void                __cdecl     ENTITY_SelectAll                    (GLOBALS_T*);
 void                __cdecl     ENTITY_DeleteAll                    (GLOBALS_T*);
 void                __cdecl     ENTITY_DeleteSelected               (GLOBALS_T*);
 void                __cdecl     ENTITY_DeleteSpecific               (ENTITY_T*, GLOBALS_T*);
 void                __cdecl     ENTITY_DeleteEntityType             (USHORT, GLOBALS_T*);
 void                __cdecl     ENTITY_SortToFront                  (USHORT, GLOBALS_T*);
+UINT8               __cdecl     ENTITY_ConsiderSortToFront          (ENTITY_T*, USHORT);
+void                __cdecl     ENTITY_Sort                         (ENTITY_T**, ENTITY_T**, GLOBALS_T*);
+void                __cdecl     ENTITY_SkipSort                     (ENTITY_T**, ENTITY_T**);
 void                __cdecl     ENTITY_PrintList                    (GLOBALS_T*);
 void                __cdecl     ENTITY_PrintClosestEntitiesList     (AI_CLOSEST_T*);
 void                __cdecl     ENTITY_Animate                      (ENTITY_T*, ASSETS_T*);

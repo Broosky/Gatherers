@@ -3,11 +3,13 @@
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "../Headers/assets.h"
 #include "../Headers/common.h"
 #include "../Headers/constants.h"
 #include "../Headers/double_buffer.h"
 #include "../Headers/entity.h"
 #include "../Headers/globals.h"
+#include "../Headers/log.h"
 #include "../Headers/picture.h"
 #include <stdlib.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,9 +17,16 @@ void __cdecl DOUBLE_BUFFER_Zero(DOUBLE_BUFFER_T* p_DoubleBuffer) {
     ZeroMemory(p_DoubleBuffer, sizeof(DOUBLE_BUFFER_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-DOUBLE_BUFFER_T* __cdecl DOUBLE_BUFFER_Create(HWND hWnd, GLOBALS_T* p_Globals) {
-    DOUBLE_BUFFER_T* p_DoubleBuffer = (DOUBLE_BUFFER_T*)malloc(sizeof(DOUBLE_BUFFER_T));
-    p_Globals->iRunningHeap += sizeof(DOUBLE_BUFFER_T);
+DOUBLE_BUFFER_T* __cdecl DOUBLE_BUFFER_Create(HWND hWnd, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    size_t stAllocation = sizeof(DOUBLE_BUFFER_T);
+    DOUBLE_BUFFER_T* p_DoubleBuffer = malloc(stAllocation);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!p_DoubleBuffer) {
+        LOG_AppendParams(p_Log, "DOUBLE_BUFFER_Create(): malloc failed for size: %zu bytes\n", stAllocation);
+        return NULL;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->stAllocations += stAllocation;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     DOUBLE_BUFFER_Zero(p_DoubleBuffer);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,9 +46,10 @@ DOUBLE_BUFFER_T* __cdecl DOUBLE_BUFFER_Create(HWND hWnd, GLOBALS_T* p_Globals) {
     return p_DoubleBuffer;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DOUBLE_BUFFER_Resize(DOUBLE_BUFFER_T* p_DoubleBuffer, HWND hWnd, COLORREF BrushColour, GLOBALS_T* p_Globals) {
+void __cdecl DOUBLE_BUFFER_Resize(DOUBLE_BUFFER_T* p_DoubleBuffer, HWND hWnd, GLOBALS_T* p_Globals) {
     SelectObject(p_DoubleBuffer->hDCMem, p_DoubleBuffer->hStorage);
     DeleteObject(p_DoubleBuffer->hCanvas);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     GetClientRect(hWnd, &p_DoubleBuffer->ClientArea);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_DoubleBuffer->hCanvas = CreateCompatibleBitmap(
@@ -51,101 +61,76 @@ void __cdecl DOUBLE_BUFFER_Resize(DOUBLE_BUFFER_T* p_DoubleBuffer, HWND hWnd, CO
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DOUBLE_BUFFER_Kill(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals) {
-    SelectObject(p_DoubleBuffer->hDCMem, p_DoubleBuffer->hStorage);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    DeleteObject(p_DoubleBuffer->hCanvas);
-    DeleteDC(p_DoubleBuffer->hDCBmp);
-    DeleteDC(p_DoubleBuffer->hDCMem);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ReleaseDC(p_DoubleBuffer->hWnd, p_DoubleBuffer->hDC);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    free(p_DoubleBuffer);
-    p_Globals->iRunningHeap -= sizeof(DOUBLE_BUFFER_T);
+    if (p_DoubleBuffer) {
+        SelectObject(p_DoubleBuffer->hDCMem, p_DoubleBuffer->hStorage);
+        DeleteObject(p_DoubleBuffer->hCanvas);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        DeleteDC(p_DoubleBuffer->hDCBmp);
+        DeleteDC(p_DoubleBuffer->hDCMem);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ReleaseDC(p_DoubleBuffer->hWnd, p_DoubleBuffer->hDC);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        free(p_DoubleBuffer);
+        p_Globals->stAllocations -= sizeof(DOUBLE_BUFFER_T);
+    }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 IPOINT_T __cdecl DOUBLE_BUFFER_FindBlitterPoint(char cChar) {
-    UINT8 ubI;
     IPOINT_T CurrentPoint = { 0, 0 };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Lookup also feasable if the sequencing is not within contiguous ranges.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // abcdefghijklmnopqrstuvwxyz
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for (ubI = 97; ubI <= 122; ubI++) {
-        if (cChar == (char)ubI) {
-            return CurrentPoint;
-        }
-        CurrentPoint.iX += 1;
+    if (cChar >= 'a' && cChar <= 'z') {
+        CurrentPoint.iX = cChar - 'a';
+        CurrentPoint.iY = 0;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // ABCDEFGHIJKLMNOPQRSTUVWXYZ
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CurrentPoint.iX = 0;
-    CurrentPoint.iY = 1;
-    for (ubI = 65; ubI <= 90; ubI++) {
-        if (cChar == (char)ubI) {
-            return CurrentPoint;
-        }
-        CurrentPoint.iX += 1;
+    else if (cChar >= 'A' && cChar <= 'Z') {
+        CurrentPoint.iX = cChar - 'A';
+        CurrentPoint.iY = 1;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 0123456789
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CurrentPoint.iX = 0;
-    CurrentPoint.iY = 2;
-    for (ubI = 48; ubI <= 57; ubI++) {
-        if (cChar == (char)ubI) {
-            return CurrentPoint;
-        }
-        CurrentPoint.iX += 1;
+    else if (cChar >= '0' && cChar <= '9') {
+        CurrentPoint.iX = cChar - '0';
+        CurrentPoint.iY = 2;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //  !"#$%&'()*+,-./ (The first character is a space.)
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CurrentPoint.iX = 0;
-    CurrentPoint.iY = 3;
-    for (ubI = 32; ubI <= 47; ubI++) {
-        if (cChar == (char)ubI) {
-            return CurrentPoint;
-        }
-        CurrentPoint.iX += 1;
+    else if (cChar >= 32 && cChar <= 47) {
+        CurrentPoint.iX = cChar - 32;
+        CurrentPoint.iY = 3;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // :;<=>?@
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CurrentPoint.iX = 0;
-    CurrentPoint.iY = 4;
-    for (ubI = 58; ubI <= 64; ubI++) {
-        if (cChar == (char)ubI) {
-            return CurrentPoint;
-        }
-        CurrentPoint.iX += 1;
+    else if (cChar >= 58 && cChar <= 64) {
+        CurrentPoint.iX = cChar - 58;
+        CurrentPoint.iY = 4;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // [\]^_`
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CurrentPoint.iX = 0;
-    CurrentPoint.iY = 5;
-    for (ubI = 91; ubI <= 96; ubI++) {
-        if (cChar == (char)ubI) {
-            return CurrentPoint;
-        }
-        CurrentPoint.iX += 1;
+    else if (cChar >= 91 && cChar <= 96) {
+        CurrentPoint.iX = cChar - 91;
+        CurrentPoint.iY = 5;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // {|}~
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CurrentPoint.iX = 0;
-    CurrentPoint.iY = 6;
-    for (ubI = 123; ubI <= 126; ubI++) {
-        if (cChar == (char)ubI) {
-            return CurrentPoint;
-        }
-        CurrentPoint.iX += 1;
+    else if (cChar >= 123 && cChar <= 126) {
+        CurrentPoint.iX = cChar - 123;
+        CurrentPoint.iY = 6;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Character not found.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    CurrentPoint.iX = 0;
-    CurrentPoint.iY = 0;
     return CurrentPoint;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,6 +148,8 @@ void __cdecl DOUBLE_BUFFER_Blitter(DOUBLE_BUFFER_T* p_DoubleBuffer, char* p_szTe
     Location.fY -= p_DoubleBuffer->XForm.eDy;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FPOINT_T SavedLocation = Location;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Could put blitter point return into a lookup to avoid same multiplication.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (ubMask) {
         HGDIOBJ hMaskTemp = SelectObject(p_DoubleBuffer->hDCBmp, (*p_DoubleBuffer->p_Blitter).hBmpMask);
@@ -186,7 +173,6 @@ void __cdecl DOUBLE_BUFFER_Blitter(DOUBLE_BUFFER_T* p_DoubleBuffer, char* p_szTe
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
-        DeleteObject(hMaskTemp);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     Location = SavedLocation;
@@ -212,43 +198,31 @@ void __cdecl DOUBLE_BUFFER_Blitter(DOUBLE_BUFFER_T* p_DoubleBuffer, char* p_szTe
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
-    DeleteObject(hPicTemp);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DOUBLE_BUFFER_Clear(DOUBLE_BUFFER_T* p_DoubleBuffer, COLORREF BrushColour) {
-    HBRUSH hBrush = CreateSolidBrush(BrushColour);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FillRect(p_DoubleBuffer->hDCMem, &p_DoubleBuffer->ClientArea, hBrush);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    DeleteObject(hBrush);
+void __cdecl DOUBLE_BUFFER_Clear(DOUBLE_BUFFER_T* p_DoubleBuffer, ASSETS_T* p_Assets) {
+    FillRect(p_DoubleBuffer->hDCMem, &p_DoubleBuffer->ClientArea, p_Assets->hBrushBufferClear);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DOUBLE_BUFFER_DrawEntityMinorVector(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity, COLORREF PenColour) {
-    HPEN hPen = CreatePen(PS_SOLID, 1, PenColour);
-    HPEN hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
+void __cdecl DOUBLE_BUFFER_DrawEntityMinorVector(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {
+    HPEN hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenMinorVector);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     MoveToEx(p_DoubleBuffer->hDCMem, p_Entity->CenterPoint.fX, p_Entity->CenterPoint.fY, NULL);
     LineTo(p_DoubleBuffer->hDCMem, p_Entity->MinorDestinationCenterPoint.fX, p_Entity->MinorDestinationCenterPoint.fY);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
-    DeleteObject(hPen);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DOUBLE_BUFFER_DrawEntityMajorVector(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity, COLORREF PenColour) {
-    HPEN hPen = CreatePen(PS_SOLID, 1, PenColour);
-    HPEN hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
+void __cdecl DOUBLE_BUFFER_DrawEntityMajorVector(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {
+    HPEN hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenMajorVector);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     MoveToEx(p_DoubleBuffer->hDCMem, p_Entity->CenterPoint.fX, p_Entity->CenterPoint.fY, NULL);
     LineTo(p_DoubleBuffer->hDCMem, p_Entity->MajorDestinationCenterPoint.fX, p_Entity->MajorDestinationCenterPoint.fY);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
-    DeleteObject(hPen);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DOUBLE_BUFFER_DrawEntityEllipse(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity, COLORREF PenColour, COLORREF BrushColour) {
-    HPEN hPen = CreatePen(PS_SOLID, 1, PenColour);
-    HBRUSH hBrush = CreateSolidBrush(BrushColour);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawEntityEllipse(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity, HPEN hPen, HBRUSH hBrush) {
     HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
     HGDIOBJ hBrushTemp = SelectObject(p_DoubleBuffer->hDCMem, hBrush);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,9 +236,6 @@ void __cdecl DOUBLE_BUFFER_DrawEntityEllipse(DOUBLE_BUFFER_T* p_DoubleBuffer, EN
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
     SelectObject(p_DoubleBuffer->hDCMem, hBrushTemp);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    DeleteObject(hBrush);
-    DeleteObject(hPen);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Remember: The transform is translated to the center point of the entity to be drawn.
@@ -275,10 +246,10 @@ void __cdecl DOUBLE_BUFFER_DrawEntity(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T*
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         BitBlt(
             p_DoubleBuffer->hDCMem,
-            p_Entity->CenterPoint.fX - p_Entity->HalfSize.fX - p_DoubleBuffer->XForm.eDx,
-            p_Entity->CenterPoint.fY - p_Entity->HalfSize.fY - p_DoubleBuffer->XForm.eDy,
-            p_Entity->Size.fX,
-            p_Entity->Size.fY,
+            p_Entity->CenterPoint.fX - p_Entity->HalfSize.fDx - p_DoubleBuffer->XForm.eDx,
+            p_Entity->CenterPoint.fY - p_Entity->HalfSize.fDy - p_DoubleBuffer->XForm.eDy,
+            p_Entity->Size.fDx,
+            p_Entity->Size.fDy,
             p_DoubleBuffer->hDCBmp,
             0,
             0,
@@ -286,17 +257,16 @@ void __cdecl DOUBLE_BUFFER_DrawEntity(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T*
         );
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
-        DeleteObject(hMaskTemp);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     HGDIOBJ hPicTemp = SelectObject(p_DoubleBuffer->hDCBmp, (*p_Entity->p_Picture).hBmp);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     BitBlt(
         p_DoubleBuffer->hDCMem,
-        p_Entity->CenterPoint.fX - p_Entity->HalfSize.fX - p_DoubleBuffer->XForm.eDx,
-        p_Entity->CenterPoint.fY - p_Entity->HalfSize.fY - p_DoubleBuffer->XForm.eDy,
-        p_Entity->Size.fX,
-        p_Entity->Size.fY,
+        p_Entity->CenterPoint.fX - p_Entity->HalfSize.fDx - p_DoubleBuffer->XForm.eDx,
+        p_Entity->CenterPoint.fY - p_Entity->HalfSize.fDy - p_DoubleBuffer->XForm.eDy,
+        p_Entity->Size.fDx,
+        p_Entity->Size.fDy,
         p_DoubleBuffer->hDCBmp,
         0,
         0,
@@ -304,21 +274,17 @@ void __cdecl DOUBLE_BUFFER_DrawEntity(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T*
     );
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
-    DeleteObject(hPicTemp);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DOUBLE_BUFFER_ClearEntity(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity, COLORREF ClearColour) {
+void __cdecl DOUBLE_BUFFER_ClearEntity(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {
     RECT Area = {
         p_Entity->Location.fX,
         p_Entity->Location.fY,
-        p_Entity->Location.fX + p_Entity->Size.fX,
-        p_Entity->Location.fY + p_Entity->Size.fY
+        p_Entity->Location.fX + p_Entity->Size.fDx,
+        p_Entity->Location.fY + p_Entity->Size.fDy
     };
-    HBRUSH hBrush = CreateSolidBrush(ClearColour);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FillRect(p_DoubleBuffer->hDCMem, &Area, hBrush);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    DeleteObject(hBrush);
+    FillRect(p_DoubleBuffer->hDCMem, &Area, p_Assets->hBrushClear);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DOUBLE_BUFFER_FlipEntity(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T* p_Entity) {
@@ -326,8 +292,8 @@ void __cdecl DOUBLE_BUFFER_FlipEntity(DOUBLE_BUFFER_T* p_DoubleBuffer, ENTITY_T*
         p_DoubleBuffer->hDC,
         p_Entity->Location.fX,
         p_Entity->Location.fY,
-        p_Entity->Size.fX,
-        p_Entity->Size.fY,
+        p_Entity->Size.fDx,
+        p_Entity->Size.fDy,
         p_DoubleBuffer->hDCMem,
         p_Entity->Location.fX,
         p_Entity->Location.fY,
@@ -370,7 +336,6 @@ void __cdecl DOUBLE_BUFFER_DrawPicture(DOUBLE_BUFFER_T* p_DoubleBuffer, PICTURE_
         );
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
-        DeleteObject(hMaskTemp);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     HGDIOBJ hPicTemp = SelectObject(p_DoubleBuffer->hDCBmp, p_Picture->hBmp);
@@ -388,7 +353,6 @@ void __cdecl DOUBLE_BUFFER_DrawPicture(DOUBLE_BUFFER_T* p_DoubleBuffer, PICTURE_
     );
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
-    DeleteObject(hPicTemp);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DOUBLE_BUFFER_DrawPictureAt(DOUBLE_BUFFER_T* p_DoubleBuffer, PICTURE_T* p_Picture, FPOINT_T Location, UINT8 ubMask) {
@@ -408,7 +372,6 @@ void __cdecl DOUBLE_BUFFER_DrawPictureAt(DOUBLE_BUFFER_T* p_DoubleBuffer, PICTUR
         );
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
-        DeleteObject(hMaskTemp);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     HGDIOBJ hPicTemp = SelectObject(p_DoubleBuffer->hDCBmp, p_Picture->hBmp);
@@ -426,7 +389,6 @@ void __cdecl DOUBLE_BUFFER_DrawPictureAt(DOUBLE_BUFFER_T* p_DoubleBuffer, PICTUR
     );
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
-    DeleteObject(hPicTemp);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DOUBLE_BUFFER_CropDrawPictureAt(DOUBLE_BUFFER_T* p_DoubleBuffer, PICTURE_T* p_Picture, FPOINT_T CropStart, FDELTA_T CropDelta, UINT8 ubMask) {
@@ -437,8 +399,8 @@ void __cdecl DOUBLE_BUFFER_CropDrawPictureAt(DOUBLE_BUFFER_T* p_DoubleBuffer, PI
             p_DoubleBuffer->hDCMem,
             CropStart.fX,
             CropStart.fY,
-            CropDelta.fDX,
-            CropDelta.fDY,
+            CropDelta.fDx,
+            CropDelta.fDy,
             p_DoubleBuffer->hDCBmp,
             0,
             0,
@@ -446,7 +408,6 @@ void __cdecl DOUBLE_BUFFER_CropDrawPictureAt(DOUBLE_BUFFER_T* p_DoubleBuffer, PI
         );
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
-        DeleteObject(hMaskTemp);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     HGDIOBJ hPicTemp = SelectObject(p_DoubleBuffer->hDCBmp, p_Picture->hBmp);
@@ -455,8 +416,8 @@ void __cdecl DOUBLE_BUFFER_CropDrawPictureAt(DOUBLE_BUFFER_T* p_DoubleBuffer, PI
         p_DoubleBuffer->hDCMem,
         CropStart.fX,
         CropStart.fY,
-        CropDelta.fDX,
-        CropDelta.fDY,
+        CropDelta.fDx,
+        CropDelta.fDy,
         p_DoubleBuffer->hDCBmp,
         0,
         0,
@@ -464,6 +425,5 @@ void __cdecl DOUBLE_BUFFER_CropDrawPictureAt(DOUBLE_BUFFER_T* p_DoubleBuffer, PI
     );
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
-    DeleteObject(hPicTemp);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

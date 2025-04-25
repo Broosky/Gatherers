@@ -7,6 +7,7 @@
 #include "../Headers/globals.h"
 #include "../Headers/log.h"
 #include <io.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <time.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,15 +16,15 @@ void __cdecl LOG_Zero(LOG_T* p_Log) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 LOG_T* __cdecl LOG_Create(const char* p_szFileName, GLOBALS_T* p_Globals) {
-    size_t stAlloc = sizeof(LOG_T);
-    LOG_T* p_Log = (LOG_T*)malloc(stAlloc);
+    size_t stAllocation = sizeof(LOG_T);
+    LOG_T* p_Log = malloc(stAllocation);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!p_Log) {
-        // This is the only fail fast that writes to console, all others will write to the log.
-        printf("LOG_Create(): malloc failed for size: %zu bytes\n", stAlloc);
+        printf("LOG_Create(): malloc failed for size: %zu bytes\n", stAllocation);
         return NULL;
     }
     else {
-        p_Globals->iRunningHeap += stAlloc;
+        p_Globals->stAllocations += stAllocation;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         LOG_Zero(p_Log);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +40,6 @@ LOG_T* __cdecl LOG_Create(const char* p_szFileName, GLOBALS_T* p_Globals) {
             return p_Log;
         }
         else {
-            // This is the only fail fast that writes to console, all others will write to the log.
             printf("LOG_Create(): fopen failed.");
             return NULL;
         }
@@ -49,7 +49,22 @@ LOG_T* __cdecl LOG_Create(const char* p_szFileName, GLOBALS_T* p_Globals) {
 void __cdecl LOG_Append(LOG_T* p_Log, const char* p_szMessage) {
     char szTimestamp[64] = { 0 };
     LOG_PopulateTimestamp(szTimestamp, sizeof(szTimestamp));
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fprintf(p_Log->p_LogFile, "[%s] %s\n", szTimestamp, p_szMessage);
+    LOG_Flush(p_Log, 1);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl LOG_AppendParams(LOG_T* p_Log, const char* p_szFormat, ...) {
+    char szTimestamp[64] = { 0 };
+    LOG_PopulateTimestamp(szTimestamp, sizeof(szTimestamp));
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    va_list vaArgs;
+    va_start(vaArgs, p_szFormat);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    fprintf(p_Log->p_LogFile, "[%s] ", szTimestamp);
+    vfprintf(p_Log->p_LogFile, p_szFormat, vaArgs);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    va_end(vaArgs);
     LOG_Flush(p_Log, 1);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +100,7 @@ void __cdecl LOG_Kill(LOG_T* p_Log, GLOBALS_T* p_Globals) {
     }
     if (p_Log) {
         free(p_Log);
-        p_Globals->iRunningHeap -= sizeof(LOG_T);
+        p_Globals->stAllocations -= sizeof(LOG_T);
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -26,6 +26,7 @@ typedef struct LOG {
 void    __cdecl     LOG_Zero                (LOG_T*);
 LOG_T*  __cdecl     LOG_Create              (const char*, GLOBALS_T*);
 void    __cdecl     LOG_Append              (LOG_T*, const char*);
+void    __cdecl     LOG_AppendParams        (LOG_T*, const char*, ...);
 void    __cdecl     LOG_Flush               (LOG_T*, UINT8);
 void    __cdecl     LOG_PopulateTimestamp   (char*, size_t);
 void    __cdecl     LOG_Kill                (LOG_T*, GLOBALS_T*);

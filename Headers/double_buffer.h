@@ -16,6 +16,8 @@
 typedef struct GLOBALS GLOBALS_T;
 typedef struct PICTURE PICTURE_T;
 typedef struct ENTITY ENTITY_T;
+typedef struct LOG LOG_T;
+typedef struct ASSETS ASSETS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,18 +37,18 @@ typedef struct DOUBLE_BUFFER {
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void                __cdecl     DOUBLE_BUFFER_Zero                      (DOUBLE_BUFFER_T*);
-DOUBLE_BUFFER_T*    __cdecl     DOUBLE_BUFFER_Create                    (HWND, GLOBALS_T*);
-void                __cdecl     DOUBLE_BUFFER_Resize                    (DOUBLE_BUFFER_T*, HWND, COLORREF, GLOBALS_T*);
+DOUBLE_BUFFER_T*    __cdecl     DOUBLE_BUFFER_Create                    (HWND, GLOBALS_T*, LOG_T*);
+void                __cdecl     DOUBLE_BUFFER_Resize                    (DOUBLE_BUFFER_T*, HWND, GLOBALS_T*);
 void                __cdecl     DOUBLE_BUFFER_Kill                      (DOUBLE_BUFFER_T*, GLOBALS_T*);
 IPOINT_T            __cdecl     DOUBLE_BUFFER_FindBlitterPoint          (char);
 void                __cdecl     DOUBLE_BUFFER_SetBlitter                (DOUBLE_BUFFER_T*, PICTURE_T*);
 void                __cdecl     DOUBLE_BUFFER_Blitter                   (DOUBLE_BUFFER_T*, char*, FPOINT_T, UINT8);
-void                __cdecl     DOUBLE_BUFFER_Clear                     (DOUBLE_BUFFER_T*, COLORREF);
-void                __cdecl     DOUBLE_BUFFER_DrawEntityMinorVector     (DOUBLE_BUFFER_T*, ENTITY_T*, COLORREF);
-void                __cdecl     DOUBLE_BUFFER_DrawEntityMajorVector     (DOUBLE_BUFFER_T*, ENTITY_T*, COLORREF);
-void                __cdecl     DOUBLE_BUFFER_DrawEntityEllipse         (DOUBLE_BUFFER_T*, ENTITY_T*, COLORREF, COLORREF);
+void                __cdecl     DOUBLE_BUFFER_Clear                     (DOUBLE_BUFFER_T*, ASSETS_T*);
+void                __cdecl     DOUBLE_BUFFER_DrawEntityMinorVector     (DOUBLE_BUFFER_T*, ENTITY_T*, ASSETS_T*);
+void                __cdecl     DOUBLE_BUFFER_DrawEntityMajorVector     (DOUBLE_BUFFER_T*, ENTITY_T*, ASSETS_T*);
+void                __cdecl     DOUBLE_BUFFER_DrawEntityEllipse         (DOUBLE_BUFFER_T*, ENTITY_T*, HPEN, HBRUSH);
 void                __cdecl     DOUBLE_BUFFER_DrawEntity                (DOUBLE_BUFFER_T*, ENTITY_T*, UINT8);
-void                __cdecl     DOUBLE_BUFFER_ClearEntity               (DOUBLE_BUFFER_T*, ENTITY_T*, COLORREF);
+void                __cdecl     DOUBLE_BUFFER_ClearEntity               (DOUBLE_BUFFER_T*, ENTITY_T*, ASSETS_T*);
 void                __cdecl     DOUBLE_BUFFER_FlipEntity                (DOUBLE_BUFFER_T*, ENTITY_T*);
 void                __cdecl     DOUBLE_BUFFER_Flip                      (DOUBLE_BUFFER_T*);
 void                __cdecl     DOUBLE_BUFFER_FlipArea                  (DOUBLE_BUFFER_T*, int, int, int, int);

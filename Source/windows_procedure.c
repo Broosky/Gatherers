@@ -11,6 +11,7 @@
 #include "../Headers/double_buffer.h"
 #include "../Headers/entity.h"
 #include "../Headers/globals.h"
+#include "../Headers/log.h"
 #include "../Headers/main.h"
 #include "../Headers/menu.h"
 #include "../Headers/misc.h"
@@ -29,13 +30,13 @@
 LRESULT CALLBACK WINDOWS_PROCEDURE_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam) {
     switch (uiMsg) {
     case WM_COMMAND: {
-        WINDOWS_PROCEDURE_HandleMenuEvent(hWnd, wParam, p_Menu, p_Globals);
+        WINDOWS_PROCEDURE_HandleMenuEvent(hWnd, wParam, p_Menu, p_Globals, p_DoubleBuffer);
         break;
     }
     case WM_SIZE: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (p_DoubleBuffer != NULL) {
-            DOUBLE_BUFFER_Resize(p_DoubleBuffer, hWnd, RGB(0, 0, 0), p_Globals);
+            DOUBLE_BUFFER_Resize(p_DoubleBuffer, hWnd, p_Globals);
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Remember to reset the graphics mode to allow the rendering engine to work.
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,31 +56,19 @@ LRESULT CALLBACK WINDOWS_PROCEDURE_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wPar
     }
     case WM_LBUTTONDOWN: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (PROCESS_IsMinimapClicked(p_DoubleBuffer, p_Assets, p_Globals) && p_Menu->ubEnableTranslations) {
+        if (PROCESS_IsMinimapClicked(p_DoubleBuffer, p_Assets, p_Globals)) {
             p_Globals->ubClickOriginFromMinimap = 1;
             PROCESS_AdjustMinimapViewport(p_Globals, p_DoubleBuffer, p_Assets);
         }
         else {
             p_Globals->ubClickOriginFromMinimap = 0;
-            WINDOWS_PROCEDURE_CreateOrCaptureEntities(p_Globals, p_Assets);
+            WINDOWS_PROCEDURE_CreateOrCaptureEntities(p_Globals, p_Assets, p_Log, p_DoubleBuffer);
         }
         break;
     }
     case WM_RBUTTONDOWN: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (p_Menu->ubToggleScatter) {
-            SELECTED_COUNT_T SelectedCount = ENTITY_GetSelectedEntityCounts(p_Globals);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (SelectedCount.usSelectedWorkersCount > 1) {
-                WINDOWS_PROCEDURE_DistributeAndSendWorkers(p_Globals, p_Assets);
-            }
-            else {
-                WINDOWS_PROCEDURE_SendWorkers(p_Globals, p_Assets);
-            }
-        }
-        else {
-            WINDOWS_PROCEDURE_SendWorkers(p_Globals, p_Assets);
-        }
+        WINDOWS_PROCEDURE_HandleRightClick(p_Globals, p_Menu);
         break;
     }
     case WM_MOUSEMOVE: {
@@ -115,9 +104,16 @@ LRESULT CALLBACK WINDOWS_PROCEDURE_WindowProc(HWND hWnd, UINT uiMsg, WPARAM wPar
         WINDOWS_PROCEDURE_HandleKeyDown(hWnd, wParam, p_Globals, p_Menu, p_DoubleBuffer);
         break;
     }
+    /*
+    case WM_SYSKEYDOWN: {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        WINDOWS_PROCEDURE_HandleKeyDown(hWnd, wParam, p_Globals, p_Menu, p_DoubleBuffer);
+        break;
+    }
+    //*/
     case WM_CLOSE: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        PostQuitMessage(0);
+        PostQuitMessage(EXIT_SUCCESS);
         break;
     }
     default: {
@@ -171,6 +167,33 @@ void __cdecl WINDOWS_PROCEDURE_BuildHelper(USHORT usType, MENU_T* p_Menu) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_HandleRightClick(GLOBALS_T* p_Globals, MENU_T* p_Menu) {
+    if (p_Globals->ubCreate) {
+        WINDOWS_PROCEDURE_BuildNone(p_Globals, p_Menu);
+    }
+    else {
+        if (p_Menu->ubToggleScatter) {
+            SELECTED_COUNT_T SelectedCount = ENTITY_GetSelectedEntityCounts(p_Globals);
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (SelectedCount.usSelectedWorkersCount > 1) {
+                WINDOWS_PROCEDURE_DistributeAndSendWorkers(p_Globals, p_Assets, p_Log);
+            }
+            else {
+                WINDOWS_PROCEDURE_SendWorkers(p_Globals, p_Assets);
+            }
+        }
+        else {
+            WINDOWS_PROCEDURE_SendWorkers(p_Globals, p_Assets);
+        }
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_BuildNone(GLOBALS_T* p_Globals, MENU_T* p_Menu) {
+    WINDOWS_PROCEDURE_BuildHelper(ENTITY_NONE, p_Menu);
+    p_Globals->usBuildType = ENTITY_WORKER;
+    p_Globals->ubCreate = 0;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl WINDOWS_PROCEDURE_SendWorkers(GLOBALS_T* p_Globals, ASSETS_T* p_Assets) {
     USHORT usMoveableCount = 0;
     ENTITY_T* p_Resource = NULL;
@@ -216,15 +239,22 @@ void __cdecl WINDOWS_PROCEDURE_SendWorkers(GLOBALS_T* p_Globals, ASSETS_T* p_Ass
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     USHORT usI;
-    USHORT usAllocation;
+    size_t stAllocation;
     FPOINT_T* p_DestinationPoints = NULL;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // We did not click on a resource, therefore we have to move the selected entities.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!p_Resource) {
-        usAllocation = sizeof(FPOINT_T) * usMoveableCount;
-        p_DestinationPoints = (FPOINT_T*)malloc(usAllocation);
-        p_Globals->iRunningHeap += usAllocation;
+        stAllocation = sizeof(FPOINT_T) * usMoveableCount;
+        p_DestinationPoints = malloc(stAllocation);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (!p_DestinationPoints) {
+            LOG_AppendParams(p_Log, "WINDOWS_PROCEDURE_SendWorkers(): malloc failed for size: %zu bytes\n", stAllocation);
+            UINT _discard = MAIN_FailFast(p_Globals, p_Log);
+            return;
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_Globals->stAllocations += stAllocation;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Future:
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,10 +290,10 @@ void __cdecl WINDOWS_PROCEDURE_SendWorkers(GLOBALS_T* p_Globals, ASSETS_T* p_Ass
             p_Current->ubIsSelected = 0;
             if (p_Current->ubIsMovable) {
                 if (p_Resource) {
-                    p_Current->p_Operating = (ENTITY_T*)p_Resource;
+                    p_Current->p_OperatingTarget = (ENTITY_T*)p_Resource;
                 }
                 else {
-                    p_Current->p_Operating = NULL;
+                    p_Current->p_OperatingTarget = NULL;
                     ENTITY_MoveToPoint(p_Current, p_DestinationPoints[usI++], p_Globals);
                 }
             }
@@ -273,12 +303,12 @@ void __cdecl WINDOWS_PROCEDURE_SendWorkers(GLOBALS_T* p_Globals, ASSETS_T* p_Ass
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_DestinationPoints) {
         free(p_DestinationPoints);
-        p_Globals->iRunningHeap -= usAllocation;
+        p_Globals->stAllocations -= stAllocation;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINDOWS_PROCEDURE_DistributeAndSendWorkers(GLOBALS_T* p_Globals, ASSETS_T* p_Assets) {
+void __cdecl WINDOWS_PROCEDURE_DistributeAndSendWorkers(GLOBALS_T* p_Globals, ASSETS_T* p_Assets, LOG_T* p_Log) {
     USHORT usMoveableCount = 0;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ENTITY_T* p_Resource = NULL;
@@ -326,24 +356,31 @@ void __cdecl WINDOWS_PROCEDURE_DistributeAndSendWorkers(GLOBALS_T* p_Globals, AS
     // If we clicked on a resource, get a collection of pointers to available resources of that type, considering their distance.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     USHORT usFound = 0;
-    int iRollingAllocationHeap = 0;
+    size_t stAllocationClosestEntities = 0;
     AI_CLOSEST_T* p_ClosestEntities = NULL;
     if (p_Resource) {
-        p_ClosestEntities = AI_FindClosestByDistance(p_Resource, p_Resource->usType, &iRollingAllocationHeap, &usFound, p_Globals);
+        p_ClosestEntities = AI_FindClosestByDistance(p_Resource, p_Resource->usType, &stAllocationClosestEntities, &usFound, p_Globals, p_Log);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Data for moving entities to a specific destination (not gathering resources).
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     USHORT usI = 0;
-    USHORT usDestinationPointsAllocation = 0;
+    size_t stAllocationDestinaionPoints = 0;
     FPOINT_T* p_DestinationPoints = NULL;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // We did not click on a resource, therefore we have to move the selected entities.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!p_Resource) {
-        usDestinationPointsAllocation = sizeof(FPOINT_T) * usMoveableCount;
-        p_DestinationPoints = (FPOINT_T*)malloc(usDestinationPointsAllocation);
-        p_Globals->iRunningHeap += usDestinationPointsAllocation;
+        stAllocationDestinaionPoints = sizeof(FPOINT_T) * usMoveableCount;
+        p_DestinationPoints = malloc(stAllocationDestinaionPoints);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (!p_DestinationPoints) {
+            LOG_AppendParams(p_Log, "WINDOWS_PROCEDURE_DistributeAndSendWorkers(): malloc failed for size: %zu bytes\n", stAllocationDestinaionPoints);
+            UINT _discard = MAIN_FailFast(p_Globals, p_Log);
+            return;
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_Globals->stAllocations += stAllocationDestinaionPoints;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Future:
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -383,7 +420,7 @@ void __cdecl WINDOWS_PROCEDURE_DistributeAndSendWorkers(GLOBALS_T* p_Globals, AS
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // Run through the resources ordered by their closest distance from the inquirer.
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    p_Current->p_Operating = (ENTITY_T*)p_ClosestEntities[usDestinationResourceIndex++].p_Entity;
+                    p_Current->p_OperatingTarget = (ENTITY_T*)p_ClosestEntities[usDestinationResourceIndex++].p_Entity;
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // There will most likely be cases where there are more workers than available resources. Let's reset the
                     // index to recycle them.
@@ -393,7 +430,7 @@ void __cdecl WINDOWS_PROCEDURE_DistributeAndSendWorkers(GLOBALS_T* p_Globals, AS
                     }
                 }
                 else {
-                    p_Current->p_Operating = NULL;
+                    p_Current->p_OperatingTarget = NULL;
                     ENTITY_MoveToPoint(p_Current, p_DestinationPoints[usI++], p_Globals);
                 }
             }
@@ -403,17 +440,17 @@ void __cdecl WINDOWS_PROCEDURE_DistributeAndSendWorkers(GLOBALS_T* p_Globals, AS
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_DestinationPoints) {
         free(p_DestinationPoints);
-        p_Globals->iRunningHeap -= usDestinationPointsAllocation;
+        p_Globals->stAllocations -= stAllocationDestinaionPoints;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_ClosestEntities) {
         free(p_ClosestEntities);
-        p_Globals->iRunningHeap -= iRollingAllocationHeap;
+        p_Globals->stAllocations -= stAllocationClosestEntities;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINDOWS_PROCEDURE_CreateOrCaptureEntities(GLOBALS_T* p_Globals, ASSETS_T* p_Assets) {
+void __cdecl WINDOWS_PROCEDURE_CreateOrCaptureEntities(GLOBALS_T* p_Globals, ASSETS_T* p_Assets, LOG_T* p_Log, DOUBLE_BUFFER_T* p_DoubleBuffer) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // For mouse drag selection.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -429,7 +466,9 @@ void __cdecl WINDOWS_PROCEDURE_CreateOrCaptureEntities(GLOBALS_T* p_Globals, ASS
         },
             p_Globals->usBuildType,
             p_Assets,
-            p_Globals
+            p_Globals,
+            p_Log,
+            p_DoubleBuffer
         );
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -508,12 +547,132 @@ void __cdecl WINDOWS_PROCEDURE_SelectEntities(GLOBALS_T* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_HandleBorderless(HWND hWnd, GLOBALS_T* p_Globals, MENU_T* p_Menu, DOUBLE_BUFFER_T* p_DoubleBuffer) {
+    if (p_Menu->ubIsFullScreen) {
+        WINDOWS_PROCEDURE_ExitFullscreen(hWnd, p_Globals, p_Menu, p_DoubleBuffer);
+    }
+    else {
+        if (p_Globals->ubIsBorderless) {
+            WINDOWS_PROCEDURE_ExitBorderless(hWnd);
+        }
+        else {
+            WINDOWS_PROCEDURE_EnterBorderless(hWnd);
+        }
+        p_Globals->ubIsBorderless = !p_Globals->ubIsBorderless;
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_EnterBorderless(HWND hWnd) {
+    SetWindowLongPtr(hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+    SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    SetMenu(hWnd, NULL);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_ExitBorderless(HWND hWnd) {
+    SetWindowLongPtr(hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+    SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    SetMenu(hWnd, p_Menu->hMenu);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_EnterFullscreen(HWND hWnd, GLOBALS_T* p_Globals, MENU_T* p_Menu, DOUBLE_BUFFER_T* p_DoubleBuffer) {
+    CheckMenuItem(p_Menu->hMenu, MENU_OPTIONS_FULLSCREEN, MF_CHECKED);
+    p_Menu->ubIsFullScreen = !p_Menu->ubIsFullScreen;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Change double buffer settings.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Last argument is 1 because the menu needs to be redrawn when the window area resizes.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SetWindowLongPtr(hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+    SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MoveWindow(hWnd, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 1);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DOUBLE_BUFFER_Resize(p_DoubleBuffer, hWnd, p_Globals);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Remember to reset the graphics mode to allow the rendering engine to work.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    TRANSFORM_Init(p_DoubleBuffer);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_ExitFullscreen(HWND hWnd, GLOBALS_T* p_Globals, MENU_T* p_Menu, DOUBLE_BUFFER_T* p_DoubleBuffer) {
+    CheckMenuItem(p_Menu->hMenu, MENU_OPTIONS_FULLSCREEN, MF_UNCHECKED);
+    p_Menu->ubIsFullScreen = !p_Menu->ubIsFullScreen;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Ensure the menu is always available.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SetMenu(hWnd, p_Menu->hMenu);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Change double buffer settings.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SetWindowLongPtr(hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+    SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MISC_ResizeWindow(hWnd, INITIAL_CLIENT_WIDTH, INITIAL_CLIENT_HEIGHT);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DOUBLE_BUFFER_Resize(p_DoubleBuffer, hWnd, p_Globals);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Remember to reset the graphics mode to allow the rendering engine to work.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    TRANSFORM_Init(p_DoubleBuffer);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_HandleFullscreen(HWND hWnd, GLOBALS_T* p_Globals, MENU_T* p_Menu, DOUBLE_BUFFER_T* p_DoubleBuffer) {
+    if (p_Menu->ubIsFullScreen) {
+        WINDOWS_PROCEDURE_ExitFullscreen(hWnd, p_Globals, p_Menu, p_DoubleBuffer);
+    }
+    else {
+        WINDOWS_PROCEDURE_EnterFullscreen(hWnd, p_Globals, p_Menu, p_DoubleBuffer);
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl WINDOWS_PROCEDURE_HandleKeyDown(HWND hWnd, WPARAM wParam, GLOBALS_T* p_Globals, MENU_T* p_Menu, DOUBLE_BUFFER_T* p_DoubleBuffer) {
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Arrow keys.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    WINDOWS_PROCEDURE_HandleArrowKeys(hWnd, wParam, p_Globals, p_Menu, p_DoubleBuffer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Chord keys.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (WINDOWS_PROCEDURE_HandleChordKeys(hWnd, wParam, MOD_CONTROL, 'F')) {
+        WINDOWS_PROCEDURE_HandleFullscreen(hWnd, p_Globals, p_Menu, p_DoubleBuffer);
+    }
+    else if (WINDOWS_PROCEDURE_HandleChordKeys(hWnd, wParam, MOD_CONTROL, 'A')) {
+        ENTITY_SelectAll(p_Globals);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Other keys.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    WINDOWS_PROCEDURE_HandleOtherKeys(hWnd, wParam, p_Globals, p_Menu, p_DoubleBuffer);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+UINT8 __cdecl WINDOWS_PROCEDURE_HandleChordKeys(
+    HWND hWnd,
+    WPARAM wParamKey,
+    USHORT uiRequiredModifiers,
+    WPARAM wParamWithKey) {
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UINT8 ubIsChordPressed = 0;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UINT8 ubCtrlHeld = (GetKeyState(VK_LCONTROL) & 0x8000) || (GetKeyState(VK_RCONTROL) & 0x8000);
+    UINT8 ubShiftHeld = (GetKeyState(VK_LSHIFT) & 0x8000) || (GetKeyState(VK_RSHIFT) & 0x8000);
+    UINT8 ubAltHeld = (GetKeyState(VK_LMENU) & 0x8000) || (GetKeyState(VK_RMENU) & 0x8000);
+    UINT8 ubKeyHeld = ((wParamKey == wParamWithKey) && (GetKeyState((int)wParamKey) & 0x8000));
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UINT8 ubCtrlChord = (uiRequiredModifiers & MOD_CONTROL) ? ubCtrlHeld : 1;
+    UINT8 ubShiftChord = (uiRequiredModifiers & MOD_SHIFT) ? ubShiftHeld : 1;
+    UINT8 ubAltChord = (uiRequiredModifiers & MOD_ALT) ? ubAltHeld : 1;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (ubKeyHeld && ubCtrlChord && ubShiftChord && ubAltChord) {
+        ubIsChordPressed = 1;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return ubIsChordPressed;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_HandleArrowKeys(HWND hWnd, WPARAM wParam, GLOBALS_T* p_Globals, MENU_T* p_Menu, DOUBLE_BUFFER_T* p_DoubleBuffer) {
     const float fLateralStep = TRANSLATION_STEP_AMOUNT;
     const float fVerticalStep = TRANSLATION_STEP_AMOUNT;
     float fAdjusted;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Arrow keys.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_Menu->ubEnableTranslations) {
         LONG lBmWidth = p_Assets->Terrain[p_Globals->usMapIndex].Bitmap.bmWidth;
@@ -572,12 +731,17 @@ void __cdecl WINDOWS_PROCEDURE_HandleKeyDown(HWND hWnd, WPARAM wParam, GLOBALS_T
             break;
         }
     }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Other keys.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WINDOWS_PROCEDURE_HandleOtherKeys(HWND hWnd, WPARAM wParam, GLOBALS_T* p_Globals, MENU_T* p_Menu, DOUBLE_BUFFER_T* p_DoubleBuffer) {
     switch (wParam) {
     case VK_ESCAPE: {
-        PostMessage(hWnd, WM_CLOSE, 0, 0);
+        if (p_Globals->ubCreate) {
+            WINDOWS_PROCEDURE_BuildNone(p_Globals, p_Menu);
+        } 
+        else {
+            WINDOWS_PROCEDURE_HandleBorderless(hWnd, p_Globals, p_Menu, p_DoubleBuffer);
+        }
         break;
     }
     case VK_DELETE: {
@@ -589,7 +753,7 @@ void __cdecl WINDOWS_PROCEDURE_HandleKeyDown(HWND hWnd, WPARAM wParam, GLOBALS_T
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WINDOWS_PROCEDURE_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU_T* p_Menu, GLOBALS_T* p_Globals) {
+void __cdecl WINDOWS_PROCEDURE_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU_T* p_Menu, GLOBALS_T* p_Globals, DOUBLE_BUFFER_T* p_DoubleBuffer) {
     switch (LOWORD(wParam)) {
     case MENU_SIMULATION_FREE: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -675,9 +839,7 @@ void __cdecl WINDOWS_PROCEDURE_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU_T*
     }
     case MENU_BUILD_NONE: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        WINDOWS_PROCEDURE_BuildHelper(ENTITY_NONE, p_Menu);
-        p_Globals->usBuildType = ENTITY_WORKER;
-        p_Globals->ubCreate = 0;
+        WINDOWS_PROCEDURE_BuildNone(p_Globals, p_Menu);
         break;
     }
     case MENU_BUILD_WORKER: {
@@ -835,42 +997,7 @@ void __cdecl WINDOWS_PROCEDURE_HandleMenuEvent(HWND hWnd, WPARAM wParam, MENU_T*
     }
     case MENU_OPTIONS_FULLSCREEN: {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (p_Menu->ubIsFullScreen) {
-            CheckMenuItem(p_Menu->hMenu, MENU_OPTIONS_FULLSCREEN, MF_UNCHECKED);
-            p_Menu->ubIsFullScreen = !p_Menu->ubIsFullScreen;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Change double buffer settings.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            SetWindowLongPtr(hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
-            SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            MISC_ResizeWindow(hWnd, INITIAL_CLIENT_WIDTH, INITIAL_CLIENT_HEIGHT);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            DOUBLE_BUFFER_Resize(p_DoubleBuffer, hWnd, RGB(0, 0, 0), p_Globals);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Remember to reset the graphics mode to allow the rendering engine to work.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            TRANSFORM_Init(p_DoubleBuffer);
-        }
-        else {
-            CheckMenuItem(p_Menu->hMenu, MENU_OPTIONS_FULLSCREEN, MF_CHECKED);
-            p_Menu->ubIsFullScreen = !p_Menu->ubIsFullScreen;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Change double buffer settings.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Last argument is 1 because the menu needs to be redrawn when the window area resizes.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            SetWindowLongPtr(hWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
-            SetWindowPos(hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            MoveWindow(hWnd, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 1);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            DOUBLE_BUFFER_Resize(p_DoubleBuffer, hWnd, RGB(0, 0, 0), p_Globals);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Remember to reset the graphics mode to allow the rendering engine to work.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            TRANSFORM_Init(p_DoubleBuffer);
-        }
+        WINDOWS_PROCEDURE_HandleFullscreen(hWnd, p_Globals, p_Menu, p_DoubleBuffer);
         break;
     }
     case MENU_OPTIONS_STATUSES: {

@@ -112,13 +112,15 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Volatile entity constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Movement speed is unit vector amplification. Divisors are slow down's when carrying resources.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define WORKER_MOVE_SPEED                   7.0f
-#define WORKER_MINERAL_DIVISOR              5.0f
-#define	WORKER_GAS_DIVISOR                  6.0f
 #define MINERAL_MOVE_SPEED                  1.0f
 #define COMMAND_MOVE_SPEED                  1.0f
 #define SUPPLY_MOVE_SPEED                   1.0f
 #define REFINERY_MOVE_SPEED                 1.0f
+#define WORKER_MINERAL_DIVISOR              3.0f
+#define	WORKER_GAS_DIVISOR                  5.0f
 #define MINERALS_PAUSE                      1500.0f
 #define MINERALS_COMMAND_PAUSE              1500.0f
 #define REFINERY_PAUSE                      2000.0f
@@ -151,9 +153,9 @@
 #define INITIAL_CLIENT_WIDTH                1650
 #define INITIAL_CLIENT_HEIGHT               850
 #define TRANSLATION_STEP_AMOUNT             35.0f
-#define AI_MAX_SEARCH_RANGE                 12000.0f
-#define MINIMAP_SIZE                        220.0f
-#define MAP_SIZE                            3000.0f
+#define AI_MAX_SEARCH_RANGE                 4250.0f     // Calculate when loaded.
+#define MINIMAP_SIZE                        220.0f      // Doesn't change if the map size changes.
+#define MAP_SIZE                            3000.0f     // Get when loaded.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Volatile AI constants.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
