@@ -5,7 +5,7 @@ Active development continues here when time allows — see the historic repo for
 
 ---
 
-## 💡 Ideas & Upcoming Changes
+## 🔹 Ideas & Upcoming Changes
 
 - Optimize pathfinding...
   - Selectable pathfinding mode: raycast, bisection...
@@ -33,7 +33,7 @@ Active development continues here when time allows — see the historic repo for
 
 ---
 
-## 🔄 April 2025 Updates
+## 🔹 April 2025 Updates
 
 - Updated pointer dereference style.
 - Arrow keys now adjust view translation.
@@ -64,7 +64,7 @@ Active development continues here when time allows — see the historic repo for
 
 ---
 
-## 📦 March 2025 Updates
+## 🔹 March 2025 Updates
 
 - Output current working directory.
 - Prefixed diagnostics for clarity.
