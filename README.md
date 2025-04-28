@@ -1,4 +1,4 @@
-﻿# 🛠️ **Gatherers**
+﻿# 💡 **Gatherers**
 
 A continuation of the [Gatherers-Historic](https://github.com/Broosky/Gatherers-Historic) StarCraft-style simulation.  
 Active development continues here when time allows — see the historic repo for early progress and design context.
