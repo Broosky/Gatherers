@@ -7,56 +7,83 @@
 #define _SETTINGS_H_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "common.h"
+#include "Windows/windows_minified.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Forward declares:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct GLOBALS GLOBALS_T;
 typedef struct LOG LOG_T;
+typedef struct ENTITY ENTITY_T;
+typedef struct GLOBALS GLOBALS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct SETTINGS {
-    const float fEngineFps;
-    const float fAnimateFps;
-    const int iClientWidth;
-    const int iClientHeight;
-    const int iSupplyFromCommand;
-    const int iCommandMineralsCost;
-    const int iCommandGasCost;
-    const int iSupplyFromDepot;
-    const int iSupplyMineralsCost;
-    const int iSupplyGasCost;
-    const int iSupplyUsedWorker;
-    const int iWorkerMineralsCost;
-    const int iWorkerGasCost;
-    const int iRefineryMineralsCost;
-    const int iRefineryGasCost;
-    const float fWorkerMoveSpeed;
-    const float fMineralSlowdownDivisor;
-    const float fGasSlowdownDivisor;
-    const float fMineralMoveSpeed;
-    const float fSupplyMoveSpeed;
-    const float fCommandMoveSpeed;
-    const float fRefineryMoveSpeed;
-    const float fMineralsPause;
-    const float fMineralsCommandPause;
-    const float fRefineryPause;
-    const float fRefineryCommandPause;
-    const float fGoldenMineralBitShift;
-    const float fGoldenGasBitShift;
-    const float fMinimapSize;
-    const int iMineralsStart;
-    const int iGasStart;
-    const int iMineralsPerGrab;
-    const int iGasPerGrab;
+    // [BuildingCosts]
+    USHORT usSupplyFromCommand;
+    USHORT usCostOfCommandMinerals;
+    USHORT usCostOfCommandGas;
+    USHORT usSupplyFromDepot;
+    USHORT usCostOfDepotMinerals;
+    USHORT usCostOfDepotGas;
+    USHORT usSupplyUsedWorker;
+    USHORT usCostOfWorkerMinerals;
+    USHORT usCostOfWorkerGas;
+    USHORT usCostOfRefineryMinerals;
+    USHORT usCostOfRefineryGas;
+    // [AppSettings]
+    float fEngineFPS;
+    float fAnimateFPS;
+    float fMaintenanceTimebase;
+    USHORT usInitialClientWidth;
+    USHORT usInitialClientHeight;
+    float fTranslationStepAmount;
+    float fAiMaxSearchRange;
+    float fMinimapSize;
+    float fMapSize;
+    USHORT usWindowRegionRounding;
+    float fPathBoundingBoxPadding;
+    // [AllocatorSettings]
+    USHORT usHeapAllocatorMaxEntities;
+    USHORT usHeapAllocatorMaxPathPoints;
+    USHORT usHeapAllocatorMaxPathObstacles;
+    USHORT usHeapAllocatorMaxMessages;
+    USHORT usHeapAllocatorAiClosest;
+    USHORT usHeapAllocatorFPoint;
+    USHORT usHeapAllocatorFRect;
+    // [AISettings]
+    float fSufficientlyClose;
+    float fCollisionBuffer;
+    // [MovementSettings]
+    float fWorkerMoveSpeed;
+    float fMineralMoveSpeed;
+    float fCommandMoveSpeed;
+    float fSupplyMoveSpeed;
+    float fRefineryMoveSpeed;
+    float fWorkerMineralDivisor;
+    float fWorkerGasDivisor;
+    // [PauseSettings]
+    float fMineralsPause;
+    float fMineralsCommandPause;
+    float fRefineryPause;
+    float fRefineryCommandPause;
+    // [ResourceSettings]
+    USHORT usMineralsPerGrab;
+    USHORT usMineralsMultiplier;
+    USHORT usGasPerGrab;
+    USHORT usGasMultiplier;
+    UINT uiMineralsOnCreation;
+    UINT uiGasOnCreation;
 } SETTINGS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void            __cdecl     SETTINGS_Zero           (SETTINGS_T*);
-SETTINGS_T*     __cdecl     SETTINGS_Create         (GLOBALS_T*, LOG_T*);
-void            __cdecl     SETTINGS_InitFromFile   (SETTINGS_T*);
-void            __cdecl     SETTINGS_Kill           (SETTINGS_T*, GLOBALS_T*);
+void                __cdecl     SETTINGS_Zero                                   (SETTINGS_T*);
+SETTINGS_T*         __cdecl     SETTINGS_Create                                 (GLOBALS_T*, LOG_T*);
+UINT8               __cdecl     SETTINGS_InitFromFile                           (SETTINGS_T*, LOG_T*, const char* const);
+UINT8               __cdecl     SETTINGS_Match                                  (const char* const, const char* const);
+void                __cdecl     SETTINGS_Print                                  (SETTINGS_T*, LOG_T*);
+void                __cdecl     SETTINGS_PropagateHotReload                     (SETTINGS_T*, LOG_T*, char*, GLOBALS_T*);
+void                __cdecl     SETTINGS_Kill                                   (SETTINGS_T**, GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -68,7 +68,8 @@
         "-Wall",
         "-mwindows",
         "${workspaceRoot}/Source/*.c",
-        "${workspaceRoot}/Headers/*.h",
+        "${workspaceRoot}/Source/Renderer/*.c",
+        "${workspaceRoot}/Source/Windows/*.c",
         "${workspaceRoot}/Resources/main.res",
         "-o",
         "${workspaceRoot}/bin/Debug/Gatherers.exe"
@@ -107,7 +108,8 @@
         "-Wall",
         "-mwindows",
         "${workspaceRoot}/Source/*.c",
-        "${workspaceRoot}/Headers/*.h",
+        "${workspaceRoot}/Source/Renderer/*.c",
+        "${workspaceRoot}/Source/Windows/*.c",
         "${workspaceRoot}/Resources/main.res",
         "-o",
         "${workspaceRoot}/bin/Release/Gatherers.exe"

@@ -1,0 +1,1052 @@
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Program Name: Gatherers (C)                                                                                             //
+// Author: Jeffrey Bednar                                                                                                  //
+// Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "../../Headers/assets.h"
+#include "../../Headers/constants.h"
+#include "../../Headers/entity.h"
+#include "../../Headers/globals.h"
+#include "../../Headers/log.h"
+#include "../../Headers/menu.h"
+#include "../../Headers/misc.h"
+#include "../../Headers/picture.h"
+#include "../../Headers/Renderer/renderer.h"
+#include "../../Headers/Renderer/renderer_double_buffer.h"
+#include "../../Headers/settings.h"
+#include "../../Headers/Windows/windows_main.h"
+#include <emmintrin.h>
+#include <math.h>
+#include <stdint.h>
+#include <stdlib.h>
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Local Only:
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_Zero(DOUBLE_BUFFER_T* p_DoubleBuffer) {
+    ZeroMemory(p_DoubleBuffer, sizeof(DOUBLE_BUFFER_T));
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+DOUBLE_BUFFER_T* __cdecl DOUBLE_BUFFER_Create(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    size_t stAllocation = sizeof(DOUBLE_BUFFER_T);
+    DOUBLE_BUFFER_T* p_DoubleBuffer = malloc(stAllocation);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!p_DoubleBuffer) {
+        MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "DOUBLE_BUFFER_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
+        return NULL;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->stAllocations += stAllocation;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DOUBLE_BUFFER_Zero(p_DoubleBuffer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    GetClientRect(p_Globals->hWnd, &p_DoubleBuffer->ClientArea);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_DoubleBuffer->hWnd = p_Globals->hWnd;
+    p_DoubleBuffer->hDC = GetDC(p_DoubleBuffer->hWnd);
+    p_DoubleBuffer->hDCMem = CreateCompatibleDC(p_DoubleBuffer->hDC);
+    p_DoubleBuffer->hDCBmp = CreateCompatibleDC(p_DoubleBuffer->hDC);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!DOUBLE_BUFFER_CreateDibSection(p_DoubleBuffer, p_Log)) {
+        MISC_WriteOut(p_Log, LOG_SEVERITY_FATAL, "DOUBLE_BUFFER_Create(): Failure creating dibsection.\n");
+        return NULL;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Renderer population.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Renderer->vp_Implementation = p_DoubleBuffer;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Renderer->GetClientArea = DOUBLE_BUFFER_GetClientArea;
+    p_Renderer->Resize = DOUBLE_BUFFER_Resize;
+    p_Renderer->Kill = DOUBLE_BUFFER_Kill;
+    p_Renderer->SetBlitter = DOUBLE_BUFFER_SetBlitter;
+    p_Renderer->Blitter = DOUBLE_BUFFER_Blitter;
+    p_Renderer->Clear = DOUBLE_BUFFER_Clear;
+    p_Renderer->ClearEntity = DOUBLE_BUFFER_ClearEntity;
+    p_Renderer->FlipEntity = DOUBLE_BUFFER_FlipEntity;
+    p_Renderer->PresentFrame = DOUBLE_BUFFER_PresentFrame;
+    p_Renderer->HandlePreProcessing = DOUBLE_BUFFER_HandlePreProcessing;
+    p_Renderer->EnablingPostProcessing = DOUBLE_BUFFER_EnablingPostProcessing;
+    p_Renderer->DisablingPostProcessing = DOUBLE_BUFFER_DisablingPostProcessing;
+    p_Renderer->HandlePostProcessing = DOUBLE_BUFFER_HandlePostProcessing;
+    p_Renderer->FlipArea = DOUBLE_BUFFER_FlipArea;
+    p_Renderer->ApplyWorldTransform = DOUBLE_BUFFER_ApplyWorldTransform;
+    p_Renderer->ResetWorldTransform = DOUBLE_BUFFER_ResetWorldTransform;
+    p_Renderer->InitWorldTransform = DOUBLE_BUFFER_InitWorldTransform;
+    p_Renderer->DrawMinimapEntities = DOUBLE_BUFFER_DrawMinimapEntities;
+    p_Renderer->DrawMinimapViewport = DOUBLE_BUFFER_DrawMinimapViewport;
+    p_Renderer->DrawMinimapSelectionArea = DOUBLE_BUFFER_DrawMinimapSelectionArea;
+    p_Renderer->DrawBuildLimits = DOUBLE_BUFFER_DrawBuildLimits;
+    p_Renderer->DrawBuildType = DOUBLE_BUFFER_DrawBuildType;
+    p_Renderer->DrawSelectionArea = DOUBLE_BUFFER_DrawSelectionArea;
+    p_Renderer->DrawTranslationThreshold = DOUBLE_BUFFER_DrawTranslationThreshold;
+    p_Renderer->DrawPicture = DOUBLE_BUFFER_DrawPicture;
+    p_Renderer->DrawPictureAt = DOUBLE_BUFFER_DrawPictureAt;
+    p_Renderer->CropDrawPictureAt = DOUBLE_BUFFER_CropDrawPictureAt;
+    p_Renderer->DrawEntityMinorVector = DOUBLE_BUFFER_DrawEntityMinorVector;
+    p_Renderer->DrawEntityMajorVector = DOUBLE_BUFFER_DrawEntityMajorVector;
+    p_Renderer->DrawEntityEllipse = DOUBLE_BUFFER_DrawEntityEllipse;
+    p_Renderer->DrawEntity = DOUBLE_BUFFER_DrawEntity;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Unused, retained internally in renderer.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return p_DoubleBuffer;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+DOUBLE_BUFFER_T* __cdecl DOUBLE_BUFFER_Cast(RENDERER_T* p_Renderer) {
+    return (DOUBLE_BUFFER_T*)p_Renderer->vp_Implementation;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_CreateCompatibleBitmap(DOUBLE_BUFFER_T* p_DoubleBuffer, LOG_T* p_Log) {
+    p_DoubleBuffer->hCanvas = CreateCompatibleBitmap(
+        p_DoubleBuffer->hDC,
+        p_DoubleBuffer->ClientArea.right,
+        p_DoubleBuffer->ClientArea.bottom
+    );
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!p_DoubleBuffer->hCanvas) {
+        MISC_WriteOut(p_Log, LOG_SEVERITY_FATAL, "DOUBLE_BUFFER_CreateCompatibleBitmap(): CreateCompatibleBitmap failed.\n");
+        return;
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+UINT8 __cdecl DOUBLE_BUFFER_CreateDibSection(DOUBLE_BUFFER_T* p_DoubleBuffer, LOG_T* p_Log) {
+    BITMAPINFO BitmapInfo = { 0 };
+    BitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    BitmapInfo.bmiHeader.biWidth = p_DoubleBuffer->ClientArea.right;
+    BitmapInfo.bmiHeader.biHeight = -p_DoubleBuffer->ClientArea.bottom; // Negative for top-left origin.
+    BitmapInfo.bmiHeader.biPlanes = 1;
+    BitmapInfo.bmiHeader.biBitCount = 32;
+    BitmapInfo.bmiHeader.biCompression = BI_RGB;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_DoubleBuffer->BitmapInfo = BitmapInfo;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_DoubleBuffer->hCanvas = CreateDIBSection(p_DoubleBuffer->hDCMem, &p_DoubleBuffer->BitmapInfo, DIB_RGB_COLORS, &p_DoubleBuffer->vp_FrameBuffer, NULL, 0);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!p_DoubleBuffer->hCanvas) {
+        MISC_WriteOut(p_Log, LOG_SEVERITY_FATAL, "DOUBLE_BUFFER_CreateDibSection(): CreateDIBSection failed.\n");
+        return 0;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_DoubleBuffer->hStorage = SelectObject(p_DoubleBuffer->hDCMem, p_DoubleBuffer->hCanvas);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return 1;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+IPOINT_T __cdecl DOUBLE_BUFFER_FindBlitterPoint(char cChar) {
+    IPOINT_T CurrentPoint = { 0, 0 };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Lookup also feasable if the sequencing is not within contiguous ranges.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // abcdefghijklmnopqrstuvwxyz
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (cChar >= 'a' && cChar <= 'z') {
+        CurrentPoint.iX = cChar - 'a';
+        CurrentPoint.iY = 0;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    else if (cChar >= 'A' && cChar <= 'Z') {
+        CurrentPoint.iX = cChar - 'A';
+        CurrentPoint.iY = 1;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 0123456789
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    else if (cChar >= '0' && cChar <= '9') {
+        CurrentPoint.iX = cChar - '0';
+        CurrentPoint.iY = 2;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  !"#$%&'()*+,-./ (The first character is a space.)
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    else if (cChar >= 32 && cChar <= 47) {
+        CurrentPoint.iX = cChar - 32;
+        CurrentPoint.iY = 3;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // :;<=>?@
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    else if (cChar >= 58 && cChar <= 64) {
+        CurrentPoint.iX = cChar - 58;
+        CurrentPoint.iY = 4;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // [\]^_`
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    else if (cChar >= 91 && cChar <= 96) {
+        CurrentPoint.iX = cChar - 91;
+        CurrentPoint.iY = 5;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // {|}~
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    else if (cChar >= 123 && cChar <= 126) {
+        CurrentPoint.iX = cChar - 123;
+        CurrentPoint.iY = 6;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Character not found.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return CurrentPoint;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Accessible via Renderer:
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_Kill(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_DoubleBuffer) {
+        DOUBLE_BUFFER_KillPostProcessing(p_DoubleBuffer, p_Globals);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        SelectObject(p_DoubleBuffer->hDCMem, p_DoubleBuffer->hStorage);
+        DeleteObject(p_DoubleBuffer->hCanvas);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        DeleteDC(p_DoubleBuffer->hDCBmp);
+        DeleteDC(p_DoubleBuffer->hDCMem);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ReleaseDC(p_DoubleBuffer->hWnd, p_DoubleBuffer->hDC);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        free(p_DoubleBuffer);
+        p_Globals->stAllocations -= sizeof(DOUBLE_BUFFER_T);
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+RECT __cdecl DOUBLE_BUFFER_GetClientArea(RENDERER_T* p_Renderer) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return p_DoubleBuffer->ClientArea;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_Resize(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, p_DoubleBuffer->hStorage);
+    DeleteObject(p_DoubleBuffer->hCanvas);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    GetClientRect(p_Globals->hWnd, &p_DoubleBuffer->ClientArea);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DOUBLE_BUFFER_CreateDibSection(p_DoubleBuffer, p_Log);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_SetBlitter(RENDERER_T* p_Renderer, PICTURE_T* p_Picture) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_DoubleBuffer->p_Blitter = p_Picture;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_Blitter(RENDERER_T* p_Renderer, char* p_szText, FPOINT_T Location, UINT8 ubMask) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    static const UINT8 ubCharWid = 11;
+    static const UINT8 ubCharHgt = 22;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Compensate for rendering translations.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Location.fX -= p_DoubleBuffer->XForm.eDx;
+    Location.fY -= p_DoubleBuffer->XForm.eDy;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FPOINT_T SavedLocation = Location;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Could put blitter point return into a lookup to avoid same multiplication.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (ubMask) {
+        HGDIOBJ hMaskTemp = SelectObject(p_DoubleBuffer->hDCBmp, (*p_DoubleBuffer->p_Blitter).hBmpMask);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        USHORT usI;
+        for (usI = 0; usI < strlen(p_szText); usI++) {
+            IPOINT_T BlitterPoint = DOUBLE_BUFFER_FindBlitterPoint(p_szText[usI]);
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            BitBlt(
+                p_DoubleBuffer->hDCMem,
+                Location.fX,
+                Location.fY,
+                10,
+                16,
+                p_DoubleBuffer->hDCBmp,
+                BlitterPoint.iX * ubCharWid,
+                BlitterPoint.iY * ubCharHgt,
+                SRCAND
+            );
+            Location.fX += ubCharWid;
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Location = SavedLocation;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPicTemp = SelectObject(p_DoubleBuffer->hDCBmp, (*p_DoubleBuffer->p_Blitter).hBmp);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    USHORT usI;
+    for (usI = 0; usI < strlen(p_szText); usI++) {
+        IPOINT_T BlitterPoint = DOUBLE_BUFFER_FindBlitterPoint(p_szText[usI]);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        BitBlt(
+            p_DoubleBuffer->hDCMem,
+            Location.fX,
+            Location.fY,
+            10,
+            16,
+            p_DoubleBuffer->hDCBmp,
+            BlitterPoint.iX * ubCharWid,
+            BlitterPoint.iY * ubCharHgt,
+            ubMask ? SRCPAINT : SRCCOPY
+        );
+        Location.fX += ubCharWid;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_Clear(RENDERER_T* p_Renderer, ASSETS_T* p_Assets) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FillRect(p_DoubleBuffer->hDCMem, &p_DoubleBuffer->ClientArea, p_Assets->hBrushBufferClear);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_ClearEntity(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    RECT Area = {
+        p_Entity->Location.fX,
+        p_Entity->Location.fY,
+        p_Entity->Location.fX + p_Entity->Size.fDx,
+        p_Entity->Location.fY + p_Entity->Size.fDy
+    };
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    FillRect(p_DoubleBuffer->hDCMem, &Area, p_Assets->hBrushClear);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_FlipEntity(RENDERER_T* p_Renderer, ENTITY_T* p_Entity) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BitBlt(
+        p_DoubleBuffer->hDC,
+        p_Entity->Location.fX,
+        p_Entity->Location.fY,
+        p_Entity->Size.fDx,
+        p_Entity->Size.fDy,
+        p_DoubleBuffer->hDCMem,
+        p_Entity->Location.fX,
+        p_Entity->Location.fY,
+        SRCCOPY
+    );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_PresentFrame(RENDERER_T* p_Renderer) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BitBlt(
+        p_DoubleBuffer->hDC,
+        0,
+        0,
+        p_DoubleBuffer->ClientArea.right,
+        p_DoubleBuffer->ClientArea.bottom,
+        p_DoubleBuffer->hDCMem,
+        0,
+        0,
+        SRCCOPY
+    );
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 3 x 3 box blur w/SSE SIMD vectorization.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_HandleBoxBlur(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    int iWidth = p_DoubleBuffer->ClientArea.right;
+    int iHeight = p_DoubleBuffer->ClientArea.bottom;
+    uint32_t* p_u32FrameBuffer = (uint32_t*)p_DoubleBuffer->vp_FrameBuffer;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    static size_t stCurrentBufferSize = 0;
+    static const size_t stAlignment = 16;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    const __m128i bMask = _mm_set1_epi32(0xFF);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // The iterator is width - 4, so extra scalar operations are needed to handle the last remaining pixels.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // _mm_<operation><alignment>_<data_type_and_size>
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t stNewBufferSize = (iWidth * iHeight) * sizeof(uint32_t);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Handle initial creation or frame resizing.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_DoubleBuffer->p_u32Temp.p_u32 == NULL || p_DoubleBuffer->p_u32Horizontal.p_u32 == NULL || stCurrentBufferSize != stNewBufferSize) {
+        DOUBLE_BUFFER_KillPostProcessing(p_DoubleBuffer, p_Globals);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_DoubleBuffer->p_u32Temp.p_u32 = (uint32_t*)_aligned_malloc(stNewBufferSize, stAlignment);
+        p_DoubleBuffer->p_u32Temp.stAllocations += stNewBufferSize;
+        p_Globals->stAllocations += stNewBufferSize;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_DoubleBuffer->p_u32Horizontal.p_u32 = (uint32_t*)_aligned_malloc(stNewBufferSize, stAlignment);
+        p_DoubleBuffer->p_u32Horizontal.stAllocations += stNewBufferSize;
+        p_Globals->stAllocations += stNewBufferSize;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (!p_DoubleBuffer->p_u32Temp.p_u32 || !p_DoubleBuffer->p_u32Horizontal.p_u32) {
+            MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "DOUBLE_BUFFER_HandleBoxBlur(): Malloc failed for size: %zu bytes\n", stNewBufferSize);
+            UINT8 _discard = MAIN_FailFast(p_Globals, p_Log);
+            return;
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        stCurrentBufferSize = stNewBufferSize;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Horizontal pass:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    int iX, iY, iRowOffset;
+    for (iY = 0; iY < iHeight; iY++) {
+        iRowOffset = iY * iWidth;
+        for (iX = 1; iX < iWidth - 4; iX += 4) {
+            // Load pixels:
+            __m128i px0 = _mm_loadu_si128((__m128i*) & p_u32FrameBuffer[iRowOffset + iX - 1]);
+            __m128i px1 = _mm_loadu_si128((__m128i*) & p_u32FrameBuffer[iRowOffset + iX]);
+            __m128i px2 = _mm_loadu_si128((__m128i*) & p_u32FrameBuffer[iRowOffset + iX + 1]);
+            // Extract and average channels:
+            __m128i aAverage = _mm_avg_epu8(
+                _mm_avg_epu8(
+                    _mm_srli_epi32(px0, 24),
+                    _mm_srli_epi32(px2, 24)
+                ),
+                _mm_srli_epi32(px1, 24)
+            );
+            __m128i rAverage = _mm_avg_epu8(
+                _mm_avg_epu8(
+                    _mm_srli_epi32(px0, 16),
+                    _mm_srli_epi32(px2, 16)
+                ),
+                _mm_srli_epi32(px1, 16)
+            );
+            __m128i gAverage = _mm_avg_epu8(
+                _mm_avg_epu8(
+                    _mm_srli_epi32(px0, 8),
+                    _mm_srli_epi32(px2, 8)
+                ),
+                _mm_srli_epi32(px1, 8)
+            );
+            __m128i bAverage = _mm_avg_epu8(
+                _mm_avg_epu8(
+                    _mm_and_si128(px0, bMask),
+                    _mm_and_si128(px2, bMask)
+                ),
+                _mm_and_si128(px1, bMask)
+            );
+            // Repack:
+            __m128i pxResult = _mm_or_si128(
+                _mm_slli_epi32(aAverage, 24),
+                _mm_or_si128(
+                    _mm_slli_epi32(rAverage, 16),
+                    _mm_or_si128(_mm_slli_epi32(gAverage, 8), bAverage)
+                )
+            );
+            // Place on the horizontal buffer for the vertical pass.
+            _mm_store_si128((__m128i*) & p_DoubleBuffer->p_u32Horizontal.p_u32[iRowOffset + iX], pxResult);
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Vertical pass:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    for (iY = 1; iY < iHeight - 1; iY++) {
+        iRowOffset = iY * iWidth;
+        for (iX = 1; iX < iWidth - 4; iX += 4) {
+            // Load pixels:
+            __m128i px0 = _mm_loadu_si128((__m128i*) & p_DoubleBuffer->p_u32Horizontal.p_u32[(iY - 1) * iWidth + iX]);
+            __m128i px1 = _mm_loadu_si128((__m128i*) & p_DoubleBuffer->p_u32Horizontal.p_u32[iRowOffset + iX]);
+            __m128i px2 = _mm_loadu_si128((__m128i*) & p_DoubleBuffer->p_u32Horizontal.p_u32[(iY + 1) * iWidth + iX]);
+            // Extract and average channels:
+            __m128i aAverage = _mm_avg_epu8(
+                _mm_avg_epu8(
+                    _mm_srli_epi32(px0, 24),
+                    _mm_srli_epi32(px2, 24)
+                ),
+                _mm_srli_epi32(px1, 24)
+            );
+            __m128i rAverage = _mm_avg_epu8(
+                _mm_avg_epu8(
+                    _mm_srli_epi32(px0, 16),
+                    _mm_srli_epi32(px2, 16)
+                ),
+                _mm_srli_epi32(px1, 16)
+            );
+            __m128i gAverage = _mm_avg_epu8(
+                _mm_avg_epu8(
+                    _mm_srli_epi32(px0, 8),
+                    _mm_srli_epi32(px2, 8)
+                ),
+                _mm_srli_epi32(px1, 8)
+            );
+            __m128i bAverage = _mm_avg_epu8(
+                _mm_avg_epu8(
+                    _mm_and_si128(px0, bMask),
+                    _mm_and_si128(px2, bMask)
+                ),
+                _mm_and_si128(px1, bMask)
+            );
+            // Repack:
+            __m128i pxResult = _mm_or_si128(
+                _mm_slli_epi32(aAverage, 24),
+                _mm_or_si128(
+                    _mm_slli_epi32(rAverage, 16),
+                    _mm_or_si128(_mm_slli_epi32(gAverage, 8), bAverage)
+                )
+            );
+            // Place on the temp buffer for the copy back to the framebuffer.
+            _mm_store_si128((__m128i*) & p_DoubleBuffer->p_u32Temp.p_u32[iRowOffset + iX], pxResult);
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Framebuffer copy:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    int iDx;
+    size_t szSize = (iWidth - 2) * sizeof(uint32_t);
+    for (iY = 1; iY < iHeight - 1; iY++) {
+        iDx = iY * iWidth + 1;
+        memcpy(&p_u32FrameBuffer[iDx], &p_DoubleBuffer->p_u32Temp.p_u32[iDx], szSize);
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Basic filtering of green channel without vectorization.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_HandleGreenMask(DOUBLE_BUFFER_T* p_DoubleBuffer, uint8_t ubFactor) {
+    int iWidth = p_DoubleBuffer->ClientArea.right;
+    int iHeight = p_DoubleBuffer->ClientArea.bottom;
+    uint32_t* vp_FrameBuffer = (uint32_t*)p_DoubleBuffer->vp_FrameBuffer;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    int iX, iY, iRowOffset, iDx;
+    for (iY = 0; iY < iHeight; iY++) {
+        iRowOffset = iY * iWidth;
+        for (iX = 0; iX < iWidth; iX++) {
+            iDx = iRowOffset + iX;
+            // Mask, scale, repack.
+            uint8_t ubG = (vp_FrameBuffer[iDx] & 0xFF00FF00) >> 8;
+            ubG = (ubG * ubFactor) >> 8;
+            vp_FrameBuffer[iDx] = ubG << 8;
+        }
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_HandleDarken(DOUBLE_BUFFER_T* p_DoubleBuffer, uint8_t ubFactor) {
+    int iWidth = p_DoubleBuffer->ClientArea.right;
+    int iHeight = p_DoubleBuffer->ClientArea.bottom;
+    uint32_t* vp_FrameBuffer = (uint32_t*)p_DoubleBuffer->vp_FrameBuffer;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    int iX, iY, iRowOffset, iDx;
+    for (iY = 0; iY < iHeight; iY++) {
+        iRowOffset = iY * iWidth;
+        for (iX = 0; iX < iWidth; iX++) {
+            iDx = iRowOffset + iX;
+            // Extract, scale, repack.
+            uint32_t u32o = vp_FrameBuffer[iDx];
+            uint8_t ubA = (u32o >> 24) & 0xFF;
+            uint8_t ubR = (u32o >> 16) & 0xFF;
+            uint8_t ubG = (u32o >> 8) & 0xFF;
+            uint8_t ubB = (u32o) & 0xFF;
+            ubR = (ubR * ubFactor) >> 8;
+            ubG = (ubG * ubFactor) >> 8;
+            ubB = (ubB * ubFactor) >> 8;
+            uint32_t u32d = (ubA << 24) | (ubR << 16) | (ubG << 8) | ubB;
+            vp_FrameBuffer[iDx] = u32d;
+        }
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Handle extra implementation specific preparations.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_EnablingPostProcessing(RENDERER_T* p_Renderer, MENU_T* p_Menu, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DisablingPostProcessing(RENDERER_T* p_Renderer, MENU_T* p_Menu, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DOUBLE_BUFFER_KillPostProcessing(p_DoubleBuffer, p_Globals);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_KillPostProcessing(DOUBLE_BUFFER_T* p_DoubleBuffer, GLOBALS_T* p_Globals) {
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_DoubleBuffer->p_u32Temp.p_u32) {
+        _aligned_free(p_DoubleBuffer->p_u32Temp.p_u32);
+        p_Globals->stAllocations -= p_DoubleBuffer->p_u32Temp.stAllocations;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_DoubleBuffer->p_u32Temp.p_u32 = NULL;
+        p_DoubleBuffer->p_u32Temp.stAllocations = 0;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_DoubleBuffer->p_u32Horizontal.p_u32) {
+        _aligned_free(p_DoubleBuffer->p_u32Horizontal.p_u32);
+        p_Globals->stAllocations -= p_DoubleBuffer->p_u32Horizontal.stAllocations;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_DoubleBuffer->p_u32Horizontal.p_u32 = NULL;
+        p_DoubleBuffer->p_u32Horizontal.stAllocations = 0;
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Prior to rendering the window DC, at this time the memory DC/Dibsection is populated by the engine/process.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Pixel index: [y * width + x] @ 32bpp: 0xAARRGGBB
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_HandlePostProcessing(RENDERER_T* p_Renderer, MENU_T* p_Menu, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Stackable, but better to combine.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_Menu->ubEnablePostProcessing) {
+        if (p_Menu->ubEnableBoxBlur) {
+            DOUBLE_BUFFER_HandleBoxBlur(p_DoubleBuffer, p_Globals, p_Log);
+        }
+        if (p_Menu->ubEnableGreenMask) {
+            DOUBLE_BUFFER_HandleGreenMask(p_DoubleBuffer, 225);
+        }
+        if (p_Menu->ubEnableDarken) {
+            DOUBLE_BUFFER_HandleDarken(p_DoubleBuffer, 64);
+        }
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_HandlePreProcessing(RENDERER_T* p_Renderer, MENU_T* p_Menu, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_DoubleBuffer->PreProcessing.DirtyZones) {
+        FPOINT_T CropStart = { 0.0f };
+        FDELTA_T CropDelta = { 0.0f };
+        p_Renderer->CropDrawPictureAt(p_Renderer, &p_Assets->Terrain[p_Globals->usMapIndex], CropStart, CropDelta, 0);
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_FlipArea(RENDERER_T* p_Renderer, int iX, int iY, int iWidth, int iHeight) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BitBlt(p_DoubleBuffer->hDC, iX, iY, iWidth, iHeight, p_DoubleBuffer->hDCMem, iX, iY, SRCCOPY);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_ApplyWorldTransform(RENDERER_T* p_Renderer, TRANSFORM_TYPE_T eType, CONSTANTS_T* p_Constants, float fValue, FPOINT_T Pin, LOG_T* p_Log) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    switch (eType) {
+    case TRANSFORM_TYPE_ROTATE: {
+        float fRadians = MISC_CalculateRadians(p_Constants, fValue);
+        float fSin = sin(fRadians);
+        float fCos = cos(fRadians);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Possible lookup table?
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_DoubleBuffer->XForm.eM11 = fCos;
+        p_DoubleBuffer->XForm.eM12 = fSin;
+        p_DoubleBuffer->XForm.eM21 = -fSin;
+        p_DoubleBuffer->XForm.eM22 = fCos;
+        p_DoubleBuffer->XForm.eDx = Pin.fX;
+        p_DoubleBuffer->XForm.eDy = Pin.fY;
+        break;
+    }
+    case TRANSFORM_TYPE_SCALE: {
+        p_DoubleBuffer->XForm.eM11 = fValue;
+        p_DoubleBuffer->XForm.eM12 = 0.0f;
+        p_DoubleBuffer->XForm.eM21 = 0.0f;
+        p_DoubleBuffer->XForm.eM22 = fValue;
+        p_DoubleBuffer->XForm.eDx = Pin.fX;
+        p_DoubleBuffer->XForm.eDy = Pin.fY;
+        break;
+    }
+    default: {
+        MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "TRANSFORM_ApplyTransform(): Unknown transform type.\n");
+    }
+    }
+    SetWorldTransform(p_DoubleBuffer->hDCMem, &p_DoubleBuffer->XForm);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_ResetWorldTransform(RENDERER_T* p_Renderer) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_DoubleBuffer->XForm.eDx = 0.0f;
+    p_DoubleBuffer->XForm.eDy = 0.0f;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ModifyWorldTransform(p_DoubleBuffer->hDCMem, NULL, MWT_IDENTITY);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_InitWorldTransform(RENDERER_T* p_Renderer) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SetGraphicsMode(p_DoubleBuffer->hDCMem, GM_ADVANCED);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawMinimapEntities(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, FPOINT_T MinimapOrigin, ASSETS_T* p_Assets, SETTINGS_T* p_Settings, LOG_T* p_Log) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HPEN hPen = NULL;
+    HBRUSH hBrush = NULL;
+    HGDIOBJ hPenTemp = NULL;
+    HGDIOBJ hBrushTemp = NULL;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Render the entities.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ENTITY_T* p_Current = p_Globals->p_RootEntity;
+    while (p_Current) {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // The maps are square, and the locations are a ratio the map size!
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T EntityLocation = {
+            (p_Current->CenterPoint.fX - p_Current->HalfSize.fDx - p_Globals->Translation.fDx) / p_Settings->fMapSize,
+            (p_Current->CenterPoint.fY - p_Current->HalfSize.fDy - p_Globals->Translation.fDy) / p_Settings->fMapSize
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FDELTA_T EntityDelta = {
+            (p_Current->CenterPoint.fX + p_Current->HalfSize.fDx - p_Globals->Translation.fDx) / p_Settings->fMapSize,
+            (p_Current->CenterPoint.fY + p_Current->HalfSize.fDy - p_Globals->Translation.fDy) / p_Settings->fMapSize
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T MinimapEntityLocation = { p_Settings->fMinimapSize * EntityLocation.fX, p_Settings->fMinimapSize * EntityLocation.fY };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FDELTA_T MinimapEntityDelta = { p_Settings->fMinimapSize * EntityDelta.fDx, p_Settings->fMinimapSize * EntityDelta.fDy };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (p_Current->ubIsSelected) {
+            hBrush = p_Assets->hBrushSelected;
+            hPen = p_Assets->hPenSelected;
+        }
+        else if (p_Current->ubIsHighlighted) {
+            hBrush = p_Assets->hBrushHighlighted;
+            hPen = p_Assets->hPenHighlighted;
+        }
+        else {
+            switch (p_Current->eType) {
+            case ENTITY_TYPE_WORKER:
+                hBrush = p_Assets->hBrushWorker;
+                hPen = p_Assets->hPenWorker;
+                break;
+            case ENTITY_TYPE_COMMAND:
+                hBrush = p_Assets->hBrushCommand;
+                hPen = p_Assets->hPenCommand;
+                break;
+            case ENTITY_TYPE_MINERAL:
+                hBrush = p_Assets->hBrushMineral;
+                hPen = p_Assets->hPenMineral;
+                break;
+            case ENTITY_TYPE_SUPPLY:
+                hBrush = p_Assets->hBrushSupply;
+                hPen = p_Assets->hPenSupply;
+                break;
+            case ENTITY_TYPE_REFINERY:
+                hBrush = p_Assets->hBrushRefinery;
+                hPen = p_Assets->hPenRefinery;
+                break;
+            default: {
+                MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "PROCESS_DrawMinimapEntities(): Unknown entity type.\n");
+                return;
+            }
+            }
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        hBrushTemp = SelectObject(p_DoubleBuffer->hDCMem, hBrush);
+        hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        Rectangle(
+            p_DoubleBuffer->hDCMem,
+            MinimapOrigin.fX + MinimapEntityLocation.fX,
+            MinimapOrigin.fY + MinimapEntityLocation.fY,
+            MinimapOrigin.fX + MinimapEntityDelta.fDx,
+            MinimapOrigin.fY + MinimapEntityDelta.fDy
+        );
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        SelectObject(p_DoubleBuffer->hDCMem, hBrushTemp);
+        SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_Current = (ENTITY_T*)p_Current->p_Next;
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawMinimapViewport(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, FPOINT_T TopLeft, FPOINT_T TopRight, FPOINT_T BottomRight, FPOINT_T BottomLeft) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenViewport);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Top, right, bottom, left.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MoveToEx(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY, NULL);
+    LineTo(p_DoubleBuffer->hDCMem, TopRight.fX, TopRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomRight.fX, BottomRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomLeft.fX, BottomLeft.fY);
+    LineTo(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawMinimapSelectionArea(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, FPOINT_T TopLeft, FPOINT_T TopRight, FPOINT_T BottomRight, FPOINT_T BottomLeft) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenSelectionArea);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MoveToEx(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY, NULL);
+    LineTo(p_DoubleBuffer->hDCMem, TopRight.fX, TopRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomRight.fX, BottomRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomLeft.fX, BottomLeft.fY);
+    LineTo(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawBuildLimits(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, FPOINT_T TopLeft, FPOINT_T TopRight, FPOINT_T BottomRight, FPOINT_T BottomLeft) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenBuildLimits);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Top, right, bottom, left.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MoveToEx(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY, NULL);
+    LineTo(p_DoubleBuffer->hDCMem, TopRight.fX, TopRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomRight.fX, BottomRight.fY);
+    LineTo(p_DoubleBuffer->hDCMem, BottomLeft.fX, BottomLeft.fY);
+    LineTo(p_DoubleBuffer->hDCMem, TopLeft.fX, TopLeft.fY);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawBuildType(RENDERER_T* p_Renderer, MENU_T* p_Menu, ASSETS_T* p_Assets, PICTURE_T* p_Picture, FPOINT_T Location, IRECT_T BarrierArea) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DOUBLE_BUFFER_DrawPictureAt(p_Renderer, p_Picture, Location, p_Menu->ubEnableMasking);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenBuildType);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Top, right, bottom, left.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MoveToEx(p_DoubleBuffer->hDCMem, BarrierArea.Location.iX, BarrierArea.Location.iY, NULL);
+    LineTo(p_DoubleBuffer->hDCMem, BarrierArea.Size.iDx, BarrierArea.Location.iY);
+    LineTo(p_DoubleBuffer->hDCMem, BarrierArea.Size.iDx, BarrierArea.Size.iDy);
+    LineTo(p_DoubleBuffer->hDCMem, BarrierArea.Location.iX, BarrierArea.Size.iDy);
+    LineTo(p_DoubleBuffer->hDCMem, BarrierArea.Location.iX, BarrierArea.Location.iY);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawSelectionArea(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, ASSETS_T* p_Assets) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_Globals->ubDrawSelectionRect && !p_Globals->ubCreate) {
+        HDC hDcMemLocal = p_DoubleBuffer->hDCMem;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        HGDIOBJ hPenTemp = SelectObject(hDcMemLocal, p_Assets->hPenSelectionArea);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        IPOINT_T OldMousePosition = p_Globals->MouseOld;
+        IPOINT_T CurrentMousePosition = p_Globals->Mouse;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Top, right, bottom, left.
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        MoveToEx(hDcMemLocal, OldMousePosition.iX, OldMousePosition.iY, NULL);
+        LineTo(hDcMemLocal, CurrentMousePosition.iX, OldMousePosition.iY);
+        LineTo(hDcMemLocal, CurrentMousePosition.iX, CurrentMousePosition.iY);
+        LineTo(hDcMemLocal, OldMousePosition.iX, CurrentMousePosition.iY);
+        LineTo(hDcMemLocal, OldMousePosition.iX, OldMousePosition.iY);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        SelectObject(hDcMemLocal, hPenTemp);
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawTranslationThreshold(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenTranslation);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Left, bottom, right, top.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    USHORT usLeft = p_Globals->usThreshold;
+    USHORT usTop = p_Globals->usThreshold;
+    USHORT usRight = p_DoubleBuffer->ClientArea.right - p_Globals->usThreshold;
+    USHORT usBottom = p_DoubleBuffer->ClientArea.bottom - p_Globals->usThreshold;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MoveToEx(p_DoubleBuffer->hDCMem, usLeft, usTop, NULL);
+    LineTo(p_DoubleBuffer->hDCMem, usRight, usTop);
+    LineTo(p_DoubleBuffer->hDCMem, usRight, usBottom);
+    LineTo(p_DoubleBuffer->hDCMem, usLeft, usBottom);
+    LineTo(p_DoubleBuffer->hDCMem, usLeft, usTop);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawPicture(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, UINT8 ubMask) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (ubMask) {
+        HGDIOBJ hMaskTemp = SelectObject(p_DoubleBuffer->hDCBmp, p_Picture->hBmpMask);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        BitBlt(
+            p_DoubleBuffer->hDCMem,
+            p_Picture->Location.fX,
+            p_Picture->Location.fY,
+            p_Picture->Bitmap.bmWidth,
+            p_Picture->Bitmap.bmHeight,
+            p_DoubleBuffer->hDCBmp,
+            0,
+            0,
+            SRCAND
+        );
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPicTemp = SelectObject(p_DoubleBuffer->hDCBmp, p_Picture->hBmp);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BitBlt(
+        p_DoubleBuffer->hDCMem,
+        p_Picture->Location.fX,
+        p_Picture->Location.fY,
+        p_Picture->Bitmap.bmWidth,
+        p_Picture->Bitmap.bmHeight,
+        p_DoubleBuffer->hDCBmp,
+        0,
+        0,
+        ubMask ? SRCPAINT : SRCCOPY
+    );
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T Location, UINT8 ubMask) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (ubMask) {
+        HGDIOBJ hMaskTemp = SelectObject(p_DoubleBuffer->hDCBmp, p_Picture->hBmpMask);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        BitBlt(
+            p_DoubleBuffer->hDCMem,
+            Location.fX,
+            Location.fY,
+            p_Picture->Bitmap.bmWidth,
+            p_Picture->Bitmap.bmHeight,
+            p_DoubleBuffer->hDCBmp,
+            0,
+            0,
+            SRCAND
+        );
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPicTemp = SelectObject(p_DoubleBuffer->hDCBmp, p_Picture->hBmp);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BitBlt(
+        p_DoubleBuffer->hDCMem,
+        Location.fX,
+        Location.fY,
+        p_Picture->Bitmap.bmWidth,
+        p_Picture->Bitmap.bmHeight,
+        p_DoubleBuffer->hDCBmp,
+        0,
+        0,
+        ubMask ? SRCPAINT : SRCCOPY
+    );
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_CropDrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T CropStart, FDELTA_T CropDelta, UINT8 ubMask) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (ubMask) {
+        HGDIOBJ hMaskTemp = SelectObject(p_DoubleBuffer->hDCBmp, p_Picture->hBmpMask);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        BitBlt(
+            p_DoubleBuffer->hDCMem,
+            CropStart.fX,
+            CropStart.fY,
+            CropDelta.fDx,
+            CropDelta.fDy,
+            p_DoubleBuffer->hDCBmp,
+            0,
+            0,
+            SRCAND
+        );
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPicTemp = SelectObject(p_DoubleBuffer->hDCBmp, p_Picture->hBmp);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BitBlt(
+        p_DoubleBuffer->hDCMem,
+        CropStart.fX,
+        CropStart.fY,
+        CropDelta.fDx,
+        CropDelta.fDy,
+        p_DoubleBuffer->hDCBmp,
+        0,
+        0,
+        ubMask ? SRCPAINT : SRCCOPY
+    );
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawEntityMinorVector(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HPEN hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenMinorVector);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MoveToEx(p_DoubleBuffer->hDCMem, p_Entity->CenterPoint.fX, p_Entity->CenterPoint.fY, NULL);
+    LineTo(p_DoubleBuffer->hDCMem, p_Entity->MinorDestinationCenterPoint.fX, p_Entity->MinorDestinationCenterPoint.fY);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawEntityMajorVector(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HPEN hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, p_Assets->hPenMajorVector);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    MoveToEx(p_DoubleBuffer->hDCMem, p_Entity->CenterPoint.fX, p_Entity->CenterPoint.fY, NULL);
+    LineTo(p_DoubleBuffer->hDCMem, p_Entity->MajorDestinationCenterPoint.fX, p_Entity->MajorDestinationCenterPoint.fY);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawEntityEllipse(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, HPEN hPen, HBRUSH hBrush, SETTINGS_T* p_Settings) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPenTemp = SelectObject(p_DoubleBuffer->hDCMem, hPen);
+    HGDIOBJ hBrushTemp = SelectObject(p_DoubleBuffer->hDCMem, hBrush);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Ellipse(
+        p_DoubleBuffer->hDCMem,
+        p_Entity->CenterPoint.fX - p_Entity->fRadius - p_Settings->fCollisionBuffer,
+        p_Entity->CenterPoint.fY - p_Entity->fRadius - p_Settings->fCollisionBuffer,
+        p_Entity->CenterPoint.fX + p_Entity->fRadius + p_Settings->fCollisionBuffer,
+        p_Entity->CenterPoint.fY + p_Entity->fRadius + p_Settings->fCollisionBuffer
+    );
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCMem, hPenTemp);
+    SelectObject(p_DoubleBuffer->hDCMem, hBrushTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DOUBLE_BUFFER_DrawEntity(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, UINT8 ubMask) {
+    DOUBLE_BUFFER_T* p_DoubleBuffer = DOUBLE_BUFFER_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (ubMask) {
+        HGDIOBJ hMaskTemp = SelectObject(p_DoubleBuffer->hDCBmp, (*p_Entity->p_Picture).hBmpMask);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        BitBlt(
+            p_DoubleBuffer->hDCMem,
+            p_Entity->CenterPoint.fX - p_Entity->HalfSize.fDx - p_DoubleBuffer->XForm.eDx,
+            p_Entity->CenterPoint.fY - p_Entity->HalfSize.fDy - p_DoubleBuffer->XForm.eDy,
+            p_Entity->Size.fDx,
+            p_Entity->Size.fDy,
+            p_DoubleBuffer->hDCBmp,
+            0,
+            0,
+            SRCAND
+        );
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        SelectObject(p_DoubleBuffer->hDCBmp, hMaskTemp);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    HGDIOBJ hPicTemp = SelectObject(p_DoubleBuffer->hDCBmp, (*p_Entity->p_Picture).hBmp);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BitBlt(
+        p_DoubleBuffer->hDCMem,
+        p_Entity->CenterPoint.fX - p_Entity->HalfSize.fDx - p_DoubleBuffer->XForm.eDx,
+        p_Entity->CenterPoint.fY - p_Entity->HalfSize.fDy - p_DoubleBuffer->XForm.eDy,
+        p_Entity->Size.fDx,
+        p_Entity->Size.fDy,
+        p_DoubleBuffer->hDCBmp,
+        0,
+        0,
+        ubMask ? SRCPAINT : SRCCOPY
+    );
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SelectObject(p_DoubleBuffer->hDCBmp, hPicTemp);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

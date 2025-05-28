@@ -3,9 +3,10 @@
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "../Headers/common.h"
+#include "../Headers/constants.h"
 #include "../Headers/globals.h"
 #include "../Headers/log.h"
+#include "../Headers/misc.h"
 #include <io.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -15,12 +16,12 @@ void __cdecl LOG_Zero(LOG_T* p_Log) {
     ZeroMemory(p_Log, sizeof(LOG_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LOG_T* __cdecl LOG_Create(const char* p_szFileName, GLOBALS_T* p_Globals) {
+LOG_T* __cdecl LOG_Create(const char* const p_szFileName, GLOBALS_T* p_Globals) {
     size_t stAllocation = sizeof(LOG_T);
     LOG_T* p_Log = malloc(stAllocation);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!p_Log) {
-        printf("LOG_Create(): malloc failed for size: %zu bytes\n", stAllocation);
+        MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "LOG_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
         return NULL;
     }
     else {
@@ -30,42 +31,57 @@ LOG_T* __cdecl LOG_Create(const char* p_szFileName, GLOBALS_T* p_Globals) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Begin log.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        p_Log->p_LogFile = fopen(p_szFileName, "a");
+        LOG_AppendDayOfYear(p_Log, p_szFileName);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        p_Log->p_LogFile = fopen(p_Log->szAppendedFileName, "a");
         if (p_Log->p_LogFile) {
-            char szTimestamp[64] = { 0 };
-            LOG_PopulateTimestamp(szTimestamp, sizeof(szTimestamp));
-            fprintf(p_Log->p_LogFile, "[%s] %s\n", szTimestamp, "Gatherers starting ===================================");
-            LOG_Flush(p_Log, 1);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "Log starting ===================================\n");
             return p_Log;
         }
         else {
-            printf("LOG_Create(): fopen failed.");
+            MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "LOG_Create(): Fopen failed: %s", strerror(errno));
             return NULL;
         }
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl LOG_Append(LOG_T* p_Log, const char* p_szMessage) {
-    char szTimestamp[64] = { 0 };
-    LOG_PopulateTimestamp(szTimestamp, sizeof(szTimestamp));
+    if (p_Log && p_Log->p_LogFile) {
+        char szTimestamp[64] = { 0 };
+        LOG_PopulateTimestamp(szTimestamp, sizeof(szTimestamp));
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        fprintf(p_Log->p_LogFile, "[%s] %s", szTimestamp, p_szMessage);
+        LOG_Flush(p_Log, 1);
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl LOG_HandleBookending(LOG_T** pp_Log, CONSTANTS_T* p_Constants, GLOBALS_T* p_Globals) {
+    LOG_T* p_Log = *pp_Log;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fprintf(p_Log->p_LogFile, "[%s] %s\n", szTimestamp, p_szMessage);
-    LOG_Flush(p_Log, 1);
+    time_t Now = time(NULL);
+    struct tm* LocalTime = localtime(&Now);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_Log->usDayOfYearCreated != LocalTime->tm_yday) {
+        LOG_Kill(pp_Log, p_Globals);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        *pp_Log = LOG_Create(p_Constants->szDefaultLogFile, p_Globals);
+    }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl LOG_AppendParams(LOG_T* p_Log, const char* p_szFormat, ...) {
-    char szTimestamp[64] = { 0 };
-    LOG_PopulateTimestamp(szTimestamp, sizeof(szTimestamp));
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    va_list vaArgs;
-    va_start(vaArgs, p_szFormat);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fprintf(p_Log->p_LogFile, "[%s] ", szTimestamp);
-    vfprintf(p_Log->p_LogFile, p_szFormat, vaArgs);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    va_end(vaArgs);
-    LOG_Flush(p_Log, 1);
+    if (p_Log && p_Log->p_LogFile) {
+        char szTimestamp[64] = { 0 };
+        LOG_PopulateTimestamp(szTimestamp, sizeof(szTimestamp));
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        va_list vaArgs;
+        va_start(vaArgs, p_szFormat);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        fprintf(p_Log->p_LogFile, "[%s] ", szTimestamp);
+        vfprintf(p_Log->p_LogFile, p_szFormat, vaArgs);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        va_end(vaArgs);
+        LOG_Flush(p_Log, 1);
+    }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl LOG_Flush(LOG_T* p_Log, UINT8 ubGuarantee) {
@@ -73,9 +89,9 @@ void __cdecl LOG_Flush(LOG_T* p_Log, UINT8 ubGuarantee) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (ubGuarantee) {
         int iDescriptor = _fileno(p_Log->p_LogFile);
-        HANDLE FileHandle = (HANDLE)_get_osfhandle(iDescriptor);
-        if (FileHandle != INVALID_HANDLE_VALUE) {
-            UINT8 _discard = FlushFileBuffers(FileHandle);
+        HANDLE hFile = (HANDLE)_get_osfhandle(iDescriptor);
+        if (hFile != INVALID_HANDLE_VALUE) {
+            UINT8 _discard = FlushFileBuffers(hFile);
         }
     }
 }
@@ -87,20 +103,34 @@ void __cdecl LOG_PopulateTimestamp(char* p_szBuffer, size_t stBufferSize) {
     strftime(p_szBuffer, stBufferSize, "%Y-%m-%d %H:%M:%S", LocalTime);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl LOG_Kill(LOG_T* p_Log, GLOBALS_T* p_Globals) {
+void __cdecl LOG_AppendDayOfYear(LOG_T* p_Log, const char* const p_szBaseFilename) {
+    time_t Now = time(NULL);
+    struct tm* LocalTime = localtime(&Now);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    char szDate[11];
+    strftime(szDate, sizeof(szDate), "%Y-%m-%d", LocalTime);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* p_szExtension = strrchr(p_szBaseFilename, '.');
+    size_t stPostfix = p_szExtension - p_szBaseFilename;
+    snprintf(p_Log->szAppendedFileName, sizeof(p_Log->szAppendedFileName),"%.*s_%s%s", (int)stPostfix, p_szBaseFilename, szDate, p_szExtension);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Log->usDayOfYearCreated = LocalTime->tm_yday;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl LOG_Kill(LOG_T** pp_Log, GLOBALS_T* p_Globals) {
+    LOG_T* p_Log = *pp_Log;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Bookend log and free.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_Log && p_Log->p_LogFile) {
-        char szTimestamp[64] = { 0 };
-        LOG_PopulateTimestamp(szTimestamp, sizeof(szTimestamp));
-        fprintf(p_Log->p_LogFile, "[%s] %s\n\n", szTimestamp, "Gatherers closing ====================================");
-        LOG_Flush(p_Log, 1);
+        MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "Log closing ====================================\n\n");
         fclose(p_Log->p_LogFile);
+        p_Log->p_LogFile = NULL;
     }
     if (p_Log) {
         free(p_Log);
         p_Globals->stAllocations -= sizeof(LOG_T);
+        *pp_Log = NULL;
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

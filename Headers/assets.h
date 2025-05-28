@@ -8,13 +8,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "common.h"
 #include "picture.h"
-#include "windows_macros.h"
-#include <windows.h>
+#include "Windows/windows_minified.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Forward declares:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct GLOBALS GLOBALS_T;
 typedef struct LOG LOG_T;
+typedef struct GLOBALS GLOBALS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +24,7 @@ typedef struct ASSETS {
         Mineral[5],
         Supply[6],
         Refinery[1],
-        HUD[2],
+        HUD[5],
         Minimap[1],
         Gas[1],
         Terrain[1],
@@ -68,13 +67,13 @@ typedef struct ASSETS {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void        __cdecl     ASSETS_Zero             (ASSETS_T*);
-ASSETS_T*   __cdecl     ASSETS_Create           (GLOBALS_T*, LOG_T*);
-void        __cdecl     ASSETS_LoadBitmaps      (ASSETS_T*, HWND);
-void        __cdecl     ASSETS_CreateBrushes    (ASSETS_T*);
-void        __cdecl     ASSETS_KillBrushes      (ASSETS_T*);
-void        __cdecl     ASSETS_KillBitmaps      (ASSETS_T*);
-void        __cdecl     ASSETS_Kill             (ASSETS_T*, GLOBALS_T*);
+void                __cdecl     ASSETS_Zero                                     (ASSETS_T*);
+ASSETS_T*           __cdecl     ASSETS_Create                                   (GLOBALS_T*, LOG_T*);
+void                __cdecl     ASSETS_LoadBitmaps                              (ASSETS_T*, HWND, LOG_T*);
+void                __cdecl     ASSETS_CreateBrushes                            (ASSETS_T*);
+void                __cdecl     ASSETS_KillBrushes                              (ASSETS_T*);
+void                __cdecl     ASSETS_KillBitmaps                              (ASSETS_T*);
+void                __cdecl     ASSETS_Kill                                     (ASSETS_T**, GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

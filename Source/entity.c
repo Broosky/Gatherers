@@ -5,14 +5,18 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../Headers/ai.h"
 #include "../Headers/assets.h"
-#include "../Headers/common.h"
 #include "../Headers/constants.h"
-#include "../Headers/double_buffer.h"
 #include "../Headers/entity.h"
+#include "../Headers/enums.h"
 #include "../Headers/globals.h"
+#include "../Headers/heap_allocator.h"
 #include "../Headers/log.h"
-#include "../Headers/main.h"
 #include "../Headers/message.h"
+#include "../Headers/misc.h"
+#include "../Headers/path_finding.h"
+#include "../Headers/Renderer/renderer.h"
+#include "../Headers/settings.h"
+#include "../Headers/Windows/windows_main.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,31 +25,21 @@ void __cdecl ENTITY_Zero(ENTITY_T* p_Entity) {
     ZeroMemory(p_Entity, sizeof(ENTITY_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Future:
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// - Pass in the global structure. I use it more than once in this function.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log, DOUBLE_BUFFER_T* p_DoubleBuffer) {
+void __cdecl ENTITY_Create(FPOINT_T Location, ENTITY_TYPE_T eType, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log, RENDERER_T* p_Renderer, SETTINGS_T* p_Settings) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // If there are no manufacturing restrictions, and no entity overlap, allow creation.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!ENTITY_Overlap(usType, p_Assets, p_Globals, p_Log, p_DoubleBuffer) && !ENTITY_Restrict(usType, p_Globals, p_Log)) {
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        size_t stAllocation = sizeof(ENTITY_T);
-        ENTITY_T* p_Entity = malloc(stAllocation);
+    if (ENTITY_BuildIntersectionCheck(eType, p_Assets, p_Globals, p_Log, p_Renderer) && ENTITY_BuildResourcesCheck(eType, p_Globals, p_Log, p_Settings)) {
+        ENTITY_T* p_Entity = (ENTITY_T*)HEAP_ALLOCATOR_Alloc(p_Globals->p_EntityAllocator, p_Log);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (!p_Entity) {
-            LOG_AppendParams(p_Log, "ENTITY_Create(): malloc failed for size: %zu bytes\n", stAllocation);
+            MISC_WriteOut(p_Log, LOG_SEVERITY_FATAL, "ENTITY_Create(): Allocation failed.\n");
             UINT8 _discard = MAIN_FailFast(p_Globals, p_Log);
             return;
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        p_Globals->stAllocations += stAllocation;
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY_Zero(p_Entity);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         p_Entity->usId = p_Globals->usIdStamp++;
-        p_Entity->usType = usType;
+        p_Entity->eType = eType;
         p_Entity->CenterPoint = Location;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // To avoid lines being drawn from each entity's center point to the client (0, 0) coordinate.
@@ -55,49 +49,49 @@ void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets,
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         p_Entity->ubIsAlive = 1;
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        switch (p_Entity->usType) {
-        case ENTITY_WORKER: {
+        switch (p_Entity->eType) {
+        case ENTITY_TYPE_WORKER: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Worker[0];
-            p_Entity->MovementSpeed = (FDELTA_T){ WORKER_MOVE_SPEED, WORKER_MOVE_SPEED };
+            p_Entity->MovementSpeed = (FDELTA_T){ p_Settings->fWorkerMoveSpeed, p_Settings->fWorkerMoveSpeed };
             p_Entity->ubIsMovable = 1;
-            p_Entity->usState = ANIMATE_WORKER_NORMAL;
+            p_Entity->usState = ANIMATION_STATE_WORKER_NORMAL;
             break;
         }
-        case ENTITY_MINERAL: {
+        case ENTITY_TYPE_MINERAL: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Mineral[0];
-            p_Entity->iMineralCount = MINERALS_ON_CREATION;
-            p_Entity->MovementSpeed = (FDELTA_T){ MINERAL_MOVE_SPEED, MINERAL_MOVE_SPEED };
+            p_Entity->iMineralCount = p_Settings->uiMineralsOnCreation;
+            p_Entity->MovementSpeed = (FDELTA_T){ p_Settings->fMineralMoveSpeed, p_Settings->fMineralMoveSpeed };
             p_Entity->ubIsObstacle = 1;
             break;
         }
-        case ENTITY_COMMAND: {
+        case ENTITY_TYPE_COMMAND: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Command[0];
-            p_Entity->MovementSpeed = (FDELTA_T){ COMMAND_MOVE_SPEED, COMMAND_MOVE_SPEED };
+            p_Entity->MovementSpeed = (FDELTA_T){ p_Settings->fCommandMoveSpeed, p_Settings->fCommandMoveSpeed };
             p_Entity->ubIsObstacle = 1;
-            p_Entity->usState = ANIMATE_COMMAND_CREATING;
+            p_Entity->usState = ANIMATION_STATE_COMMAND_CREATING;
             break;
         }
-        case ENTITY_SUPPLY: {
+        case ENTITY_TYPE_SUPPLY: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Supply[0];
-            p_Entity->MovementSpeed = (FDELTA_T){ SUPPLY_MOVE_SPEED, SUPPLY_MOVE_SPEED };
+            p_Entity->MovementSpeed = (FDELTA_T){ p_Settings->fSupplyMoveSpeed, p_Settings->fSupplyMoveSpeed };
             p_Entity->ubIsObstacle = 1;
-            p_Entity->usState = ANIMATE_SUPPLY_NORMAL;
+            p_Entity->usState = ANIMATION_STATE_SUPPLY_NORMAL;
             break;
         }
-        case ENTITY_REFINERY: {
+        case ENTITY_TYPE_REFINERY: {
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             p_Entity->p_Picture = &p_Assets->Refinery[0];
-            p_Entity->iGasCount = GAS_ON_CREATION;
-            p_Entity->MovementSpeed = (FDELTA_T){ REFINERY_MOVE_SPEED, REFINERY_MOVE_SPEED };
+            p_Entity->iGasCount = p_Settings->uiGasOnCreation;
+            p_Entity->MovementSpeed = (FDELTA_T){ p_Settings->fRefineryMoveSpeed, p_Settings->fRefineryMoveSpeed };
             p_Entity->ubIsObstacle = 1;
             break;
         }
         default: {
-            printf("ENTITY_Create(): Unknown entity type.\n");
+            MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_Create(): Unknown entity type.\n");
         }
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,487 +115,254 @@ void __cdecl ENTITY_Create(FPOINT_T Location, USHORT usType, ASSETS_T* p_Assets,
             p_Globals->p_RootEntity = p_Entity;
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY_SortToFront(OBSTACLES_TO_FRONT, p_Globals);
+        ENTITY_SortToFront(SORT_ORDER_OBSTACLES_TO_FRONT, p_Globals, p_Log);
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT8 __cdecl ENTITY_Restrict(USHORT usType, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+UINT8 __cdecl ENTITY_BuildResourcesCheck(ENTITY_TYPE_T eType, GLOBALS_T* p_Globals, LOG_T* p_Log, SETTINGS_T* p_Settings) {
+    const FPOINT_T Position = { 15.0f, 85.0f };
+    ENTITY_REQUIREMENTS_T EntityRequirements = { 0 };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // This function will return 0 if there are no manufacturing restrictions, otherwise it will return 1.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FPOINT_T Position = { 15.0f, 85.0f };
-    switch (usType) {
-    case ENTITY_COMMAND: {
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // If I have enough minerals and gas, allow it.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (p_Globals->iMineralCount >= COST_OF_COMMAND_MINERALS) {
-            if (p_Globals->iGasCount >= COST_OF_COMMAND_GAS) {
-                p_Globals->iGasCount -= COST_OF_COMMAND_GAS;
-                p_Globals->iMineralCount -= COST_OF_COMMAND_MINERALS;
-                p_Globals->iTotalSupply += SUPPLY_FROM_COMMAND;
-                return 0;
-            }
-            else {
-                MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-                return 1;
-            }
-        }
-        else {
-            MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-            return 1;
-        }
+    switch (eType) {
+    case ENTITY_TYPE_COMMAND: {
+        EntityRequirements = (ENTITY_REQUIREMENTS_T){
+            // Cost
+            p_Settings->usCostOfCommandMinerals,
+            p_Settings->usCostOfCommandGas,
+            // Supply
+            0,
+            p_Settings->usSupplyFromCommand,
+            p_Settings->usSupplyFromCommand
+        };
+        break;
     }
-    case ENTITY_WORKER: {
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // If I have enough minerals, gas, and supply, allow it.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (p_Globals->iTotalSupply - p_Globals->iCurrentSupply >= SUPPLY_USED_WORKER) {
-            if (p_Globals->iMineralCount >= COST_OF_WORKER_MINERALS) {
-                if (p_Globals->iGasCount >= COST_OF_WORKER_GAS) {
-                    p_Globals->iGasCount -= COST_OF_WORKER_GAS;
-                    p_Globals->iMineralCount -= COST_OF_WORKER_MINERALS;
-                    p_Globals->iCurrentSupply += SUPPLY_USED_WORKER;
-                    return 0;
-                }
-                else {
-                    MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-                    return 1;
-                }
-            }
-            else {
-                MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-                return 1;
-            }
-        }
-        else {
-            MESSAGE_Create("Not enough supplies!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-            return 1;
-        }
+    case ENTITY_TYPE_WORKER: {
+        EntityRequirements = (ENTITY_REQUIREMENTS_T){
+            // Cost
+            p_Settings->usCostOfWorkerMinerals,
+            p_Settings->usCostOfWorkerGas,
+            // Supply
+            p_Settings->usSupplyUsedWorker,
+            0,
+            -p_Settings->usSupplyUsedWorker
+        };
+        break;
     }
-    case ENTITY_MINERAL: {
-        return 0;
+    case ENTITY_TYPE_SUPPLY: {
+        EntityRequirements = (ENTITY_REQUIREMENTS_T){
+            // Cost
+            p_Settings->usCostOfDepotMinerals,
+            p_Settings->usCostOfDepotGas,
+            // Supply
+            0,
+            p_Settings->usSupplyFromDepot,
+            p_Settings->usSupplyFromDepot
+        };
+        break;
     }
-    case ENTITY_SUPPLY: {
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // If I have enough minerals and gas, allow it.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (p_Globals->iMineralCount >= COST_OF_DEPOT_MINERALS) {
-            if (p_Globals->iGasCount >= COST_OF_DEPOT_GAS) {
-                p_Globals->iGasCount -= COST_OF_DEPOT_GAS;
-                p_Globals->iMineralCount -= COST_OF_DEPOT_MINERALS;
-                p_Globals->iTotalSupply += SUPPLY_FROM_DEPOT;
-                return 0;
-            }
-            else {
-                MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-                return 1;
-            }
-        }
-        else {
-            MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-            return 1;
-        }
+    case ENTITY_TYPE_REFINERY: {
+        EntityRequirements = (ENTITY_REQUIREMENTS_T){
+            // Cost
+            p_Settings->usCostOfRefineryMinerals,
+            p_Settings->usCostOfRefineryGas,
+            // Supply
+            0,
+            0,
+            0
+        };
+        break;
     }
-    case ENTITY_REFINERY: {
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // If I have enough minerals and gas, allow it.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (p_Globals->iMineralCount >= COST_OF_REFINERY_MINERALS) {
-            if (p_Globals->iGasCount >= COST_OF_REFINERY_GAS) {
-                p_Globals->iGasCount -= COST_OF_REFINERY_GAS;
-                p_Globals->iMineralCount -= COST_OF_REFINERY_MINERALS;
-                return 0;
-            }
-            else {
-                MESSAGE_Create("Not enough gas!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-                return 1;
-            }
-        }
-        else {
-            MESSAGE_Create("Not enough minerals!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-            return 1;
-        }
-    }
-    default: {
-        printf("ENTITY_Restrict(): Unknown entity type.\n");
+    case ENTITY_TYPE_MINERAL: {
         return 1;
     }
+    default:
+        MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_Restrict(): Unknown entity type.\n");
+        return 0;
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (EntityRequirements.iSupplyNeeded > (p_Globals->iTotalSupply - p_Globals->iCurrentSupply)) {
+        MESSAGE_Create("Not enough supplies!", Position, MESSAGE_TYPE_GENERAL_WARNING, p_Globals, p_Log);
+        return 0;
+    }
+    if (p_Globals->iMineralCount < EntityRequirements.iMinMinerals) {
+        MESSAGE_Create("Not enough minerals!", Position, MESSAGE_TYPE_GENERAL_WARNING, p_Globals, p_Log);
+        return 0;
+    }
+    if (p_Globals->iGasCount < EntityRequirements.iMinGas) {
+        MESSAGE_Create("Not enough gas!", Position, MESSAGE_TYPE_GENERAL_WARNING, p_Globals, p_Log);
+        return 0;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->iMineralCount -= EntityRequirements.iMinMinerals;
+    p_Globals->iGasCount -= EntityRequirements.iMinGas;
+    p_Globals->iCurrentSupply += (EntityRequirements.iSupplyDelta < 0) ? -EntityRequirements.iSupplyDelta : 0;
+    p_Globals->iTotalSupply += (EntityRequirements.iSupplyDelta > 0) ? EntityRequirements.iSupplyDelta : 0;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return 1;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT8 __cdecl ENTITY_Overlap(USHORT usType, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log, DOUBLE_BUFFER_T* p_DoubleBuffer) {
-    FPOINT_T Position = { 15.0f, 85.0f };
+UINT8 __cdecl ENTITY_BuildIntersectionCheck(ENTITY_TYPE_T eType, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log, RENDERER_T* p_Renderer) {
     FDELTA_T Size = { 0.0f, 0.0f };
+    FPOINT_T Position = { 15.0f, 85.0f };
+    FDELTA_T AdditionalBuffer = { 0.0f, 0.0f };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    switch (usType) {
-    case ENTITY_WORKER: {
+    RECT ClientArea = p_Renderer->GetClientArea(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    switch (eType) {
+    case ENTITY_TYPE_WORKER: {
         Size.fDx = p_Assets->Worker[0].Bitmap.bmWidth;
         Size.fDy = p_Assets->Worker[0].Bitmap.bmHeight;
         break;
     }
-    case ENTITY_MINERAL: {
+    case ENTITY_TYPE_MINERAL: {
         Size.fDx = p_Assets->Mineral[0].Bitmap.bmWidth;
         Size.fDy = p_Assets->Mineral[0].Bitmap.bmHeight;
         break;
     }
-    case ENTITY_COMMAND: {
+    case ENTITY_TYPE_COMMAND: {
         Size.fDx = p_Assets->Command[0].Bitmap.bmWidth;
         Size.fDy = p_Assets->Command[0].Bitmap.bmHeight;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        AdditionalBuffer.fDx = p_Assets->Command[0].Bitmap.bmWidth >> 1;
+        AdditionalBuffer.fDy = p_Assets->Command[0].Bitmap.bmHeight >> 1;
         break;
     }
-    case ENTITY_SUPPLY: {
+    case ENTITY_TYPE_SUPPLY: {
         Size.fDx = p_Assets->Supply[0].Bitmap.bmWidth;
         Size.fDy = p_Assets->Supply[0].Bitmap.bmHeight;
         break;
     }
-    case ENTITY_REFINERY: {
+    case ENTITY_TYPE_REFINERY: {
         Size.fDx = p_Assets->Refinery[0].Bitmap.bmWidth;
         Size.fDy = p_Assets->Refinery[0].Bitmap.bmHeight;
         break;
     }
     default: {
-        printf("ENTITY_Overlap(): Unknown entity type.\n");
+        MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_Overlap(): Unknown entity type.\n");
     }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FPOINT_T EntityALocation = { p_Globals->iMouseX - Size.fDx / 2.0f, p_Globals->iMouseY - Size.fDy / 2.0f };
-    FDELTA_T EntityADelta = { EntityALocation.fX + Size.fDx, EntityALocation.fY + Size.fDy };
+    FPOINT_T EntityALocation = {
+        p_Globals->Mouse.iX -  (Size.fDx / 2.0f + AdditionalBuffer.fDx),
+        p_Globals->Mouse.iY - (Size.fDy / 2.0f + AdditionalBuffer.fDy)
+    };
+    FDELTA_T EntityADelta = {
+        EntityALocation.fX + Size.fDx + AdditionalBuffer.fDx * 2.0f,
+        EntityALocation.fY + Size.fDy + AdditionalBuffer.fDy * 2.0f
+    };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Check for screen out-of-bounds.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (EntityALocation.fX < 0.0f || EntityADelta.fDx > p_DoubleBuffer->ClientArea.right ||
-        EntityALocation.fY < 0.0f || EntityADelta.fDy > p_DoubleBuffer->ClientArea.bottom) {
-        MESSAGE_Create("You can't build there!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-        return 1;
+    if (EntityALocation.fX < 0.0f || EntityADelta.fDx > ClientArea.right ||
+        EntityALocation.fY < 0.0f || EntityADelta.fDy > ClientArea.bottom) {
+        MESSAGE_Create("You can't build there!", Position, MESSAGE_TYPE_GENERAL_WARNING, p_Globals, p_Log);
+        return 0;
     }
     else {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Check for intersections with other entities.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        int iLessX = p_Assets->Worker[0].Bitmap.bmWidth;
-        int iLessY = p_Assets->Worker[0].Bitmap.bmHeight;
-        int iMoreX = iLessX << 1;
-        int iMoreY = iLessY << 1;
+        IDELTA_T BufferWorkerLess = {
+            p_Assets->Worker[0].Bitmap.bmWidth,
+            p_Assets->Worker[0].Bitmap.bmHeight
+        };
+        IDELTA_T BufferWorkerMore = {
+            BufferWorkerLess.iDx << 1,
+            BufferWorkerLess.iDy << 1,
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        IDELTA_T BufferCommandLess = {
+            p_Assets->Command[0].Bitmap.bmWidth >> 1,
+            p_Assets->Command[0].Bitmap.bmHeight >> 1
+        };
+        IDELTA_T BufferCommandMore = {
+            p_Assets->Command[0].Bitmap.bmWidth,
+            p_Assets->Command[0].Bitmap.bmHeight
+        };
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        FPOINT_T EntityBLocation = { 0.0f, 0.0f };
+        FDELTA_T EntityBDelta = { 0.0f, 0.0f };
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ENTITY_T* p_Current = p_Globals->p_RootEntity;
         while (p_Current) {
-            FPOINT_T EntityBLocation = {
-                p_Current->Location.fX - iLessX,
-                p_Current->Location.fY - iLessY
-            };
-            FDELTA_T EntityBDelta = {
-                EntityBLocation.fX + p_Current->Size.fDx + iMoreX,
-                EntityBLocation.fY + p_Current->Size.fDy + iMoreY
-            };
+            if (p_Current->eType == ENTITY_TYPE_COMMAND) {
+                EntityBLocation.fX = p_Current->Location.fX - BufferWorkerLess.iDx - BufferCommandLess.iDx;
+                EntityBLocation.fY = p_Current->Location.fY - BufferWorkerLess.iDy - BufferCommandLess.iDy;
+
+                EntityBDelta.fDx = EntityBLocation.fX + p_Current->Size.fDx + BufferWorkerMore.iDx + BufferCommandMore.iDx;
+                EntityBDelta.fDy = EntityBLocation.fY + p_Current->Size.fDy + BufferWorkerMore.iDy + BufferCommandMore.iDy;
+            }
+            else {
+                EntityBLocation.fX = p_Current->Location.fX - BufferWorkerLess.iDx;
+                EntityBLocation.fY = p_Current->Location.fY - BufferWorkerLess.iDy;
+
+                EntityBDelta.fDx = EntityBLocation.fX + p_Current->Size.fDx + BufferWorkerMore.iDx;
+                EntityBDelta.fDy = EntityBLocation.fY + p_Current->Size.fDy + BufferWorkerMore.iDy;
+            }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if ((EntityALocation.fX < EntityBDelta.fDx) &&
                 (EntityADelta.fDx > EntityBLocation.fX) &&
                 (EntityALocation.fY < EntityBDelta.fDy) &&
                 (EntityADelta.fDy > EntityBLocation.fY)
                 ) {
-                MESSAGE_Create("You can't build there!", Position, MESSAGE_GENERAL_WARNING, p_Globals, p_Log);
-                return 1;
+                MESSAGE_Create("You can't build there!", Position, MESSAGE_TYPE_GENERAL_WARNING, p_Globals, p_Log);
+                return 0;
             }
             p_Current = (ENTITY_T*)p_Current->p_Next;
         }
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // No overlap exists.
+    // No intersections exist.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    return 0;
+    return 1;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_Pause(ENTITY_T* p_Entity, float fTime) {
+void __cdecl ENTITY_Pause(ENTITY_T* p_Entity, float fTime, SETTINGS_T* p_Settings) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // When the entity is paused, reset the pause counter for each call.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Entity->fPauseCount = 0.0f;
     p_Entity->ubIsPaused = 1;
-    p_Entity->fPauseTime = fTime * ENGINE_FPS / 1000.0f;
+    p_Entity->fPauseTime = fTime * p_Settings->fEngineFPS / 1000.0f;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT8 __cdecl ENTITY_CollidedWith(ENTITY_T* p_Source, ENTITY_T* p_Destination) {
-    float fDistance = sqrtf(
-        (p_Destination->CenterPoint.fX - p_Source->CenterPoint.fX) *
-        (p_Destination->CenterPoint.fX - p_Source->CenterPoint.fX) +
-        (p_Destination->CenterPoint.fY - p_Source->CenterPoint.fY) *
-        (p_Destination->CenterPoint.fY - p_Source->CenterPoint.fY)
-    );
+UINT8 __cdecl ENTITY_CollidedWith(ENTITY_T* p_Source, ENTITY_T* p_Destination, SETTINGS_T* p_Settings) {
+    UINT8 ubHasCollided = 0;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (fDistance <= p_Source->fRadius + COLLISION_BUFFER + p_Destination->fRadius + COLLISION_BUFFER) {
+    float fDistance = PATH_CalculateDistance(p_Source, p_Destination);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (fDistance <= p_Source->fRadius + p_Settings->fCollisionBuffer + p_Destination->fRadius + p_Settings->fCollisionBuffer) {
         p_Source->ubIsInMotion = 0;
-        return 1;
-    }
-    return 0;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT8 __cdecl ENTITY_WithinPoint(ENTITY_T* p_Inquirer, FPOINT_T Location) {
-    if (
-        Location.fX >= p_Inquirer->Location.fX &&
-        Location.fX <= p_Inquirer->Location.fX + p_Inquirer->Size.fDx &&
-        Location.fY >= p_Inquirer->Location.fY &&
-        Location.fY <= p_Inquirer->Location.fY + p_Inquirer->Size.fDy
-        ) {
-        return 1;
-    }
-    return 0;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-FDELTA_T __cdecl ENTITY_CalculateVector(FPOINT_T Start, FPOINT_T Destination) {
-    FDELTA_T Vector = { Destination.fX - Start.fX, Destination.fY - Start.fY };
-    return Vector;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-FDELTA_T __cdecl ENTITY_CalculateUnitVector(FDELTA_T Vector) {
-    float fMagnitude = sqrtf(Vector.fDx * Vector.fDx + Vector.fDy * Vector.fDy);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FDELTA_T UnitVector = {
-        Vector.fDx / fMagnitude,
-        Vector.fDy / fMagnitude
-    };
-    return UnitVector;
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_MoveTo(ENTITY_T* p_Source, ENTITY_T* p_Destination, GLOBALS_T* p_Globals) {
-    ENTITY_MoveToPoint(p_Source, p_Destination->CenterPoint, p_Globals);
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_MoveToPoint(ENTITY_T* p_Source, FPOINT_T DestinationCenterPoint, GLOBALS_T* p_Globals) {
-    p_Source->ubIsInMotion = 1;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Calculate the absolute destination data. This is the major vector.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Source->MajorDestinationCenterPoint = DestinationCenterPoint;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Source->MajorVector = ENTITY_CalculateVector(p_Source->CenterPoint, p_Source->MajorDestinationCenterPoint);
-    p_Source->MajorUnitVector = ENTITY_CalculateUnitVector(p_Source->MajorVector);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Calculate the path-finding destination data. These are the minor vectors needed to reach the major vector.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ENTITY_FindMinorVector(p_Source, p_Globals);
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Future:
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// - Extract a smaller subset of obstacles, by creating a new list of objects that lie upon the primary vector.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_FindMinorVector(ENTITY_T* p_Source, GLOBALS_T* p_Globals) {
-    FPOINT_T CurrentPoint = p_Source->CenterPoint;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Minor vector will initially equal the major vector. What if nothing is in the way?
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Source->MinorDestinationCenterPoint = p_Source->MajorDestinationCenterPoint;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Source->MinorVector = ENTITY_CalculateVector(CurrentPoint, p_Source->MinorDestinationCenterPoint);
-    p_Source->MinorUnitVector = ENTITY_CalculateUnitVector(p_Source->MinorVector);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Iterate along the vector to see if I need to change my course.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    while (
-        abs(p_Source->MinorDestinationCenterPoint.fX - CurrentPoint.fX) >= SUFFICIENTLY_CLOSE ||
-        abs(p_Source->MinorDestinationCenterPoint.fY - CurrentPoint.fY) >= SUFFICIENTLY_CLOSE
-        ) {
-        if (ENTITY_WithinPoint(p_Source, CurrentPoint)) {
-            CurrentPoint.fX += p_Source->MinorUnitVector.fDx;
-            CurrentPoint.fY += p_Source->MinorUnitVector.fDy;
-            continue;
-        }
-        else {
-            ENTITY_T* p_Current = p_Globals->p_RootEntity;
-            while (p_Current && p_Current->ubIsObstacle) {
-                if (ENTITY_WithinPoint(p_Current, CurrentPoint)) {
-                    if (ENTITY_WithinPoint(p_Current, p_Source->MajorDestinationCenterPoint)) {
-                        return;
-                    }
-                    else {
-                        p_Source->MinorDestinationCenterPoint = ENTITY_FindMinorVectorHead(p_Source, p_Current, p_Globals);
-                        /////////////////////////////////////////////////////////////////////////////////////////////////////
-                        p_Source->MinorVector = ENTITY_CalculateVector(p_Source->CenterPoint, p_Source->MinorDestinationCenterPoint);
-                        p_Source->MinorUnitVector = ENTITY_CalculateUnitVector(p_Source->MinorVector);
-                        return;
-                    }
-                }
-                else {
-                    p_Current = (ENTITY_T*)p_Current->p_Next;
-                }
-            }
-        }
-        CurrentPoint.fX += p_Source->MinorUnitVector.fDx;
-        CurrentPoint.fY += p_Source->MinorUnitVector.fDy;
-    }
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-FPOINT_T __cdecl ENTITY_FindMinorVectorHead(ENTITY_T* p_Source, ENTITY_T* p_Current, GLOBALS_T* p_Globals) {
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Top left, right, bottom left, right.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    FPOINT_T CornerPoints[4] = {
-        { p_Current->CenterPoint.fX - p_Current->HalfSize.fDx - p_Source->HalfSize.fDx, p_Current->CenterPoint.fY - p_Current->HalfSize.fDy - p_Source->HalfSize.fDy },
-        { p_Current->CenterPoint.fX + p_Current->HalfSize.fDx + p_Source->HalfSize.fDx, p_Current->CenterPoint.fY - p_Current->HalfSize.fDy - p_Source->HalfSize.fDy },
-        { p_Current->CenterPoint.fX - p_Current->HalfSize.fDx - p_Source->HalfSize.fDx, p_Current->CenterPoint.fY + p_Current->HalfSize.fDy + p_Source->HalfSize.fDy },
-        { p_Current->CenterPoint.fX + p_Current->HalfSize.fDx + p_Source->HalfSize.fDx, p_Current->CenterPoint.fY + p_Current->HalfSize.fDy + p_Source->HalfSize.fDy }
-    };
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Calculate the distances to the points, and order the points from closest to farthest from the major destination.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    UINT8 ubI;
-    float fDistances[4];
-    for (ubI = 0; ubI < 4; ubI++) {
-        fDistances[ubI] = sqrtf(
-            (CornerPoints[ubI].fX - p_Source->MajorDestinationCenterPoint.fX) *
-            (CornerPoints[ubI].fX - p_Source->MajorDestinationCenterPoint.fX) +
-            (CornerPoints[ubI].fY - p_Source->MajorDestinationCenterPoint.fY) *
-            (CornerPoints[ubI].fY - p_Source->MajorDestinationCenterPoint.fY)
-        );
+        ubHasCollided = 1;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    UINT8 ubJ;
-    for (ubI = 0; ubI < 4; ubI++) {
-        for (ubJ = 0; ubJ < 3; ubJ++) {
-            if (fDistances[ubJ] > fDistances[ubJ + 1]) {
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Swap the distances.
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                float fHolder = fDistances[ubJ + 1];
-                fDistances[ubJ + 1] = fDistances[ubJ];
-                fDistances[ubJ] = fHolder;
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Swap the coordinates.
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                FPOINT_T Holder = CornerPoints[ubJ + 1];
-                CornerPoints[ubJ + 1] = CornerPoints[ubJ];
-                CornerPoints[ubJ] = Holder;
-            }
-        }
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Calculate bisections.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Points are ordered to distances from closest to farthest from the major destination point.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for (ubI = 0; ubI < 4; ubI++) {
-        UINT8 ubIsBisection = 0;
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        FPOINT_T EndPosition = CornerPoints[ubI];
-        FPOINT_T CurrentPoint = p_Source->CenterPoint;
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        FDELTA_T Vector = ENTITY_CalculateVector(CurrentPoint, EndPosition);
-        FDELTA_T UnitVector = ENTITY_CalculateUnitVector(Vector);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        while (
-            abs(EndPosition.fX - CurrentPoint.fX) >= SUFFICIENTLY_CLOSE ||
-            abs(EndPosition.fY - CurrentPoint.fY) >= SUFFICIENTLY_CLOSE
-            ) {
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Bisection has occured. This vector is unreachable.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (ENTITY_WithinPoint(p_Current, CurrentPoint)) {
-                ubIsBisection = 1;
-                break;
-            }
-            CurrentPoint.fX += UnitVector.fDx;
-            CurrentPoint.fY += UnitVector.fDy;
-        }
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // This is the correct head to travel to, but it may contain additional obstacles.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (!ubIsBisection) {
-            CurrentPoint = p_Source->CenterPoint;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            EndPosition = CornerPoints[ubI];
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            Vector = ENTITY_CalculateVector(CurrentPoint, EndPosition);
-            UnitVector = ENTITY_CalculateUnitVector(Vector);
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            while (
-                abs(EndPosition.fX - CurrentPoint.fX) >= SUFFICIENTLY_CLOSE ||
-                abs(EndPosition.fY - CurrentPoint.fY) >= SUFFICIENTLY_CLOSE
-                ) {
-                if (ENTITY_WithinPoint(p_Source, CurrentPoint)) {
-                    CurrentPoint.fX += UnitVector.fDx;
-                    CurrentPoint.fY += UnitVector.fDy;
-                    continue;
-                }
-                else {
-                    ENTITY_T* p_NewObstacle = p_Globals->p_RootEntity;
-                    while (p_NewObstacle && p_NewObstacle->ubIsObstacle) {
-                        if (ENTITY_WithinPoint(p_NewObstacle, CurrentPoint)) {
-                            return ENTITY_FindMinorVectorHead(p_Source, p_NewObstacle, p_Globals);
-                        }
-                        p_NewObstacle = (ENTITY_T*)p_NewObstacle->p_Next;
-                    }
-                }
-                CurrentPoint.fX += UnitVector.fDx;
-                CurrentPoint.fY += UnitVector.fDy;
-            }
-            return CornerPoints[ubI];
-        }
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Should not usually get here. This means the entity was ordered to move while already inside an obstacle.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    return CornerPoints[0];
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_UpdatePosition(ENTITY_T* p_Entity, GLOBALS_T* p_Globals) {
-    p_Entity->Location.fX += p_Entity->MinorUnitVector.fDx * p_Entity->MovementSpeed.fDx;
-    p_Entity->Location.fY += p_Entity->MinorUnitVector.fDy * p_Entity->MovementSpeed.fDy;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Entity->CenterPoint.fX = p_Entity->Location.fX + p_Entity->HalfSize.fDx;
-    p_Entity->CenterPoint.fY = p_Entity->Location.fY + p_Entity->HalfSize.fDy;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Minor vectors...
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (
-        abs(p_Entity->CenterPoint.fX - p_Entity->MinorDestinationCenterPoint.fX) <= SUFFICIENTLY_CLOSE &&
-        abs(p_Entity->CenterPoint.fY - p_Entity->MinorDestinationCenterPoint.fY) <= SUFFICIENTLY_CLOSE
-        ) {
-        p_Entity->CenterPoint = p_Entity->MinorDestinationCenterPoint;
-        p_Entity->Location.fX = p_Entity->MinorDestinationCenterPoint.fX - p_Entity->HalfSize.fDx;
-        p_Entity->Location.fY = p_Entity->MinorDestinationCenterPoint.fY - p_Entity->HalfSize.fDy;
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Major vector; we've reached our destination...
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (
-            abs(p_Entity->CenterPoint.fX - p_Entity->MajorDestinationCenterPoint.fX) <= SUFFICIENTLY_CLOSE &&
-            abs(p_Entity->CenterPoint.fY - p_Entity->MajorDestinationCenterPoint.fY) <= SUFFICIENTLY_CLOSE
-            ) {
-            p_Entity->CenterPoint = p_Entity->MajorDestinationCenterPoint;
-            p_Entity->Location.fX = p_Entity->MajorDestinationCenterPoint.fX - p_Entity->HalfSize.fDx;
-            p_Entity->Location.fY = p_Entity->MajorDestinationCenterPoint.fY - p_Entity->HalfSize.fDy;
-            p_Entity->ubIsInMotion = 0;
-        }
-        else {
-            ENTITY_FindMinorVector(p_Entity, p_Globals);
-        }
-    }
+    return ubHasCollided;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // This function will redefine the manufacturing statistics when an entity is deleted.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_Redefine(USHORT usType, GLOBALS_T* p_Globals) {
-    switch (usType) {
-    case ENTITY_WORKER: {
-        p_Globals->iCurrentSupply -= SUPPLY_USED_WORKER;
+void __cdecl ENTITY_Redefine(ENTITY_TYPE_T eType, GLOBALS_T* p_Globals, SETTINGS_T* p_Settings, LOG_T* p_Log) {
+    switch (eType) {
+    case ENTITY_TYPE_WORKER: {
+        p_Globals->iCurrentSupply -= p_Settings->usSupplyUsedWorker;
         break;
     }
-    case ENTITY_COMMAND: {
-        p_Globals->iTotalSupply -= SUPPLY_FROM_COMMAND;
+    case ENTITY_TYPE_COMMAND: {
+        p_Globals->iTotalSupply -= p_Settings->usSupplyFromCommand;
         break;
     }
-    case ENTITY_SUPPLY: {
-        p_Globals->iTotalSupply -= SUPPLY_FROM_DEPOT;
+    case ENTITY_TYPE_SUPPLY: {
+        p_Globals->iTotalSupply -= p_Settings->usSupplyFromDepot;
         break;
     }
-    case ENTITY_MINERAL: {
+    case ENTITY_TYPE_MINERAL: {
         break;
     }
-    case ENTITY_REFINERY: {
+    case ENTITY_TYPE_REFINERY: {
         break;
     }
     default: {
-        printf("ENTITY_Redefine(): Unknown entity type.\n");
+        MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_Redefine(): Unknown entity type.\n");
     }
     }
 }
@@ -614,7 +375,7 @@ void __cdecl ENTITY_SelectAll(GLOBALS_T* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_DeleteAll(GLOBALS_T* p_Globals) {
+void __cdecl ENTITY_DeleteAll(GLOBALS_T* p_Globals, SETTINGS_T* p_Settings, LOG_T* p_Log) {
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
     while (p_Current) {
         ENTITY_T* p_Temp = p_Current;
@@ -622,16 +383,16 @@ void __cdecl ENTITY_DeleteAll(GLOBALS_T* p_Globals) {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Re-calculate manufacturing statistics.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ENTITY_Redefine(p_Temp->usType, p_Globals);
+        ENTITY_Redefine(p_Temp->eType, p_Globals, p_Settings, p_Log);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         p_Temp->ubIsAlive = 0;
-        free(p_Temp);
-        p_Globals->stAllocations -= sizeof(ENTITY_T);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        HEAP_ALLOCATOR_Free(p_Globals->p_EntityAllocator, p_Temp, p_Log);
     }
     p_Globals->p_RootEntity = NULL;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_DeleteSelected(GLOBALS_T* p_Globals) {
+void __cdecl ENTITY_DeleteSelected(GLOBALS_T* p_Globals, SETTINGS_T* p_Settings, LOG_T* p_Log) {
     ENTITY_T* p_Previous = NULL;
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
     while (p_Current) {
@@ -641,11 +402,11 @@ void __cdecl ENTITY_DeleteSelected(GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine(p_Current->usType, p_Globals);
+                ENTITY_Redefine(p_Current->eType, p_Globals, p_Settings, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
-                free(p_Current);
-                p_Globals->stAllocations -= sizeof(ENTITY_T);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                HEAP_ALLOCATOR_Free(p_Globals->p_EntityAllocator, p_Current, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current = p_Globals->p_RootEntity;
                 continue;
@@ -656,11 +417,11 @@ void __cdecl ENTITY_DeleteSelected(GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine(p_Current->usType, p_Globals);
+                ENTITY_Redefine(p_Current->eType, p_Globals, p_Settings, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
-                free(p_Current);
-                p_Globals->stAllocations -= sizeof(ENTITY_T);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                HEAP_ALLOCATOR_Free(p_Globals->p_EntityAllocator, p_Current, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current = p_Ahead;
             }
@@ -674,7 +435,7 @@ void __cdecl ENTITY_DeleteSelected(GLOBALS_T* p_Globals) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Deleting one specific entity. When it is found, break out of the loop. Quick sort and binary search could be beneficial.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_DeleteSpecific(ENTITY_T* p_Entity, GLOBALS_T* p_Globals) {
+void __cdecl ENTITY_DeleteSpecific(ENTITY_T* p_Entity, GLOBALS_T* p_Globals, SETTINGS_T* p_Settings, LOG_T* p_Log) {
     ENTITY_T* p_Previous = NULL;
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
     while (p_Current) {
@@ -684,11 +445,11 @@ void __cdecl ENTITY_DeleteSpecific(ENTITY_T* p_Entity, GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine(p_Current->usType, p_Globals);
+                ENTITY_Redefine(p_Current->eType, p_Globals, p_Settings, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
-                free(p_Current);
-                p_Globals->stAllocations -= sizeof(ENTITY_T);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                HEAP_ALLOCATOR_Free(p_Globals->p_EntityAllocator, p_Current, p_Log);
                 break;
             }
             else {
@@ -696,11 +457,11 @@ void __cdecl ENTITY_DeleteSpecific(ENTITY_T* p_Entity, GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine(p_Current->usType, p_Globals);
+                ENTITY_Redefine(p_Current->eType, p_Globals, p_Settings, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
-                free(p_Current);
-                p_Globals->stAllocations -= sizeof(ENTITY_T);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                HEAP_ALLOCATOR_Free(p_Globals->p_EntityAllocator, p_Current, p_Log);
                 break;
             }
         }
@@ -711,21 +472,21 @@ void __cdecl ENTITY_DeleteSpecific(ENTITY_T* p_Entity, GLOBALS_T* p_Globals) {
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_DeleteEntityType(USHORT usType, GLOBALS_T* p_Globals) {
+void __cdecl ENTITY_DeleteEntityType(ENTITY_TYPE_T eType, GLOBALS_T* p_Globals, SETTINGS_T* p_Settings, LOG_T* p_Log) {
     ENTITY_T* p_Previous = NULL;
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
     while (p_Current) {
-        if (p_Current->usType == usType) {
+        if (p_Current->eType == eType) {
             if (p_Current == p_Globals->p_RootEntity) {
                 p_Globals->p_RootEntity = (ENTITY_T*)p_Current->p_Next;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine(p_Current->usType, p_Globals);
+                ENTITY_Redefine(p_Current->eType, p_Globals, p_Settings, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
-                free(p_Current);
-                p_Globals->stAllocations -= sizeof(ENTITY_T);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                HEAP_ALLOCATOR_Free(p_Globals->p_EntityAllocator, p_Current, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current = p_Globals->p_RootEntity;
                 continue;
@@ -736,11 +497,11 @@ void __cdecl ENTITY_DeleteEntityType(USHORT usType, GLOBALS_T* p_Globals) {
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // Re-calculate manufacturing statistics.
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                ENTITY_Redefine(p_Current->usType, p_Globals);
+                ENTITY_Redefine(p_Current->eType, p_Globals, p_Settings, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current->ubIsAlive = 0;
-                free(p_Current);
-                p_Globals->stAllocations -= sizeof(ENTITY_T);
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                HEAP_ALLOCATOR_Free(p_Globals->p_EntityAllocator, p_Current, p_Log);
                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 p_Current = p_Ahead;
             }
@@ -780,247 +541,127 @@ void __cdecl ENTITY_SkipSort(ENTITY_T** pp_Previous, ENTITY_T** pp_Current) {
     *pp_Current = (ENTITY_T*)(*pp_Current)->p_Next;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT8 __cdecl ENTITY_ConsiderSortToFront(ENTITY_T* p_Entity, USHORT usCondition) {
+UINT8 __cdecl ENTITY_ConsiderSortToFront(ENTITY_T* p_Entity, SORT_ORDER_T eCondition, LOG_T* p_Log) {
     UINT8 ubShouldSort = 0;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    switch (usCondition) {
-    case WORKERS_TO_FRONT: {
-        ubShouldSort = p_Entity->usType == ENTITY_WORKER;
+    switch (eCondition) {
+    case SORT_ORDER_WORKERS_TO_FRONT: {
+        ubShouldSort = p_Entity->eType == ENTITY_TYPE_WORKER;
         break;
     }
-    case MINERALS_TO_FRONT: {
-        ubShouldSort = p_Entity->usType == ENTITY_MINERAL;
+    case SORT_ORDER_MINERALS_TO_FRONT: {
+        ubShouldSort = p_Entity->eType == ENTITY_TYPE_MINERAL;
         break;
     }
-    case COMMANDS_TO_FRONT: {
-        ubShouldSort = p_Entity->usType == ENTITY_COMMAND;
+    case SORT_ORDER_COMMANDS_TO_FRONT: {
+        ubShouldSort = p_Entity->eType == ENTITY_TYPE_COMMAND;
         break;
     }
-    case SUPPLIES_TO_FRONT: {
-        ubShouldSort = p_Entity->usType == ENTITY_SUPPLY;
+    case SORT_ORDER_SUPPLIES_TO_FRONT: {
+        ubShouldSort = p_Entity->eType == ENTITY_TYPE_SUPPLY;
         break;
     }
-    case REFINERIES_TO_FRONT: {
-        ubShouldSort = p_Entity->usType == ENTITY_REFINERY;
+    case SORT_ORDER_REFINERIES_TO_FRONT: {
+        ubShouldSort = p_Entity->eType == ENTITY_TYPE_REFINERY;
         break;
     }
-    case OBSTACLES_TO_FRONT: {
+    case SORT_ORDER_OBSTACLES_TO_FRONT: {
         ubShouldSort = p_Entity->ubIsObstacle;
         break;
     }
     default:
-        printf("ENTITY_ConsiderSortToFront(): Unknown case.\n");
+        MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_ConsiderSortToFront(): Unknown case.\n");
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     return ubShouldSort;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_SortToFront(USHORT usCondition, GLOBALS_T* p_Globals) {
+void __cdecl ENTITY_SortToFront(SORT_ORDER_T eCondition, GLOBALS_T* p_Globals, LOG_T* p_Log) {
     ENTITY_T* p_Previous = NULL;
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
     while (p_Current) {
-        if (ENTITY_ConsiderSortToFront(p_Current, usCondition)) {
+        if (ENTITY_ConsiderSortToFront(p_Current, eCondition, p_Log)) {
             ENTITY_Sort(&p_Previous, &p_Current, p_Globals);
         }
         else {
             ENTITY_SkipSort(&p_Previous, &p_Current);
         }
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->eEntitySortState = eCondition;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_PrintList(GLOBALS_T* p_Globals) {
+void __cdecl ENTITY_PrintList(GLOBALS_T* p_Globals, LOG_T* p_Log) {
     ENTITY_T* p_Current = p_Globals->p_RootEntity;
-    printf("--------------------\n");
+    MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "--------------------\n");
     while (p_Current) {
-        switch (p_Current->usType) {
-        case ENTITY_WORKER: {
-            printf("Type: ENTITY_WORKER\n");
+        switch (p_Current->eType) {
+        case ENTITY_TYPE_WORKER: {
+            MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "Type: ENTITY_TYPE_WORKER\n");
             break;
         }
-        case ENTITY_MINERAL: {
-            printf("Type: ENTITY_MINERAL\n");
+        case ENTITY_TYPE_MINERAL: {
+            MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "Type: ENTITY_TYPE_MINERAL\n");
             break;
         }
-        case ENTITY_COMMAND: {
-            printf("Type: ENTITY_COMMAND\n");
+        case ENTITY_TYPE_COMMAND: {
+            MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "Type: ENTITY_TYPE_COMMAND\n");
             break;
         }
-        case ENTITY_SUPPLY: {
-            printf("Type: ENTITY_SUPPLY\n");
+        case ENTITY_TYPE_SUPPLY: {
+            MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "Type: ENTITY_TYPE_SUPPLY\n");
             break;
         }
-        case ENTITY_REFINERY: {
-            printf("Type: ENTITY_REFINERY\n");
+        case ENTITY_TYPE_REFINERY: {
+            MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "Type: ENTITY_TYPE_REFINERY\n");
             break;
         }
         default: {
-            printf("ENTITY_PrintList(): Unknown entity type.\n");
+            MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_PrintList(): Unknown entity type.\n");
         }
         }
         p_Current = (ENTITY_T*)p_Current->p_Next;
     }
-    printf("--------------------\n");
+    MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "--------------------\n");
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_PrintClosestEntitiesList(AI_CLOSEST_T* p_ClosestEntities) {
-    printf("--------------------\n");
+void __cdecl ENTITY_PrintClosestEntitiesList(AI_CLOSEST_T* p_ClosestEntities, LOG_T* p_Log) {
+    MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "--------------------\n");
     if (p_ClosestEntities) {
         USHORT usI = 0;
         while (p_ClosestEntities[usI].p_Entity) {
             ENTITY_T* p_Entity = p_ClosestEntities[usI].p_Entity;
-            printf("Closest Entity [%d]: ID: %d, P: %p, Distance: %0.2f\n", usI, p_Entity->usId, p_Entity, p_ClosestEntities[usI].fDistance);
+            MISC_WriteOutParams(p_Log, LOG_SEVERITY_TRACE, "Closest Entity [%hu]: ID: %hu, P: %p, Distance: %0.2f\n", usI, p_Entity->usId, p_Entity, p_ClosestEntities[usI].fDistance);
             usI++;
         }
     }
-    printf("--------------------\n");
+    MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "--------------------\n");
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ENTITY_Animate(ENTITY_T* p_Entity, ASSETS_T* p_Assets) {
-    switch (p_Entity->usType) {
-    case ENTITY_SUPPLY: {
-        switch (p_Entity->usState) {
-        case ANIMATE_SUPPLY_NORMAL: {
-            p_Entity->usCurrentFrame++;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // I know there is only 6 frames in this animation.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Entity->usCurrentFrame > 5) {
-                p_Entity->usCurrentFrame = 0;
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            switch (p_Entity->usCurrentFrame) {
-            case 0: { p_Entity->p_Picture = &p_Assets->Supply[0]; break; } // Original.
-            case 1: { p_Entity->p_Picture = &p_Assets->Supply[1]; break; } // Top light bright.
-            case 2: { p_Entity->p_Picture = &p_Assets->Supply[2]; break; } // Top light brighter.
-            case 3: { p_Entity->p_Picture = &p_Assets->Supply[3]; break; } // Top light brightest.
-            case 4: { p_Entity->p_Picture = &p_Assets->Supply[4]; break; } // Top light brighter.
-            case 5: { p_Entity->p_Picture = &p_Assets->Supply[5]; break; } // Top light bright.
-            default: {
-                printf("ENTITY_Animate(): Unknown frame.\n");
-            }
-            }
-            break;
-        }
-        default: {
-            printf("ENTITY_Animate(): Unknown entity state.\n");
-        }
-        }
+void __cdecl ENTITY_HandleAnimation(ENTITY_T* p_Entity, ASSETS_T* p_Assets, SETTINGS_T* p_Settings, LOG_T* p_Log) {
+    switch (p_Entity->eType) {
+    case ENTITY_TYPE_SUPPLY: {
+        ENTITY_AnimateSupply(p_Entity, p_Log);
         break;
     }
-    case ENTITY_REFINERY: {
+    case ENTITY_TYPE_REFINERY: {
+        ENTITY_AnimateRefinery(p_Entity, p_Log);
         break;
     }
-    case ENTITY_WORKER: {
-        switch (p_Entity->usState) {
-        case ANIMATE_WORKER_NORMAL: { p_Entity->p_Picture = &p_Assets->Worker[0]; break; } // Normal.
-        case ANIMATE_WORKER_MINERALS: { p_Entity->p_Picture = &p_Assets->Worker[1]; break; } // Holding minerals.
-        case ANIMATE_WORKER_GAS: { p_Entity->p_Picture = &p_Assets->Worker[2]; break; } // Holding gas.
-        default: {
-            printf("ENTITY_Animate(): Unknown entity state. %d\n", p_Entity->usState);
-        }
-        }
+    case ENTITY_TYPE_WORKER: {
+        ENTITY_AnimateWorker(p_Entity, p_Log);
         break;
     }
-    case ENTITY_MINERAL: {
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Animation frame depends on the percentage of minerals remaining.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if ((p_Entity->iMineralCount / (float)MINERALS_ON_CREATION) > 0.75f) {
-            p_Entity->p_Picture = &p_Assets->Mineral[0];
-        }
-        else if ((p_Entity->iMineralCount / (float)MINERALS_ON_CREATION) > 0.50f) {
-            p_Entity->p_Picture = &p_Assets->Mineral[1];
-        }
-        else if ((p_Entity->iMineralCount / (float)MINERALS_ON_CREATION) > 0.25f) {
-            p_Entity->p_Picture = &p_Assets->Mineral[2];
-        }
-        else if ((p_Entity->iMineralCount / (float)MINERALS_ON_CREATION) > 0.0f) {
-            p_Entity->p_Picture = &p_Assets->Mineral[3];
-        }
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // The mineral count is <= 0.0f.
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        else {
-            p_Entity->p_Picture = &p_Assets->Mineral[4];
-        }
+    case ENTITY_TYPE_MINERAL: {
+        ENTITY_AnimateMineral(p_Entity, p_Log);
         break;
     }
-    case ENTITY_COMMAND: {
-        switch (p_Entity->usState) {
-        case ANIMATE_COMMAND_NORMAL: {
-            p_Entity->p_Picture = &p_Assets->Command[0]; // Normal.
-            break;
-        }
-        case ANIMATE_COMMAND_CREATING: {
-            p_Entity->usCurrentFrame++;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // I know there is only 24 frames in this animation.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Entity->usCurrentFrame > 23) {
-                p_Entity->usCurrentFrame = 0;
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            switch (p_Entity->usCurrentFrame) {
-            case 0: { p_Entity->p_Picture = &p_Assets->Command[0];  break; } // Original.
-            case 1: { p_Entity->p_Picture = &p_Assets->Command[6];  break; } // East light bright.
-            case 2: { p_Entity->p_Picture = &p_Assets->Command[7];  break; } // East light brighter.
-            case 3: { p_Entity->p_Picture = &p_Assets->Command[8];  break; } // East light brightest.
-            case 4: { p_Entity->p_Picture = &p_Assets->Command[9];  break; } // East light brighter.
-            case 5: { p_Entity->p_Picture = &p_Assets->Command[10]; break; } // East light bright.
-            case 6: { p_Entity->p_Picture = &p_Assets->Command[0];  break; } // Original.
-            case 7: { p_Entity->p_Picture = &p_Assets->Command[11]; break; } // South light bright.
-            case 8: { p_Entity->p_Picture = &p_Assets->Command[12]; break; } // South light brighter.
-            case 9: { p_Entity->p_Picture = &p_Assets->Command[13]; break; } // South light brightest,
-            case 10: { p_Entity->p_Picture = &p_Assets->Command[14]; break; } // South light brighter.
-            case 11: { p_Entity->p_Picture = &p_Assets->Command[15]; break; } // South light bright.
-            case 12: { p_Entity->p_Picture = &p_Assets->Command[0];  break; } // Original.
-            case 13: { p_Entity->p_Picture = &p_Assets->Command[16]; break; } // West light bright.
-            case 14: { p_Entity->p_Picture = &p_Assets->Command[17]; break; } // West light brighter.
-            case 15: { p_Entity->p_Picture = &p_Assets->Command[18]; break; } // West light brightest.
-            case 16: { p_Entity->p_Picture = &p_Assets->Command[19]; break; } // West light brighter.
-            case 17: { p_Entity->p_Picture = &p_Assets->Command[20]; break; } // West light bright,
-            case 18: { p_Entity->p_Picture = &p_Assets->Command[0];  break; } // Original.
-            case 19: { p_Entity->p_Picture = &p_Assets->Command[21]; break; } // Center light bright.
-            case 20: { p_Entity->p_Picture = &p_Assets->Command[22]; break; } // Center light brighter.
-            case 21: { p_Entity->p_Picture = &p_Assets->Command[23]; break; } // Center light brightest
-            case 22: { p_Entity->p_Picture = &p_Assets->Command[24]; break; } // Center light brighter.
-            case 23: { p_Entity->p_Picture = &p_Assets->Command[25]; break; } // Center light bright.
-            default: {
-                printf("ENTITY_Animate(): Unknown frame.\n");
-            }
-            }
-            break;
-        }
-        case ANIMATE_COMMAND_RECEIVE: {
-            p_Entity->usCurrentFrame++;
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // I know there is only 6 frames in this animation.
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (p_Entity->usCurrentFrame > 5) {
-                p_Entity->usCurrentFrame = 0;
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            switch (p_Entity->usCurrentFrame) {
-            case 0: { p_Entity->p_Picture = &p_Assets->Command[0]; break; } // Original.
-            case 1: { p_Entity->p_Picture = &p_Assets->Command[1]; break; } // All lights bright.
-            case 2: { p_Entity->p_Picture = &p_Assets->Command[2]; break; } // All lights brighter.
-            case 3: { p_Entity->p_Picture = &p_Assets->Command[3]; break; } // All lights brightest.
-            case 4: { p_Entity->p_Picture = &p_Assets->Command[4]; break; } // All lights brighter.
-            case 5: { p_Entity->p_Picture = &p_Assets->Command[5]; break; } // All lights bright.
-            default: {
-                printf("ENTITY_Animate(): Unknown frame.\n");
-            }
-            }
-            break;
-        }
-        default: {
-            printf("ENTITY_Animate(): Unknown entity state.\n");
-        }
-        }
+    case ENTITY_TYPE_COMMAND: {
+        ENTITY_AnimateCommand(p_Entity, p_Log);
         break;
     }
     default: {
-        printf("ENTITY_Animate(): Unknown entity type.\n");
+        MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_HandleAnimation(): Unknown entity type.\n");
     }
     }
 }
@@ -1033,8 +674,8 @@ SELECTED_COUNT_T __cdecl ENTITY_GetSelectedEntityCounts(GLOBALS_T* p_Globals) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     while (p_Current) {
         if (p_Current->ubIsSelected) {
-            switch (p_Current->usType) {
-            case ENTITY_WORKER: {
+            switch (p_Current->eType) {
+            case ENTITY_TYPE_WORKER: {
                 SelectedCount.usSelectedWorkersCount++;
                 SelectedCount.usSelectedAllCount++;
                 break;
@@ -1050,5 +691,182 @@ SELECTED_COUNT_T __cdecl ENTITY_GetSelectedEntityCounts(GLOBALS_T* p_Globals) {
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     return SelectedCount;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ENTITY_ReceiveHotReload(SETTINGS_T* p_Settings, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    ENTITY_T* p_Current = p_Globals->p_RootEntity;
+    while (p_Current) {
+        switch (p_Current->eType) {
+        case ENTITY_TYPE_WORKER: {
+            float fDivisor = 1.0f;
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (p_Current->ubIsCarryingMinerals) {
+                fDivisor = p_Settings->fWorkerMineralDivisor;
+            }
+            else if (p_Current->ubIsCarryingGas) {
+                fDivisor = p_Settings->fWorkerGasDivisor;
+            }
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            p_Current->MovementSpeed = (FDELTA_T){ p_Settings->fWorkerMoveSpeed / fDivisor, p_Settings->fWorkerMoveSpeed / fDivisor };
+            break;
+        }
+        case ENTITY_TYPE_MINERAL: {
+            p_Current->MovementSpeed = (FDELTA_T){ p_Settings->fMineralMoveSpeed, p_Settings->fMineralMoveSpeed };
+            break;
+        }
+        case ENTITY_TYPE_COMMAND: {
+            p_Current->MovementSpeed = (FDELTA_T){ p_Settings->fCommandMoveSpeed, p_Settings->fCommandMoveSpeed };
+            break;
+        }
+        case ENTITY_TYPE_SUPPLY: {
+            p_Current->MovementSpeed = (FDELTA_T){ p_Settings->fSupplyMoveSpeed, p_Settings->fSupplyMoveSpeed };
+            break;
+        }
+        case ENTITY_TYPE_REFINERY: {
+            p_Current->MovementSpeed = (FDELTA_T){ p_Settings->fRefineryMoveSpeed, p_Settings->fRefineryMoveSpeed };
+            break;
+        }
+        default: {
+            MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_ReceiveHotReload(): Unknown entity type.\n");
+        }
+        }
+        p_Current = (ENTITY_T*)p_Current->p_Next;
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ENTITY_AnimateSupply(ENTITY_T* p_Entity, LOG_T* p_Log) {
+    switch (p_Entity->usState) {
+    case ANIMATION_STATE_SUPPLY_NORMAL: {
+        p_Entity->usCurrentFrame++;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (p_Entity->usCurrentFrame > 5) {
+            p_Entity->usCurrentFrame = 0;
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        switch (p_Entity->usCurrentFrame) {
+        case 0: { p_Entity->p_Picture = &p_Assets->Supply[0]; break; } // Original.
+        case 1: { p_Entity->p_Picture = &p_Assets->Supply[1]; break; } // Top light bright.
+        case 2: { p_Entity->p_Picture = &p_Assets->Supply[2]; break; } // Top light brighter.
+        case 3: { p_Entity->p_Picture = &p_Assets->Supply[3]; break; } // Top light brightest.
+        case 4: { p_Entity->p_Picture = &p_Assets->Supply[4]; break; } // Top light brighter.
+        case 5: { p_Entity->p_Picture = &p_Assets->Supply[5]; break; } // Top light bright.
+        default: {
+            MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_AnimateSupply(): Unknown frame.\n");
+        }
+        }
+        break;
+    }
+    default: {
+        MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_AnimateSupply(): Unknown entity state.\n");
+    }
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ENTITY_AnimateRefinery(ENTITY_T* p_Entity, LOG_T* p_Log) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ENTITY_AnimateWorker(ENTITY_T* p_Entity, LOG_T* p_Log) {
+    switch (p_Entity->usState) {
+    case ANIMATION_STATE_WORKER_NORMAL: { p_Entity->p_Picture = &p_Assets->Worker[0]; break; } // Normal.
+    case ANIMATION_STATE_WORKER_MINERALS: { p_Entity->p_Picture = &p_Assets->Worker[1]; break; } // Holding minerals.
+    case ANIMATION_STATE_WORKER_GAS: { p_Entity->p_Picture = &p_Assets->Worker[2]; break; } // Holding gas.
+    default: {
+        MISC_WriteOutParams(p_Log, LOG_SEVERITY_WARNING, "ENTITY_AnimateWorker(): Unknown entity state. %hu\n", p_Entity->usState);
+    }
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ENTITY_AnimateMineral(ENTITY_T* p_Entity, LOG_T* p_Log) {
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Animation frame depends on the percentage of minerals remaining.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if ((p_Entity->iMineralCount / (float)p_Settings->uiMineralsOnCreation) > 0.75f) {
+        p_Entity->p_Picture = &p_Assets->Mineral[0];
+    }
+    else if ((p_Entity->iMineralCount / (float)p_Settings->uiMineralsOnCreation) > 0.50f) {
+        p_Entity->p_Picture = &p_Assets->Mineral[1];
+    }
+    else if ((p_Entity->iMineralCount / (float)p_Settings->uiMineralsOnCreation) > 0.25f) {
+        p_Entity->p_Picture = &p_Assets->Mineral[2];
+    }
+    else if ((p_Entity->iMineralCount / (float)p_Settings->uiMineralsOnCreation) > 0.0f) {
+        p_Entity->p_Picture = &p_Assets->Mineral[3];
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // The mineral count is <= 0.0f.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    else {
+        p_Entity->p_Picture = &p_Assets->Mineral[4];
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ENTITY_AnimateCommand(ENTITY_T* p_Entity, LOG_T* p_Log) {
+    switch (p_Entity->usState) {
+    case ANIMATION_STATE_COMMAND_NORMAL: {
+        p_Entity->p_Picture = &p_Assets->Command[0]; // Normal.
+        break;
+    }
+    case ANIMATION_STATE_COMMAND_CREATING: {
+        p_Entity->usCurrentFrame++;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (p_Entity->usCurrentFrame > 23) {
+            p_Entity->usCurrentFrame = 0;
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        switch (p_Entity->usCurrentFrame) {
+        case 0: { p_Entity->p_Picture = &p_Assets->Command[0];  break; } // Original.
+        case 1: { p_Entity->p_Picture = &p_Assets->Command[6];  break; } // East light bright.
+        case 2: { p_Entity->p_Picture = &p_Assets->Command[7];  break; } // East light brighter.
+        case 3: { p_Entity->p_Picture = &p_Assets->Command[8];  break; } // East light brightest.
+        case 4: { p_Entity->p_Picture = &p_Assets->Command[9];  break; } // East light brighter.
+        case 5: { p_Entity->p_Picture = &p_Assets->Command[10]; break; } // East light bright.
+        case 6: { p_Entity->p_Picture = &p_Assets->Command[0];  break; } // Original.
+        case 7: { p_Entity->p_Picture = &p_Assets->Command[11]; break; } // South light bright.
+        case 8: { p_Entity->p_Picture = &p_Assets->Command[12]; break; } // South light brighter.
+        case 9: { p_Entity->p_Picture = &p_Assets->Command[13]; break; } // South light brightest,
+        case 10: { p_Entity->p_Picture = &p_Assets->Command[14]; break; } // South light brighter.
+        case 11: { p_Entity->p_Picture = &p_Assets->Command[15]; break; } // South light bright.
+        case 12: { p_Entity->p_Picture = &p_Assets->Command[0];  break; } // Original.
+        case 13: { p_Entity->p_Picture = &p_Assets->Command[16]; break; } // West light bright.
+        case 14: { p_Entity->p_Picture = &p_Assets->Command[17]; break; } // West light brighter.
+        case 15: { p_Entity->p_Picture = &p_Assets->Command[18]; break; } // West light brightest.
+        case 16: { p_Entity->p_Picture = &p_Assets->Command[19]; break; } // West light brighter.
+        case 17: { p_Entity->p_Picture = &p_Assets->Command[20]; break; } // West light bright,
+        case 18: { p_Entity->p_Picture = &p_Assets->Command[0];  break; } // Original.
+        case 19: { p_Entity->p_Picture = &p_Assets->Command[21]; break; } // Center light bright.
+        case 20: { p_Entity->p_Picture = &p_Assets->Command[22]; break; } // Center light brighter.
+        case 21: { p_Entity->p_Picture = &p_Assets->Command[23]; break; } // Center light brightest
+        case 22: { p_Entity->p_Picture = &p_Assets->Command[24]; break; } // Center light brighter.
+        case 23: { p_Entity->p_Picture = &p_Assets->Command[25]; break; } // Center light bright.
+        default: {
+            MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_AnimateCommand(): Unknown frame.\n");
+        }
+        }
+        break;
+    }
+    case ANIMATION_STATE_COMMAND_RECEIVE: {
+        p_Entity->usCurrentFrame++;
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (p_Entity->usCurrentFrame > 5) {
+            p_Entity->usCurrentFrame = 0;
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        switch (p_Entity->usCurrentFrame) {
+        case 0: { p_Entity->p_Picture = &p_Assets->Command[0]; break; } // Original.
+        case 1: { p_Entity->p_Picture = &p_Assets->Command[1]; break; } // All lights bright.
+        case 2: { p_Entity->p_Picture = &p_Assets->Command[2]; break; } // All lights brighter.
+        case 3: { p_Entity->p_Picture = &p_Assets->Command[3]; break; } // All lights brightest.
+        case 4: { p_Entity->p_Picture = &p_Assets->Command[4]; break; } // All lights brighter.
+        case 5: { p_Entity->p_Picture = &p_Assets->Command[5]; break; } // All lights bright.
+        default: {
+            MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_AnimateCommand(): Unknown frame.\n");
+        }
+        }
+        break;
+    }
+    default: {
+        MISC_WriteOut(p_Log, LOG_SEVERITY_WARNING, "ENTITY_AnimateCommand(): Unknown entity state.\n");
+    }
+    }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

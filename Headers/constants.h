@@ -7,160 +7,140 @@
 #define _CONSTANTS_H_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "common.h"
+#include "Windows/windows_minified.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define APP_NAME                            "Gatherers (C) V12.0"
-#define PI                                  3.1416f
+// Resource constants
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Resource constants.
+// Max: LOWORD(lParam) = WORD = ushort = 0 - 65,535
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define ICO_MAIN                            100
-#define IMG_MAIN                            200
-#define DLG_LOAD                            300
-#define DLG_LOAD_IMG                        400
-#define DLG_LOAD_STATUS                     500
+#define ICO_MAIN                                        100
+#define IMG_MAIN                                        200
+#define DLG_LOAD                                        300
+#define DLG_LOAD_IMG                                    400
+#define DLG_LOAD_STATUS                                 500
+#define MAIN_MENU                                       600
+// Simulation ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MENU_SIMULATION_TOGGLE_SIMULATION               5000
+#define MENU_SIMULATION_TOGGLE_SCATTER                  5100
+#define MENU_SIMULATION_FREE                            5200
+#define MENU_SIMULATION_PRINT                           5300
+#define MENU_SIMULATION_EXIT                            5400
+#define MENU_SIMULATION_SAVE    					    5500
+#define MENU_SIMULATION_LOAD                            5600
+// Delete ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MENU_DELETE_SELECTED                            10000
+#define MENU_DELETE_WORKER                              10100
+#define MENU_DELETE_COMMAND                             10200
+#define MENU_DELETE_MINERAL                             10300
+#define MENU_DELETE_SUPPLY                              10400
+#define MENU_DELETE_REFINERY                            10500
+#define MENU_DELETE_ALL                                 10600
+// Build ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MENU_BUILD_NONE                                 15000
+#define MENU_BUILD_WORKER                               15100
+#define MENU_BUILD_COMMAND                              15200
+#define MENU_BUILD_MINERAL                              15300
+#define MENU_BUILD_SUPPLY                               15400
+#define MENU_BUILD_REFINERY                             15500
+// Options //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MENU_OPTIONS_MASKING                            20000
+#define MENU_OPTIONS_ALL_DIAGNOSTICS                    20100
+#define MENU_OPTIONS_IDS                                20200
+#define MENU_OPTIONS_STATISTICS                         20300
+#define MENU_OPTIONS_RESOURCES                          20400
+#define MENU_OPTIONS_STATUSES                           20500
+#define MENU_OPTIONS_SHOW_MINOR_VECTORS                 20600
+#define MENU_OPTIONS_SHOW_MAJOR_VECTORS                 20700
+#define MENU_OPTIONS_PATH_FINDING_ENABLE                20800
+#define MENU_OPTIONS_PATH_FINDING_RAYCAST               20900
+#define MENU_OPTIONS_PATH_FINDING_BISECTION             21000
+#define MENU_OPTIONS_PATH_FINDING_INTERPOLATE_CURVES    21100
+#define MENU_OPTIONS_ENABLE_TRANSLATIONS                21200
+#define MENU_OPTIONS_TOPMOST                            21300
+#define MENU_OPTIONS_FULLSCREEN                         21400
+// Renderer /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MENU_RENDERER_WIREFRAME                         25000
+#define MENU_RENDERER_SINGLE_BUFFER                     25100
+#define MENU_RENDERER_DOUBLE_BUFFER                     25200
+#define MENU_RENDERER_SDL                               25300
+#define MENU_RENDERER_DIRECT2D                          25400
+#define MENU_RENDERER_POST_PROCESSING_ENABLE            25500
+#define MENU_RENDERER_POST_PROCESSING_BOX_BLUR          25600
+#define MENU_RENDERER_POST_PROCESSING_GREEN_MASK        25700    
+#define MENU_RENDERER_POST_PROCESSING_DARKEN            25800    
+// Log //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MENU_LOG_OPEN                                   30000
+// Settings /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MENU_SETTINGS_OPEN                              35000
+#define MENU_SETTINGS_RELOAD                            35100
+// Clear ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MENU_CLEAR_SELECTED                             40000
+#define MENU_CLEAR_MINERAL_COUNT                        40100
+#define MENU_CLEAR_GAS_COUNT                            40200
+#define MENU_CLEAR_ALL_COUNT                            40300
+// Sort /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define MENU_SORT_WORKERS                               45000
+#define MENU_SORT_COMMANDS                              45100
+#define MENU_SORT_MINERALS                              45200
+#define MENU_SORT_SUPPLY                                45300
+#define MENU_SORT_REFINERIES                            45400
+#define MENU_SORT_OBSTACLES                             45500
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Menu constants.
+// Forward declares:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define MAIN_MENU                           600
-#define MENU_SIMULATION_TOGGLE_SIMULATION   700
-#define MENU_SIMULATION_FREE                800
-#define MENU_SIMULATION_EXIT                900
-#define MENU_SIMULATION_PRINT               1000
-#define MENU_SIMULATION_TOGGLE_SCATTER      1100
-#define MENU_DELETE_SELECTED                1200
-#define MENU_DELETE_WORKER                  1300
-#define MENU_DELETE_COMMAND                 1400
-#define MENU_DELETE_MINERAL                 1500
-#define MENU_DELETE_SUPPLY                  1600
-#define MENU_DELETE_REFINERY                1700
-#define MENU_DELETE_ALL                     1800
-#define MENU_BUILD_NONE                     1900
-#define MENU_BUILD_WORKER                   2000
-#define MENU_BUILD_COMMAND                  2100
-#define MENU_BUILD_MINERAL                  2200
-#define MENU_BUILD_SUPPLY                   2300
-#define MENU_BUILD_REFINERY                 2400
-#define MENU_OPTIONS_ALL_DIAGNOSTICS        2500
-#define MENU_OPTIONS_IDS                    2600
-#define MENU_OPTIONS_STATS                  2700
-#define MENU_OPTIONS_MASKING                2800
-#define MENU_OPTIONS_RESOURCES              2900
-#define MENU_OPTIONS_STATUSES               3000
-#define MENU_OPTIONS_FULLSCREEN             3100
-#define MENU_OPTIONS_SHOW_MINOR             3200
-#define MENU_OPTIONS_SHOW_MAJOR             3300
-#define MENU_OPTIONS_ENABLE_TRANSLATIONS    3400
-#define MENU_OPTIONS_TOPMOST                3500
-#define MENU_OPTIONS_PATH_RAYCAST           3550
-#define MENU_OPTIONS_PATH_BISECTION         3560
-#define MENU_CLEAR_SELECTED                 3600
-#define MENU_CLEAR_MINERAL_COUNT            3700
-#define MENU_CLEAR_GAS_COUNT                3800
-#define MENU_CLEAR_ALL_COUNT                3900
-#define MENU_SORT_WORKERS                   4000
-#define MENU_SORT_COMMANDS                  4100
-#define MENU_SORT_MINERALS                  4200
-#define MENU_SORT_SUPPLY                    4300
-#define MENU_SORT_REFINERIES                4400
-#define MENU_SORT_OBSTACLES                 4500
+typedef struct LOG LOG_T;
+typedef struct GLOBALS GLOBALS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// List sorting constants.
+// Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define WORKERS_TO_FRONT                    4600
-#define MINERALS_TO_FRONT                   4700
-#define COMMANDS_TO_FRONT                   4800
-#define SUPPLIES_TO_FRONT                   4900
-#define REFINERIES_TO_FRONT                 5000
-#define OBSTACLES_TO_FRONT                  5100
+typedef struct CONSTANTS {
+    char szAppName[64];
+    char szDefaultSettingsFile[64];
+    char szDefaultLogFile[64];
+	char szDefaultSaveFile[64];
+    float fPi;
+    // List sorting constants:
+    USHORT usWorkersToFront;
+    USHORT usMineralsToFront;
+    USHORT usCommandsToFront;
+    USHORT usSuppliesToFront;
+    USHORT usRefineriesToFront;
+    USHORT usObstaclesToFront;
+    // Entity type constants:
+    USHORT usEntityNone;
+    USHORT usEntityWorker;
+    USHORT usEntityMineral;
+    USHORT usEntityCommand;
+    USHORT usEntitySupply;
+    USHORT usEntityRefinery;
+    USHORT usEntityObstacle;
+    // Animation state constants:
+    USHORT usAnimateWorkerNormal;
+    USHORT usAnimateWorkerMinerals;
+    USHORT usAnimateWorkerGas;
+    USHORT usAnimateCommandNormal;
+    USHORT usAnimateCommandReceive;
+    USHORT usAnimateCommandCreating;
+    USHORT usAnimateSupplyNormal;
+    // Matrix rendering constants:
+    USHORT usTransformRotate;
+    USHORT usTransformScale;
+    // Message type constants:
+    USHORT usMessageGainMinerals;
+    USHORT usMessageGainGas;
+    USHORT usMessageBonusMinerals;
+    USHORT usMessageBonusGas;
+    USHORT usMessageGeneralWarning;
+    // Command card constants:
+    USHORT usCardBlank;
+} CONSTANTS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Entity type constants.
+// Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define ENTITY_NONE                         5200
-#define ENTITY_WORKER                       5300
-#define ENTITY_MINERAL                      5400
-#define ENTITY_COMMAND                      5500
-#define ENTITY_SUPPLY                       5600
-#define ENTITY_REFINERY                     5700
-#define ENTITY_OBSTACLE                     5800
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Animation state constants.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define ANIMATE_WORKER_NORMAL               5900
-#define ANIMATE_WORKER_MINERALS             6000
-#define ANIMATE_WORKER_GAS                  6100
-#define ANIMATE_COMMAND_NORMAL              6200
-#define ANIMATE_COMMAND_RECEIVE             6300
-#define ANIMATE_COMMAND_CREATING            6400
-#define ANIMATE_SUPPLY_NORMAL               6500
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Matrix rendering constants.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define TRANSFORM_ROTATE                    6600
-#define TRANSFORM_SCALE                     6700
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Message type constants.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define MESSAGE_GAIN_MINERALS               6800
-#define MESSAGE_GAIN_GAS                    6900
-#define MESSAGE_BONUS_MINERALS              7000
-#define MESSAGE_BONUS_GAS                   7100
-#define MESSAGE_GENERAL_WARNING             7200
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Command card constants.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define CARD_BLANK                          7300
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Volatile entity constants.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Movement speed is unit vector amplification. Divisors are slow down's when carrying resources.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define WORKER_MOVE_SPEED                   7.0f
-#define MINERAL_MOVE_SPEED                  1.0f
-#define COMMAND_MOVE_SPEED                  1.0f
-#define SUPPLY_MOVE_SPEED                   1.0f
-#define REFINERY_MOVE_SPEED                 1.0f
-#define WORKER_MINERAL_DIVISOR              3.0f
-#define	WORKER_GAS_DIVISOR                  5.0f
-#define MINERALS_PAUSE                      1500.0f
-#define MINERALS_COMMAND_PAUSE              1500.0f
-#define REFINERY_PAUSE                      2000.0f
-#define REFINERY_COMMAND_PAUSE              4000.0f
-#define MINERALS_PER_GRAB                   1
-#define MINERALS_MULTIPLIER                 3
-#define GAS_PER_GRAB                        1
-#define GAS_MULTIPLIER                      3
-#define MINERALS_ON_CREATION                100000
-#define GAS_ON_CREATION                     100000
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Volatile building constants.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define SUPPLY_FROM_COMMAND                 5
-#define COST_OF_COMMAND_MINERALS            100
-#define COST_OF_COMMAND_GAS                 100
-#define SUPPLY_FROM_DEPOT                   3
-#define COST_OF_DEPOT_MINERALS              75
-#define COST_OF_DEPOT_GAS                   75
-#define SUPPLY_USED_WORKER                  1
-#define COST_OF_WORKER_MINERALS             25
-#define COST_OF_WORKER_GAS                  0
-#define COST_OF_REFINERY_MINERALS           50
-#define COST_OF_REFINERY_GAS                0
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Volatile drawing constants.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define ENGINE_FPS                          60.0f
-#define ANIMATE_FPS                         30.0f
-#define INITIAL_CLIENT_WIDTH                1650
-#define INITIAL_CLIENT_HEIGHT               850
-#define TRANSLATION_STEP_AMOUNT             35.0f
-#define AI_MAX_SEARCH_RANGE                 4250.0f     // Calculate when loaded.
-#define MINIMAP_SIZE                        220.0f      // Doesn't change if the map size changes.
-#define MAP_SIZE                            3000.0f     // Get when loaded.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Volatile AI constants.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define SUFFICIENTLY_CLOSE                  5.0f
-#define COLLISION_BUFFER                    5.0f
+void                __cdecl     CONSTANTS_Zero                                  (CONSTANTS_T*);
+CONSTANTS_T*        __cdecl     CONSTANTS_Create                                (GLOBALS_T*, LOG_T*);
+void                __cdecl     CONSTANTS_Kill                                  (CONSTANTS_T**, GLOBALS_T*);
+void                __cdecl     CONSTANTS_Init                                  (CONSTANTS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

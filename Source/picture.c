@@ -3,24 +3,24 @@
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "../Headers/common.h"
+#include "../Headers/log.h"
+#include "../Headers/misc.h"
 #include "../Headers/picture.h"
-#include "../Headers/windows_macros.h"
+#include "../Headers/Windows/windows_minified.h"
 #include <stdio.h>
-#include <windows.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl PICTURE_Zero(PICTURE_T* p_Picture) {
     ZeroMemory(p_Picture, sizeof(PICTURE_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl PICTURE_Load(PICTURE_T* p_Picture, FPOINT_T Location, char* p_szFileName, char* p_szFileNameMask) {
+void __cdecl PICTURE_Load(PICTURE_T* p_Picture, FPOINT_T Location, char* p_szFileName, char* p_szFileNameMask, LOG_T* p_Log) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     PICTURE_Zero(p_Picture);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Picture->hBmp = LoadImage(NULL, p_szFileName, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!p_Picture->hBmp) {
-        printf("PICTURE_Load(): Picture file not found (%s).\n", p_szFileName);
+        MISC_WriteOutParams(p_Log, LOG_SEVERITY_ERROR, "PICTURE_Load(): Picture file not found (%s).\n", p_szFileName);
     }
     else {
         GetObject(p_Picture->hBmp, sizeof(BITMAP), &p_Picture->Bitmap);
@@ -29,7 +29,7 @@ void __cdecl PICTURE_Load(PICTURE_T* p_Picture, FPOINT_T Location, char* p_szFil
     p_Picture->hBmpMask = LoadImage(NULL, p_szFileNameMask, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!p_Picture->hBmpMask) {
-        printf("PICTURE_Load(): Mask file not found (%s).\n", p_szFileNameMask);
+        MISC_WriteOutParams(p_Log, LOG_SEVERITY_ERROR, "PICTURE_Load(): Mask file not found (%s).\n", p_szFileNameMask);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Picture->Location = Location;

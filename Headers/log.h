@@ -7,29 +7,33 @@
 #define _LOG_H_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "common.h"
-#include "windows_macros.h"
+#include "Windows/windows_minified.h"
 #include <stdio.h>
-#include <windows.h> 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Forward declares:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct GLOBALS GLOBALS_T;
+typedef struct CONSTANTS CONSTANTS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct LOG {
     FILE* p_LogFile;
+    USHORT usDayOfYearCreated;
+    char szAppendedFileName[64];
 } LOG_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void    __cdecl     LOG_Zero                (LOG_T*);
-LOG_T*  __cdecl     LOG_Create              (const char*, GLOBALS_T*);
-void    __cdecl     LOG_Append              (LOG_T*, const char*);
-void    __cdecl     LOG_AppendParams        (LOG_T*, const char*, ...);
-void    __cdecl     LOG_Flush               (LOG_T*, UINT8);
-void    __cdecl     LOG_PopulateTimestamp   (char*, size_t);
-void    __cdecl     LOG_Kill                (LOG_T*, GLOBALS_T*);
+void                __cdecl     LOG_Zero                                        (LOG_T*);
+LOG_T*              __cdecl     LOG_Create                                      (const char* const, GLOBALS_T*);
+void                __cdecl     LOG_Append                                      (LOG_T*, const char*);
+void                __cdecl     LOG_AppendParams                                (LOG_T*, const char*, ...);
+void                __cdecl     LOG_Flush                                       (LOG_T*, UINT8);
+void                __cdecl     LOG_PopulateTimestamp                           (char*, size_t);
+void                __cdecl     LOG_Kill                                        (LOG_T**, GLOBALS_T*);
+void                __cdecl     LOG_HandleBookending                            (LOG_T**, CONSTANTS_T*, GLOBALS_T*);
+void                __cdecl     LOG_AppendDayOfYear                             (LOG_T*, const char* const);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

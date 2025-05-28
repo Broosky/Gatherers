@@ -5,8 +5,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../Headers/common.h"
 #include "../Headers/constants.h"
-#include "../Headers/windows_macros.h"
-#include <windows.h>
+#include "../Headers/Windows/windows_minified.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ICO_MAIN ICON "II.ico"
 IMG_MAIN BITMAP "../Assets/II/Illusion Interactive.bmp"
@@ -17,7 +16,7 @@ FONT 8, "MS Sans Serif"
 STYLE 0x90800800
 EXSTYLE 0x00000000 {
     CONTROL "#200", DLG_LOAD_IMG, "Static", 0x5000020e, 0, 0, 478, 157, 0x00000000
-    CONTROL "", DLG_LOAD_STATUS, "Static", 0x50000000, 4, 145, 470, 9, 0x00000000
+        CONTROL "", DLG_LOAD_STATUS, "Static", 0x50000000, 4, 145, 470, 9, 0x00000000
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://learn.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource
@@ -30,34 +29,37 @@ FILEOS VOS_NT_WINDOWS32
 FILETYPE VFT_APP
 FILESUBTYPE VFT2_UNKNOWN
 BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904E4"
-        BEGIN
-            VALUE "CompanyName", "Illusion Interactive"
-            VALUE "FileDescription", "Resource Gathering Simulator"
-            VALUE "FileVersion", "12.0.0.0"
-            VALUE "InternalName", "Gatherers"
-            VALUE "LegalCopyright", "(c) Illusion Interactive"
-            VALUE "OriginalFilename", "Gatherers"
-            VALUE "ProductName", "Gatherers"
-            VALUE "ProductVersion", "12.0.0.0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1252
-    END
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "040904E4"
+BEGIN
+VALUE "CompanyName", "Illusion Interactive"
+VALUE "FileDescription", "Resource Gathering Simulator"
+VALUE "FileVersion", "12.0.0.0"
+VALUE "InternalName", "Gatherers"
+VALUE "LegalCopyright", "(c) Illusion Interactive"
+VALUE "OriginalFilename", "Gatherers"
+VALUE "ProductName", "Gatherers"
+VALUE "ProductVersion", "12.0.0.0"
+END
+END
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0x409, 1252
+END
 END
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MAIN_MENU MENU {
     POPUP "S&imulation" {
         MENUITEM "&Toggle Simulation", MENU_SIMULATION_TOGGLE_SIMULATION
-        MENUITEM "T&oggle Scatter", MENU_SIMULATION_TOGGLE_SCATTER
+        MENUITEM "&Toggle Scatter", MENU_SIMULATION_TOGGLE_SCATTER
         MENUITEM SEPARATOR
-        MENUITEM "Add Free &Resources", MENU_SIMULATION_FREE
+        MENUITEM "&Add Free Resources", MENU_SIMULATION_FREE
         MENUITEM SEPARATOR
         MENUITEM "&Print Entity List", MENU_SIMULATION_PRINT
+        MENUITEM SEPARATOR
+        MENUITEM "&Save", MENU_SIMULATION_SAVE
+        MENUITEM "&Load", MENU_SIMULATION_LOAD
         MENUITEM SEPARATOR
         MENUITEM "&Exit", MENU_SIMULATION_EXIT
     }
@@ -67,7 +69,7 @@ MAIN_MENU MENU {
         MENUITEM "&Workers", MENU_DELETE_WORKER
         MENUITEM "&Command Centers", MENU_DELETE_COMMAND
         MENUITEM "&Mineral Fields", MENU_DELETE_MINERAL
-        MENUITEM "S&upply Depots", MENU_DELETE_SUPPLY
+        MENUITEM "&Supply Depots", MENU_DELETE_SUPPLY
         MENUITEM "&Refineries", MENU_DELETE_REFINERY
         MENUITEM SEPARATOR
         MENUITEM "&All Entities", MENU_DELETE_ALL
@@ -82,38 +84,66 @@ MAIN_MENU MENU {
         MENUITEM "&Refinery", MENU_BUILD_REFINERY
     }
     POPUP "&Options" {
-        MENUITEM "Draw With &Transparency", MENU_OPTIONS_MASKING
+        MENUITEM "&Draw With Transparency", MENU_OPTIONS_MASKING
+        MENUITEM "&Enable Translations", MENU_OPTIONS_ENABLE_TRANSLATIONS
         MENUITEM SEPARATOR
-        POPUP "Draw Diagno&stics..."
+        POPUP "&Draw Diagnostics..."
         BEGIN
-            MENUITEM "Draw All Tog&gle", MENU_OPTIONS_ALL_DIAGNOSTICS
-            MENUITEM "Draw &ID's", MENU_OPTIONS_IDS
-            MENUITEM "Draw S&tats", MENU_OPTIONS_STATS
+            MENUITEM "&Draw All Toggle", MENU_OPTIONS_ALL_DIAGNOSTICS
+            MENUITEM SEPARATOR
+            MENUITEM "&Draw ID's", MENU_OPTIONS_IDS
+            MENUITEM "&Draw Statistics", MENU_OPTIONS_STATISTICS
             MENUITEM "&Draw Resources", MENU_OPTIONS_RESOURCES
-            MENUITEM "D&raw Statuses", MENU_OPTIONS_STATUSES
-            MENUITEM "Dr&aw Minor Vectors", MENU_OPTIONS_SHOW_MINOR
-            MENUITEM "Dra&w Major Vectors", MENU_OPTIONS_SHOW_MAJOR
+            MENUITEM "&Draw Statuses", MENU_OPTIONS_STATUSES
+            MENUITEM "&Draw Minor Vectors", MENU_OPTIONS_SHOW_MINOR_VECTORS
+            MENUITEM "&Draw Major Vectors", MENU_OPTIONS_SHOW_MAJOR_VECTORS
         END
-        MENUITEM SEPARATOR
         POPUP "&Pathfinding..."
         BEGIN
-            MENUITEM "&Raycast", MENU_OPTIONS_PATH_RAYCAST
-            MENUITEM "&Bisection", MENU_OPTIONS_PATH_BISECTION
+            MENUITEM "&Enable Pathfinding", MENU_OPTIONS_PATH_FINDING_ENABLE
+            MENUITEM SEPARATOR
+            MENUITEM "&Raycast", MENU_OPTIONS_PATH_FINDING_RAYCAST
+            MENUITEM "&Bisection", MENU_OPTIONS_PATH_FINDING_BISECTION
+            MENUITEM SEPARATOR
+            MENUITEM "&Interpolate Curves", MENU_OPTIONS_PATH_FINDING_INTERPOLATE_CURVES
         END
+        POPUP "&Window..."
+        BEGIN
+            MENUITEM "&Topmost", MENU_OPTIONS_TOPMOST
+            MENUITEM "&Fullscreen", MENU_OPTIONS_FULLSCREEN
+        END
+    }
+    POPUP "Re&nderer" {
+        MENUITEM "&Wireframe", MENU_RENDERER_WIREFRAME
+        MENUITEM "&Single Buffer", MENU_RENDERER_SINGLE_BUFFER
+        MENUITEM "&Double Buffer", MENU_RENDERER_DOUBLE_BUFFER
+        MENUITEM "&SDL", MENU_RENDERER_SDL
+        MENUITEM "&Direct2D", MENU_RENDERER_DIRECT2D
         MENUITEM SEPARATOR
-        MENUITEM "Enable Tra&nslations", MENU_OPTIONS_ENABLE_TRANSLATIONS
-        MENUITEM SEPARATOR
-        MENUITEM "Pin As T&opmost", MENU_OPTIONS_TOPMOST
-        MENUITEM "&Fullscreen", MENU_OPTIONS_FULLSCREEN
+        POPUP "&Post Processing..."
+        BEGIN
+            MENUITEM "&Enable Post Processing", MENU_RENDERER_POST_PROCESSING_ENABLE
+            MENUITEM SEPARATOR
+            MENUITEM "&Enable Box Blur", MENU_RENDERER_POST_PROCESSING_BOX_BLUR
+            MENUITEM "&Enable Green Mask", MENU_RENDERER_POST_PROCESSING_GREEN_MASK
+            MENUITEM "&Enable Darken", MENU_RENDERER_POST_PROCESSING_DARKEN
+        END
+    }
+    POPUP "&Log" {
+        MENUITEM "&Open Log", MENU_LOG_OPEN
+    }
+    POPUP "S&ettings" {
+        MENUITEM "&Open Settings", MENU_SETTINGS_OPEN
+        MENUITEM "&Reload Settings", MENU_SETTINGS_RELOAD
     }
     POPUP "&Clear" {
         MENUITEM "&Selected Entities", MENU_CLEAR_SELECTED
         MENUITEM SEPARATOR
-        MENUITEM "Total &Mineral Count", MENU_CLEAR_MINERAL_COUNT
-        MENUITEM "Total &Gas Count", MENU_CLEAR_GAS_COUNT
-        MENUITEM "Total &Resource Count", MENU_CLEAR_ALL_COUNT
+        MENUITEM "&Total Mineral Count", MENU_CLEAR_MINERAL_COUNT
+        MENUITEM "&Total Gas Count", MENU_CLEAR_GAS_COUNT
+        MENUITEM "&Total Resource Count", MENU_CLEAR_ALL_COUNT
     }
-    POPUP "&Sort" {
+    POPUP "So&rt" {
         POPUP "&Entities..."
         BEGIN
             MENUITEM "&Workers to Front", MENU_SORT_WORKERS

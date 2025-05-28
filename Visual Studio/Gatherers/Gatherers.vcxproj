@@ -97,6 +97,12 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY /Y /I "$(ProjectDir)..\..\Resources\Gatherers.cfg" "$(ProjectDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying default Gatherers.cfg to Visual Studio working directory...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -125,6 +131,12 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>XCOPY /Y /I "$(ProjectDir)..\..\Resources\Gatherers.cfg" "$(ProjectDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying default Gatherers.cfg to Visual Studio working directory...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -143,26 +155,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Resources\renderer_template.c" />
     <ClCompile Include="..\..\Source\ai.c" />
     <ClCompile Include="..\..\Source\benchmark.c" />
     <ClCompile Include="..\..\Source\card.c" />
-    <ClCompile Include="..\..\Source\double_buffer.c" />
+    <ClCompile Include="..\..\Source\constants.c" />
     <ClCompile Include="..\..\Source\engine.c" />
     <ClCompile Include="..\..\Source\entity.c" />
     <ClCompile Include="..\..\Source\globals.c" />
     <ClCompile Include="..\..\Source\assets.c" />
     <ClCompile Include="..\..\Source\load.c" />
     <ClCompile Include="..\..\Source\log.c" />
-    <ClCompile Include="..\..\Source\main.c" />
     <ClCompile Include="..\..\Source\menu.c" />
     <ClCompile Include="..\..\Source\message.c" />
     <ClCompile Include="..\..\Source\misc.c" />
+    <ClCompile Include="..\..\Source\network.c" />
+    <ClCompile Include="..\..\Source\path_finding.c" />
     <ClCompile Include="..\..\Source\picture.c" />
     <ClCompile Include="..\..\Source\process.c" />
-    <ClCompile Include="..\..\Source\transform.c" />
+    <ClCompile Include="..\..\Source\Renderer\renderer.c" />
+    <ClCompile Include="..\..\Source\Renderer\renderer_direct_2d.c" />
+    <ClCompile Include="..\..\Source\Renderer\renderer_double_buffer.c" />
+    <ClCompile Include="..\..\Source\Renderer\renderer_sdl.c" />
+    <ClCompile Include="..\..\Source\Renderer\renderer_single_buffer.c" />
+    <ClCompile Include="..\..\Source\Renderer\renderer_wireframe.c" />
+    <ClCompile Include="..\..\Source\heap_allocator.c" />
+    <ClCompile Include="..\..\Source\save.c" />
+    <ClCompile Include="..\..\Source\sound.c" />
     <ClCompile Include="..\..\Source\settings.c" />
     <ClCompile Include="..\..\Source\timebase.c" />
-    <ClCompile Include="..\..\Source\windows_procedure.c" />
+    <ClCompile Include="..\..\Source\Windows\windows_main.c" />
+    <ClCompile Include="..\..\Source\Windows\windows_procedure.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Headers\ai.h" />
@@ -170,30 +193,47 @@
     <ClInclude Include="..\..\Headers\card.h" />
     <ClInclude Include="..\..\Headers\common.h" />
     <ClInclude Include="..\..\Headers\constants.h" />
-    <ClInclude Include="..\..\Headers\double_buffer.h" />
     <ClInclude Include="..\..\Headers\engine.h" />
     <ClInclude Include="..\..\Headers\entity.h" />
+    <ClInclude Include="..\..\Headers\enums.h" />
     <ClInclude Include="..\..\Headers\globals.h" />
     <ClInclude Include="..\..\Headers\assets.h" />
+    <ClInclude Include="..\..\Headers\load.h" />
     <ClInclude Include="..\..\Headers\log.h" />
-    <ClInclude Include="..\..\Headers\main.h" />
     <ClInclude Include="..\..\Headers\menu.h" />
     <ClInclude Include="..\..\Headers\message.h" />
     <ClInclude Include="..\..\Headers\misc.h" />
+    <ClInclude Include="..\..\Headers\network.h" />
+    <ClInclude Include="..\..\Headers\path_finding.h" />
     <ClInclude Include="..\..\Headers\picture.h" />
     <ClInclude Include="..\..\Headers\process.h" />
-    <ClInclude Include="..\..\Headers\transform.h" />
+    <ClInclude Include="..\..\Headers\Renderer\renderer.h" />
+    <ClInclude Include="..\..\Headers\Renderer\renderer_direct_2d.h" />
+    <ClInclude Include="..\..\Headers\Renderer\renderer_double_buffer.h" />
+    <ClInclude Include="..\..\Headers\Renderer\renderer_sdl.h" />
+    <ClInclude Include="..\..\Headers\Renderer\renderer_single_buffer.h" />
+    <ClInclude Include="..\..\Headers\Renderer\renderer_wireframe.h" />
+    <ClInclude Include="..\..\Headers\heap_allocator.h" />
+    <ClInclude Include="..\..\Headers\save.h" />
+    <ClInclude Include="..\..\Headers\sound.h" />
     <ClInclude Include="..\..\Headers\settings.h" />
     <ClInclude Include="..\..\Headers\timebase.h" />
     <ClInclude Include="..\..\Headers\common_types.h" />
-    <ClInclude Include="..\..\Headers\windows_macros.h" />
-    <ClInclude Include="..\..\Headers\windows_procedure.h" />
+    <ClInclude Include="..\..\Headers\Windows\windows_macros.h" />
+    <ClInclude Include="..\..\Headers\Windows\windows_main.h" />
+    <ClInclude Include="..\..\Headers\Windows\windows_minified.h" />
+    <ClInclude Include="..\..\Headers\Windows\windows_procedure.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Resources\II.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\Resources\main.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Resources\Gatherers.cfg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

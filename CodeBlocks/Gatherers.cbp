@@ -47,38 +47,6 @@
 		<Unit filename="../.vscode/launch.json" />
 		<Unit filename="../.vscode/settings.json" />
 		<Unit filename="../.vscode/tasks.json" />
-		<Unit filename="../Dev-C++/Gatherers.dev" />
-		<Unit filename="../Dev-C++/Gatherers.layout" />
-		<Unit filename="../Dev-C++/Gatherers_private.h" />
-		<Unit filename="../Dev-C++/Gatherers_private.rc">
-			<Option compilerVar="WINDRES" />
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="../Dev-C++/Makefile.win" />
-		<Unit filename="../Headers/ai.h" />
-		<Unit filename="../Headers/assets.h" />
-		<Unit filename="../Headers/benchmark.h" />
-		<Unit filename="../Headers/card.h" />
-		<Unit filename="../Headers/common.h" />
-		<Unit filename="../Headers/common_types.h" />
-		<Unit filename="../Headers/constants.h" />
-		<Unit filename="../Headers/double_buffer.h" />
-		<Unit filename="../Headers/engine.h" />
-		<Unit filename="../Headers/entity.h" />
-		<Unit filename="../Headers/globals.h" />
-		<Unit filename="../Headers/load.h" />
-		<Unit filename="../Headers/log.h" />
-		<Unit filename="../Headers/main.h" />
-		<Unit filename="../Headers/menu.h" />
-		<Unit filename="../Headers/message.h" />
-		<Unit filename="../Headers/misc.h" />
-		<Unit filename="../Headers/picture.h" />
-		<Unit filename="../Headers/process.h" />
-		<Unit filename="../Headers/settings.h" />
-		<Unit filename="../Headers/timebase.h" />
-		<Unit filename="../Headers/transform.h" />
-		<Unit filename="../Headers/windows_macros.h" />
-		<Unit filename="../Headers/windows_procedure.h" />
 		<Unit filename="../Assets/BL/BB0.bmp" />
 		<Unit filename="../Assets/BL/BB1.bmp" />
 		<Unit filename="../Assets/BL/BG0.bmp" />
@@ -130,6 +98,12 @@
 		<Unit filename="../Assets/HU/HU0.bmp" />
 		<Unit filename="../Assets/HU/HU0_M.bmp" />
 		<Unit filename="../Assets/HU/HU1.bmp" />
+		<Unit filename="../Assets/HU/HU2.bmp" />
+		<Unit filename="../Assets/HU/HU2_M.bmp" />
+		<Unit filename="../Assets/HU/HU3.bmp" />
+		<Unit filename="../Assets/HU/HU3_M.bmp" />
+		<Unit filename="../Assets/HU/HU4.bmp" />
+		<Unit filename="../Assets/HU/HU4_M.bmp" />
 		<Unit filename="../Assets/MF/MF0.bmp" />
 		<Unit filename="../Assets/MF/MF0_M.bmp" />
 		<Unit filename="../Assets/MF/MF1.bmp" />
@@ -151,14 +125,86 @@
 		<Unit filename="../Assets/SU/SU4.bmp" />
 		<Unit filename="../Assets/SU/SU5.bmp" />
 		<Unit filename="../Assets/TE/TE0.bmp" />
+		<Unit filename="../Assets/TE/TE1.bmp" />
 		<Unit filename="../Assets/WO/WO0.bmp" />
 		<Unit filename="../Assets/WO/WO0_M.bmp" />
 		<Unit filename="../Assets/WO/WO1.bmp" />
 		<Unit filename="../Assets/WO/WO2.bmp" />
+		<Unit filename="../Dev-C++/Gatherers.dev" />
+		<Unit filename="../Dev-C++/Gatherers.layout" />
+		<Unit filename="../Dev-C++/Gatherers_private.h" />
+		<Unit filename="../Dev-C++/Gatherers_private.rc">
+			<Option compilerVar="WINDRES" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Dev-C++/Makefile.win" />
+		<Unit filename="../Headers/Renderer/renderer.h" />
+		<Unit filename="../Headers/Renderer/renderer_direct_2d.h" />
+		<Unit filename="../Headers/Renderer/renderer_double_buffer.h" />
+		<Unit filename="../Headers/Renderer/renderer_sdl.h" />
+		<Unit filename="../Headers/Renderer/renderer_single_buffer.h" />
+		<Unit filename="../Headers/Renderer/renderer_wireframe.h" />
+		<Unit filename="../Headers/Windows/windows_macros.h" />
+		<Unit filename="../Headers/Windows/windows_main.h" />
+		<Unit filename="../Headers/Windows/windows_minified.h" />
+		<Unit filename="../Headers/Windows/windows_procedure.h" />
+		<Unit filename="../Headers/ai.h" />
+		<Unit filename="../Headers/assets.h" />
+		<Unit filename="../Headers/benchmark.h" />
+		<Unit filename="../Headers/card.h" />
+		<Unit filename="../Headers/common.h" />
+		<Unit filename="../Headers/common_types.h" />
+		<Unit filename="../Headers/constants.h" />
+		<Unit filename="../Headers/engine.h" />
+		<Unit filename="../Headers/entity.h" />
+		<Unit filename="../Headers/enums.h" />
+		<Unit filename="../Headers/globals.h" />
+		<Unit filename="../Headers/heap_allocator.h" />
+		<Unit filename="../Headers/load.h" />
+		<Unit filename="../Headers/log.h" />
+		<Unit filename="../Headers/menu.h" />
+		<Unit filename="../Headers/message.h" />
+		<Unit filename="../Headers/misc.h" />
+		<Unit filename="../Headers/network.h" />
+		<Unit filename="../Headers/path_finding.h" />
+		<Unit filename="../Headers/picture.h" />
+		<Unit filename="../Headers/process.h" />
+		<Unit filename="../Headers/save.h" />
+		<Unit filename="../Headers/settings.h" />
+		<Unit filename="../Headers/sound.h" />
+		<Unit filename="../Headers/timebase.h" />
 		<Unit filename="../README.md" />
+		<Unit filename="../Resources/Gatherers.cfg" />
 		<Unit filename="../Resources/II.ico" />
 		<Unit filename="../Resources/main.rc">
 			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="../Resources/renderer_template.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Source/Renderer/renderer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Source/Renderer/renderer_direct_2d.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Source/Renderer/renderer_double_buffer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Source/Renderer/renderer_sdl.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Source/Renderer/renderer_single_buffer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Source/Renderer/renderer_wireframe.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Source/Windows/windows_main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Source/Windows/windows_procedure.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Source/ai.c">
 			<Option compilerVar="CC" />
@@ -172,7 +218,7 @@
 		<Unit filename="../Source/card.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../Source/double_buffer.c">
+		<Unit filename="../Source/constants.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Source/engine.c">
@@ -184,13 +230,13 @@
 		<Unit filename="../Source/globals.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Source/heap_allocator.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../Source/load.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Source/log.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/main.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Source/menu.c">
@@ -202,22 +248,28 @@
 		<Unit filename="../Source/misc.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Source/network.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Source/path_finding.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../Source/picture.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Source/process.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Source/save.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../Source/settings.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Source/sound.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../Source/timebase.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/transform.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Source/windows_procedure.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Visual Studio/Gatherers.sln" />

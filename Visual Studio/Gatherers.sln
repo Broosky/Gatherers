@@ -127,6 +127,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HU", "HU", "{19A438DA-7FC7-
 		..\Assets\HU\HU0.bmp = ..\Assets\HU\HU0.bmp
 		..\Assets\HU\HU0_M.bmp = ..\Assets\HU\HU0_M.bmp
 		..\Assets\HU\HU1.bmp = ..\Assets\HU\HU1.bmp
+		..\Assets\HU\HU2.bmp = ..\Assets\HU\HU2.bmp
+		..\Assets\HU\HU2_M.bmp = ..\Assets\HU\HU2_M.bmp
+		..\Assets\HU\HU3.bmp = ..\Assets\HU\HU3.bmp
+		..\Assets\HU\HU3_M.bmp = ..\Assets\HU\HU3_M.bmp
+		..\Assets\HU\HU4.bmp = ..\Assets\HU\HU4.bmp
+		..\Assets\HU\HU4_M.bmp = ..\Assets\HU\HU4_M.bmp
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "II", "II", "{B4FEC885-314A-487F-B845-37B1F49CDB45}"
@@ -173,6 +179,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TE", "TE", "{832C6805-1879-49F0-8729-BBE1D857BA64}"
 	ProjectSection(SolutionItems) = preProject
 		..\Assets\TE\TE0.bmp = ..\Assets\TE\TE0.bmp
+		..\Assets\TE\TE1.bmp = ..\Assets\TE\TE1.bmp
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WO", "WO", "{731DD8FA-E3B9-4733-855A-DA410498BF6C}"

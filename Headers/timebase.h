@@ -7,13 +7,12 @@
 #define _TIMEBASE_H_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "common.h"
-#include "windows_macros.h"
-#include <windows.h>
+#include "Windows/windows_minified.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Forward declares:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-typedef struct GLOBALS GLOBALS_T;
 typedef struct LOG LOG_T;
+typedef struct GLOBALS GLOBALS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,12 +26,16 @@ typedef struct TIMEBASE {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void            __cdecl     TIMEBASE_Zero           (TIMEBASE_T*);
-TIMEBASE_T*     __cdecl     TIMEBASE_Create         (float, GLOBALS_T*, LOG_T*);
-UINT8           __cdecl     TIMEBASE_Tick           (TIMEBASE_T*);
-void            __cdecl     TIMEBASE_StartTimer     (TIMEBASE_T*);
-float           __cdecl     TIMEBASE_EndTimer       (TIMEBASE_T*);
-void            __cdecl     TIMEBASE_Kill           (TIMEBASE_T*, GLOBALS_T*);
+void                __cdecl     TIMEBASE_Zero                                   (TIMEBASE_T*);
+TIMEBASE_T*         __cdecl     TIMEBASE_Create                                 (float*, GLOBALS_T*, LOG_T*);
+UINT8               __cdecl     TIMEBASE_Tick                                   (TIMEBASE_T*);
+void                __cdecl     TIMEBASE_StartTimer                             (TIMEBASE_T*);
+float               __cdecl     TIMEBASE_EndTimer                               (TIMEBASE_T*);
+void                __cdecl     TIMEBASE_ResetTimer                             (TIMEBASE_T*);
+void                __cdecl     TIMEBASE_Kill                                   (TIMEBASE_T**, GLOBALS_T*);
+void                __cdecl     TIMEBASE_SetTimings                             (TIMEBASE_T*, float);
+void                __cdecl     TIMEBASE_ReceiveHotReload                       (TIMEBASE_T*, float);
+void                __cdecl     TIMEBASE_SetCounters                            (TIMEBASE_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -8,28 +8,55 @@ Active development continues here when time allows — see the legacy repo for e
 ## 🔹 Ideas & Upcoming Changes
 
 - Optimize pathfinding...
-  - Selectable pathfinding mode: raycast, bisection...
-  - Memoize pathfinding points.
+  - Selectable pathfinding mode: raycast (original), bisection...
+  - Memoize pathfinding points, or compute full path + memoize.
   - For main pathfinding points, curve the transitions such that the movement is not jagged.
 - Move entity resource diagnostic rendering out of entity rendering logic.
 - Draw scaled down versions of entities in the minimap instead of coloured blocks.
+- Selectable renderer: Direct3D.
 - Engine:
   - Homebrew renderer (DIBSECTION)...
-  - Selectable renderer: GDI32/SDL/Direct2D...
+  - Pre-processing...
+  - Post-processing... 
   - Networking...
   - Sound...
+  - 3D spectator mode...
 - Crossplatform support: Refactor IO, clock, etc...
 - Mouse wheel zoom in or out.
-- Change constant `#define`s types.
-- Load settings from file/hot reload.
 - Replace classic `char` buffer copying with modern safer alternatives.
 - Double check and update `const` parameters.
-- Use stack allocations instead of repetitive pointer dereferences.
+- Use stack allocations instead of repetitive pointer dereferences for tight loops.
 - Single vs multiple instances.
 - Doxygen documentation.
 - Don't allow workers to move inside an entity.
-- Restructure `DOUBLE_BUFFER_` to `RENDERER_` and allow it to operate on a implementation strategy (GDI single/double buffer, SDL, Direct2D, ...), quasi DI.
+- Check include paths for Linux toolchain.
+- Unit movement acceleration/deceleration.
+- Framerate independent unit movement.
+- Tiled backdrop for very large maps.
+- Fixed point arithmetic?
 - New assets...
+
+---
+
+## 🔹 May 2025 Updates
+
+- Rough-in pathfinding optimizations.
+- Memory pools for critical allocation paths (pathfinding).
+- Refactor existing `malloc`s to use memory pools where applicable.
+- Change constant `#define`s to types.
+- Migrate volatile settings to file + hot reload.
+- Restructure `DOUBLE_BUFFER_T` to `RENDERER_T` and allow it to operate on a renderer implementation strategy.
+- Selectable renderer: wireframe, GDI single/double buffer, SDL, Direct2D.
+- Modified the resource bar for large numbers: 999,999,999.
+- Crop blit selective background on redraw.
+- Improve log flow with trace, warning, and others + common writing functions.
+- Maintenance timebase + daily bookending of log file.
+- Linked list traversal helpers.
+- Rough in some engine pre/post-processing.
+- Experiment with frame buffer channel masking and blurs using SSE SIMD vectorization.
+- Restructured menu items.
+- Split large functions into smaller ones.
+- Other architectural and miscellaneous changes + toolchain updates.
 
 ---
 

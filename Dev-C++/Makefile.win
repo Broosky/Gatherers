@@ -8,8 +8,8 @@ CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
 RES      = ../Resources/main.res
-OBJ      = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/load.o ../obj/Release/main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/engine.o ../obj/Release/log.o ../obj/Release/assets.o ../obj/Release/benchmark.o ../obj/Release/double_buffer.o ../obj/Release/transform.o ../obj/Release/windows_procedure.o $(RES)
-LINKOBJ  = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/load.o ../obj/Release/main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/engine.o ../obj/Release/log.o ../obj/Release/assets.o ../obj/Release/benchmark.o ../obj/Release/double_buffer.o ../obj/Release/transform.o ../obj/Release/windows_procedure.o $(RES)
+OBJ      = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/load.o  ../obj/Release/save.o ../obj/Release/Windows/windows_main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/engine.o ../obj/Release/log.o ../obj/Release/assets.o ../obj/Release/benchmark.o ../obj/Release/Renderer/renderer_double_buffer.o ../obj/Release/Windows/windows_procedure.o ../obj/Release/Renderer/renderer_direct_2d.o ../obj/Release/heap_allocator.o ../obj/Release/network.o ../obj/Release/path_finding.o ../obj/Release/Renderer/renderer.o ../obj/Release/Renderer/renderer_sdl.o ../obj/Release/Renderer/renderer_single_buffer.o ../obj/Release/sound.o ../obj/Release/Renderer/renderer_wireframe.o ../obj/Release/constants.o $(RES)
+LINKOBJ  = ../obj/Release/ai.o ../obj/Release/card.o ../obj/Release/entity.o ../obj/Release/globals.o ../obj/Release/load.o  ../obj/Release/save.o ../obj/Release/Windows/windows_main.o ../obj/Release/menu.o ../obj/Release/message.o ../obj/Release/misc.o ../obj/Release/picture.o ../obj/Release/process.o ../obj/Release/settings.o ../obj/Release/timebase.o ../obj/Release/engine.o ../obj/Release/log.o ../obj/Release/assets.o ../obj/Release/benchmark.o ../obj/Release/Renderer/renderer_double_buffer.o ../obj/Release/Windows/windows_procedure.o ../obj/Release/Renderer/renderer_direct_2d.o ../obj/Release/heap_allocator.o ../obj/Release/network.o ../obj/Release/path_finding.o ../obj/Release/Renderer/renderer.o ../obj/Release/Renderer/renderer_sdl.o ../obj/Release/Renderer/renderer_single_buffer.o ../obj/Release/sound.o ../obj/Release/Renderer/renderer_wireframe.o ../obj/Release/constants.o $(RES)
 LIBS     = -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib32" -L"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32" -static-libgcc -mwindows "../../../Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib32/libgdi32.a" -m32
 INCS     = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/Program Files (x86)/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -43,8 +43,8 @@ $(BIN): $(OBJ)
 ../obj/Release/load.o: ../Source/load.c
 	$(CC) -c ../Source/load.c -o ../obj/Release/load.o $(CFLAGS)
 
-../obj/Release/main.o: ../Source/main.c
-	$(CC) -c ../Source/main.c -o ../obj/Release/main.o $(CFLAGS)
+../obj/Release/Windows/windows_main.o: ../Source/Windows/windows_main.c
+	$(CC) -c ../Source/Windows/windows_main.c -o ../obj/Release/Windows/windows_main.o $(CFLAGS)
 
 ../obj/Release/menu.o: ../Source/menu.c
 	$(CC) -c ../Source/menu.c -o ../obj/Release/menu.o $(CFLAGS)
@@ -79,14 +79,44 @@ $(BIN): $(OBJ)
 ../obj/Release/benchmark.o: ../Source/benchmark.c
 	$(CC) -c ../Source/benchmark.c -o ../obj/Release/benchmark.o $(CFLAGS)
 
-../obj/Release/double_buffer.o: ../Source/double_buffer.c
-	$(CC) -c ../Source/double_buffer.c -o ../obj/Release/double_buffer.o $(CFLAGS)
+../obj/Release/Renderer/renderer_double_buffer.o: ../Source/Renderer/renderer_double_buffer.c
+	$(CC) -c ../Source/Renderer/renderer_double_buffer.c -o ../obj/Release/Renderer/renderer_double_buffer.o $(CFLAGS)
+	
+../obj/Release/Windows/windows_procedure.o: ../Source/Windows/windows_procedure.c
+	$(CC) -c ../Source/Windows/windows_procedure.c -o ../obj/Release/Windows/windows_procedure.o $(CFLAGS)
+	
+../obj/Release/Renderer/renderer_direct_2d.o: ../Source/Renderer/renderer_direct_2d.c
+	$(CC) -c ../Source/Renderer/renderer_direct_2d.c -o ../obj/Release/Renderer/renderer_direct_2d.o $(CFLAGS)
+	
+../obj/Release/heap_allocator.o: ../Source/heap_allocator.c
+	$(CC) -c ../Source/heap_allocator.c -o ../obj/Release/heap_allocator.o $(CFLAGS)
+	
+../obj/Release/save.o: ../Source/save.c
+	$(CC) -c ../Source/save.c -o ../obj/Release/save.o $(CFLAGS)
+	
+../obj/Release/network.o: ../Source/network.c
+	$(CC) -c ../Source/network.c -o ../obj/Release/network.o $(CFLAGS)
+	
+../obj/Release/path_finding.o: ../Source/path_finding.c
+	$(CC) -c ../Source/path_finding.c -o ../obj/Release/path_finding.o $(CFLAGS)
 
-../obj/Release/transform.o: ../Source/transform.c
-	$(CC) -c ../Source/transform.c -o ../obj/Release/transform.o $(CFLAGS)
-
-../obj/Release/windows_procedure.o: ../Source/windows_procedure.c
-	$(CC) -c ../Source/windows_procedure.c -o ../obj/Release/windows_procedure.o $(CFLAGS)
+../obj/Release/Renderer/renderer.o: ../Source/Renderer/renderer.c
+	$(CC) -c ../Source/Renderer/renderer.c -o ../obj/Release/Renderer/renderer.o $(CFLAGS)
+	
+../obj/Release/Renderer/renderer_sdl.o: ../Source/Renderer/renderer_sdl.c
+	$(CC) -c ../Source/Renderer/renderer_sdl.c -o ../obj/Release/Renderer/renderer_sdl.o $(CFLAGS)
+	
+../obj/Release/Renderer/renderer_single_buffer.o: ../Source/Renderer/renderer_single_buffer.c
+	$(CC) -c ../Source/Renderer/renderer_single_buffer.c -o ../obj/Release/Renderer/renderer_single_buffer.o $(CFLAGS)
+	
+../obj/Release/sound.o: ../Source/sound.c
+	$(CC) -c ../Source/sound.c -o ../obj/Release/sound.o $(CFLAGS)
+	
+../obj/Release/Renderer/renderer_wireframe.o: ../Source/Renderer/renderer_wireframe.c
+	$(CC) -c ../Source/Renderer/renderer_wireframe.c -o ../obj/Release/Renderer/renderer_wireframe.o $(CFLAGS)
+	
+../obj/Release/constants.o: ../Source/constants.c
+	$(CC) -c ../Source/constants.c -o ../obj/Release/constants.o $(CFLAGS)
 	
 ../Resources/main.res: ../Resources/main.rc 
 	$(WINDRES) -i ../Resources/main.rc  -F pe-i386 --input-format=rc -o ../Resources/main.res -O coff
