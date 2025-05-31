@@ -41,6 +41,7 @@ Active development continues here when time allows — see the legacy repo for e
 ## 🔹 May 2025 Updates
 
 - Rough-in pathfinding optimizations.
+- Rough-in renderer dirty zones.
 - Memory pools for critical allocation paths (pathfinding).
 - Refactor existing `malloc`s to use memory pools where applicable.
 - Change constant `#define`s to types.

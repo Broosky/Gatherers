@@ -97,6 +97,7 @@ MAIN_MENU MENU {
             MENUITEM "&Draw Statuses", MENU_OPTIONS_STATUSES
             MENUITEM "&Draw Minor Vectors", MENU_OPTIONS_SHOW_MINOR_VECTORS
             MENUITEM "&Draw Major Vectors", MENU_OPTIONS_SHOW_MAJOR_VECTORS
+            MENUITEM "&Draw Dirty Zones", MENU_OPTIONS_DIRTY_ZONES
         END
         POPUP "&Pathfinding..."
         BEGIN

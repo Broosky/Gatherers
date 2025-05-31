@@ -18,6 +18,7 @@ typedef struct MENU MENU_T;
 typedef struct ENTITY ENTITY_T;
 typedef struct GLOBALS GLOBALS_T;
 typedef struct SETTINGS SETTINGS_T;
+typedef struct CONSTANTS CONSTANTS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct AI_CLOSEST {
     float fDistance;
@@ -28,7 +29,7 @@ typedef struct AI_CLOSEST {
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ENTITY_T*           __cdecl     AI_FindClosest                                  (ENTITY_T*, ENTITY_TYPE_T, GLOBALS_T*, SETTINGS_T*);
-void                __cdecl     AI_HandleWorkers                                (ENTITY_T*, GLOBALS_T*, LOG_T*, MENU_T*, SETTINGS_T*);
+void                __cdecl     AI_HandleWorkers                                (ENTITY_T*, GLOBALS_T*, LOG_T*, MENU_T*, CONSTANTS_T*, SETTINGS_T*);
 AI_CLOSEST_T*       __cdecl     AI_FindClosestByDistance                        (ENTITY_T*, ENTITY_TYPE_T, GLOBALS_T*, LOG_T*);
 int                 __cdecl     AI_CompareDistances                             (const void*, const void*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

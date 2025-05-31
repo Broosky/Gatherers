@@ -47,7 +47,9 @@ void                __cdecl     RENDERER_IMPL_EnablingPostProcessing            
 void                __cdecl     RENDERER_IMPL_DisablingPostProcessing           (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
 void                __cdecl     RENDERER_IMPL_HandlePostProcessing              (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
 void                __cdecl     RENDERER_IMPL_HandlePreProcessing               (RENDERER_T*, MENU_T*, ASSETS_T*, GLOBALS_T*, LOG_T*);
-void                __cdecl     RENDERER_IMPL_FlipArea                          (RENDERER_T*, int, int, int, int);
+FRECT_T             __cdecl     RENDERER_IMPL_CaptureDirtyZone                  (RENDERER_T*, ENTITY_T*, SETTINGS_T*, CONSTANTS_T*);
+void                __cdecl     RENDERER_IMPL_PrepareDirtyZone                  (RENDERER_T*, FRECT_T, GLOBALS_T*, LOG_T*);
+void                __cdecl     RENDERER_IMPL_FlipArea                          (RENDERER_T*, IRECT_T);
 void                __cdecl     RENDERER_IMPL_ApplyWorldTransform               (RENDERER_T*, TRANSFORM_TYPE_T, CONSTANTS_T*, float, FPOINT_T, LOG_T*);
 void                __cdecl     RENDERER_IMPL_ResetWorldTransform               (RENDERER_T*);
 void                __cdecl     RENDERER_IMPL_InitWorldTransform                (RENDERER_T*);
@@ -60,13 +62,14 @@ void                __cdecl     RENDERER_IMPL_DrawSelectionArea                 
 void                __cdecl     RENDERER_IMPL_DrawTranslationThreshold          (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
 void                __cdecl     RENDERER_IMPL_DrawPicture                       (RENDERER_T*, PICTURE_T*, UINT8);
 void                __cdecl     RENDERER_IMPL_DrawPictureAt                     (RENDERER_T*, PICTURE_T*, FPOINT_T, UINT8);
-void                __cdecl     RENDERER_IMPL_CropDrawPictureAt                 (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, UINT8);
+void                __cdecl     RENDERER_IMPL_CropDrawPictureAt                 (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, FPOINT_T, UINT8);
 void                __cdecl     RENDERER_IMPL_DrawEntityMinorVector             (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 void                __cdecl     RENDERER_IMPL_DrawEntityMajorVector             (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 void                __cdecl     RENDERER_IMPL_DrawEntityEllipse                 (RENDERER_T*, ENTITY_T*, HPEN, HBRUSH, SETTINGS_T*);
 void                __cdecl     RENDERER_IMPL_DrawEntity                        (RENDERER_T*, ENTITY_T*, UINT8);
+void                __cdecl     RENDERER_IMPL_DrawDirtyZones                    (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Local Only:
+// Local only:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl RENDERER_IMPL_Zero(RENDERER_IMPL_T* p_RendererImpl) {
     ZeroMemory(p_RendererImpl, sizeof(RENDERER_IMPL_T));
@@ -99,6 +102,8 @@ RENDERER_IMPL_T* __cdecl RENDERER_IMPL_Create(RENDERER_T* p_Renderer, GLOBALS_T*
     p_Renderer->FlipEntity = RENDERER_IMPL_FlipEntity;
     p_Renderer->PresentFrame = RENDERER_IMPL_PresentFrame;
     p_Renderer->HandlePreProcessing = RENDERER_IMPL_HandlePreProcessing;
+    p_Renderer->CaptureDirtyZone = RENDERER_IMPL_CaptureDirtyZone;
+    p_Renderer->PrepareDirtyZone = RENDERER_IMPL_PrepareDirtyZone;
     p_Renderer->EnablingPostProcessing = RENDERER_IMPL_EnablingPostProcessing;
     p_Renderer->DisablingPostProcessing = RENDERER_IMPL_DisablingPostProcessing;
     p_Renderer->HandlePostProcessing = RENDERER_IMPL_HandlePostProcessing;
@@ -120,6 +125,7 @@ RENDERER_IMPL_T* __cdecl RENDERER_IMPL_Create(RENDERER_T* p_Renderer, GLOBALS_T*
     p_Renderer->DrawEntityMajorVector = RENDERER_IMPL_DrawEntityMajorVector;
     p_Renderer->DrawEntityEllipse = RENDERER_IMPL_DrawEntityEllipse;
     p_Renderer->DrawEntity = RENDERER_IMPL_DrawEntity;
+    p_Renderer->DrawDirtyZones = RENDERER_IMPL_DrawDirtyZones;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Unused, retained internally in renderer.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +148,7 @@ void __cdecl RENDERER_IMPL_Kill(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RECT __cdecl RENDERER_IMPL_GetClientArea(RENDERER_T* p_Renderer) {
-    return (RECT){ 0, 0, 0 };
+    return (RECT) { .left = 0, .top = 0, .right = 0, .bottom = 0 };
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl RENDERER_IMPL_Resize(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
@@ -178,7 +184,20 @@ void __cdecl RENDERER_IMPL_HandlePostProcessing(RENDERER_T* p_Renderer, MENU_T* 
 void __cdecl RENDERER_IMPL_HandlePreProcessing(RENDERER_T* p_Renderer, MENU_T* p_Menu, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl RENDERER_IMPL_FlipArea(RENDERER_T* p_Renderer, int iX, int iY, int iWidth, int iHeight) {
+FRECT_T __cdecl RENDERER_IMPL_CaptureDirtyZone(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, SETTINGS_T* p_Settings, CONSTANTS_T* p_Constants) {
+    return (FRECT_T) {
+        .Location = { .fX = 0.0f, .fY = 0.0f },
+            .Size = { .fDx = 0.0f, .fDy = 0.0f }
+    };
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl RENDERER_IMPL_DrawDirtyZones(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl RENDERER_IMPL_PrepareDirtyZone(RENDERER_T* p_Renderer, FRECT_T DirtyZone, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl RENDERER_IMPL_FlipArea(RENDERER_T* p_Renderer, IRECT_T Area) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl RENDERER_IMPL_ApplyWorldTransform(RENDERER_T* p_Renderer, TRANSFORM_TYPE_T eType, CONSTANTS_T* p_Constants, float fValue, FPOINT_T Pin, LOG_T* p_Log) {
@@ -217,7 +236,7 @@ void __cdecl RENDERER_IMPL_DrawPicture(RENDERER_T* p_Renderer, PICTURE_T* p_Pict
 void __cdecl RENDERER_IMPL_DrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T Location, UINT8 ubMask) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl RENDERER_IMPL_CropDrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T CropStart, FDELTA_T CropDelta, UINT8 ubMask) {
+void __cdecl RENDERER_IMPL_CropDrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T CropDestination, FDELTA_T CropDelta, FPOINT_T CropSource, UINT8 ubMask) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl RENDERER_IMPL_DrawEntityMinorVector(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {

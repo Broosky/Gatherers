@@ -29,7 +29,7 @@ void                __cdecl     WINDOWS_PROCEDURE_BuildNone                     
 void                __cdecl     WINDOWS_PROCEDURE_SendWorkers                   (GLOBALS_T*, ASSETS_T*, LOG_T*, MENU_T*, SETTINGS_T*);
 void                __cdecl     WINDOWS_PROCEDURE_DistributeAndSendWorkers      (GLOBALS_T*, ASSETS_T*, LOG_T*, MENU_T*, SETTINGS_T*);
 void                __cdecl     WINDOWS_PROCEDURE_SelectEntities                (GLOBALS_T*);
-void                __cdecl     WINDOWS_PROCEDURE_CreateOrCaptureEntities       (GLOBALS_T*, ASSETS_T*, LOG_T*, RENDERER_T*, SETTINGS_T*);
+void                __cdecl     WINDOWS_PROCEDURE_CreateOrCaptureEntities       (GLOBALS_T*, ASSETS_T*, LOG_T*, RENDERER_T*, SETTINGS_T*, CONSTANTS_T*);
 FPOINT_LIST_T*      __cdecl     WINDOWS_PROCEDURE_CaptureDestinationPoints      (USHORT, GLOBALS_T*, ASSETS_T*, LOG_T*);
 ENTITY_T*           __cdecl     WINDOWS_PROCEDURE_CaptureDestinationData        (USHORT*, GLOBALS_T*);
 void                __cdecl     WINDOWS_PROCEDURE_HandleKeyDown                 (WPARAM, GLOBALS_T*, MENU_T*, RENDERER_T*, LOG_T*, SETTINGS_T*);

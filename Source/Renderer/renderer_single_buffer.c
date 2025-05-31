@@ -10,83 +10,85 @@
 #include "../../Headers/Renderer/renderer_single_buffer.h"
 #include <stdlib.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Local Only:
+// Local only:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SINGLE_BUFFER_Zero(SINGLE_BUFFER_T* p_SingleBuffer) {
-    ZeroMemory(p_SingleBuffer, sizeof(SINGLE_BUFFER_T));
+	ZeroMemory(p_SingleBuffer, sizeof(SINGLE_BUFFER_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SINGLE_BUFFER_T* __cdecl SINGLE_BUFFER_Create(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
-    size_t stAllocation = sizeof(SINGLE_BUFFER_T);
-    SINGLE_BUFFER_T* p_SingleBuffer = malloc(stAllocation);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!p_SingleBuffer) {
-        MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "SINGLE_BUFFER_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
-        return NULL;
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Globals->stAllocations += stAllocation;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SINGLE_BUFFER_Zero(p_SingleBuffer);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Renderer population.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Renderer->vp_Implementation = p_SingleBuffer;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Renderer->GetClientArea = SINGLE_BUFFER_GetClientArea;
-    p_Renderer->Resize = SINGLE_BUFFER_Resize;
-    p_Renderer->Kill = SINGLE_BUFFER_Kill;
-    p_Renderer->SetBlitter = SINGLE_BUFFER_SetBlitter;
-    p_Renderer->Blitter = SINGLE_BUFFER_Blitter;
-    p_Renderer->Clear = SINGLE_BUFFER_Clear;
-    p_Renderer->ClearEntity = SINGLE_BUFFER_ClearEntity;
-    p_Renderer->FlipEntity = SINGLE_BUFFER_FlipEntity;
-    p_Renderer->PresentFrame = SINGLE_BUFFER_PresentFrame;
-    p_Renderer->HandlePreProcessing = SINGLE_BUFFER_HandlePreProcessing;
-    p_Renderer->EnablingPostProcessing = SINGLE_BUFFER_EnablingPostProcessing;
-    p_Renderer->DisablingPostProcessing = SINGLE_BUFFER_DisablingPostProcessing;
-    p_Renderer->HandlePostProcessing = SINGLE_BUFFER_HandlePostProcessing;
-    p_Renderer->FlipArea = SINGLE_BUFFER_FlipArea;
-    p_Renderer->ApplyWorldTransform = SINGLE_BUFFER_ApplyWorldTransform;
-    p_Renderer->ResetWorldTransform = SINGLE_BUFFER_ResetWorldTransform;
-    p_Renderer->InitWorldTransform = SINGLE_BUFFER_InitWorldTransform;
-    p_Renderer->DrawMinimapEntities = SINGLE_BUFFER_DrawMinimapEntities;
-    p_Renderer->DrawMinimapViewport = SINGLE_BUFFER_DrawMinimapViewport;
-    p_Renderer->DrawMinimapSelectionArea = SINGLE_BUFFER_DrawMinimapSelectionArea;
-    p_Renderer->DrawBuildLimits = SINGLE_BUFFER_DrawBuildLimits;
-    p_Renderer->DrawBuildType = SINGLE_BUFFER_DrawBuildType;
-    p_Renderer->DrawSelectionArea = SINGLE_BUFFER_DrawSelectionArea;
-    p_Renderer->DrawTranslationThreshold = SINGLE_BUFFER_DrawTranslationThreshold;
-    p_Renderer->DrawPicture = SINGLE_BUFFER_DrawPicture;
-    p_Renderer->DrawPictureAt = SINGLE_BUFFER_DrawPictureAt;
-    p_Renderer->CropDrawPictureAt = SINGLE_BUFFER_CropDrawPictureAt;
-    p_Renderer->DrawEntityMinorVector = SINGLE_BUFFER_DrawEntityMinorVector;
-    p_Renderer->DrawEntityMajorVector = SINGLE_BUFFER_DrawEntityMajorVector;
-    p_Renderer->DrawEntityEllipse = SINGLE_BUFFER_DrawEntityEllipse;
-    p_Renderer->DrawEntity = SINGLE_BUFFER_DrawEntity;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Unused, retained internally in renderer.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    return p_SingleBuffer;
+	size_t stAllocation = sizeof(SINGLE_BUFFER_T);
+	SINGLE_BUFFER_T* p_SingleBuffer = malloc(stAllocation);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (!p_SingleBuffer) {
+		MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "SINGLE_BUFFER_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
+		return NULL;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Globals->stAllocations += stAllocation;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	SINGLE_BUFFER_Zero(p_SingleBuffer);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Renderer population.
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Renderer->vp_Implementation = p_SingleBuffer;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Renderer->GetClientArea = SINGLE_BUFFER_GetClientArea;
+	p_Renderer->Resize = SINGLE_BUFFER_Resize;
+	p_Renderer->Kill = SINGLE_BUFFER_Kill;
+	p_Renderer->SetBlitter = SINGLE_BUFFER_SetBlitter;
+	p_Renderer->Blitter = SINGLE_BUFFER_Blitter;
+	p_Renderer->Clear = SINGLE_BUFFER_Clear;
+	p_Renderer->ClearEntity = SINGLE_BUFFER_ClearEntity;
+	p_Renderer->FlipEntity = SINGLE_BUFFER_FlipEntity;
+	p_Renderer->PresentFrame = SINGLE_BUFFER_PresentFrame;
+	p_Renderer->HandlePreProcessing = SINGLE_BUFFER_HandlePreProcessing;
+	p_Renderer->CaptureDirtyZone = SINGLE_BUFFER_CaptureDirtyZone;
+	p_Renderer->PrepareDirtyZone = SINGLE_BUFFER_PrepareDirtyZone;
+	p_Renderer->EnablingPostProcessing = SINGLE_BUFFER_EnablingPostProcessing;
+	p_Renderer->DisablingPostProcessing = SINGLE_BUFFER_DisablingPostProcessing;
+	p_Renderer->HandlePostProcessing = SINGLE_BUFFER_HandlePostProcessing;
+	p_Renderer->FlipArea = SINGLE_BUFFER_FlipArea;
+	p_Renderer->ApplyWorldTransform = SINGLE_BUFFER_ApplyWorldTransform;
+	p_Renderer->ResetWorldTransform = SINGLE_BUFFER_ResetWorldTransform;
+	p_Renderer->InitWorldTransform = SINGLE_BUFFER_InitWorldTransform;
+	p_Renderer->DrawMinimapEntities = SINGLE_BUFFER_DrawMinimapEntities;
+	p_Renderer->DrawMinimapViewport = SINGLE_BUFFER_DrawMinimapViewport;
+	p_Renderer->DrawMinimapSelectionArea = SINGLE_BUFFER_DrawMinimapSelectionArea;
+	p_Renderer->DrawBuildLimits = SINGLE_BUFFER_DrawBuildLimits;
+	p_Renderer->DrawBuildType = SINGLE_BUFFER_DrawBuildType;
+	p_Renderer->DrawSelectionArea = SINGLE_BUFFER_DrawSelectionArea;
+	p_Renderer->DrawTranslationThreshold = SINGLE_BUFFER_DrawTranslationThreshold;
+	p_Renderer->DrawPicture = SINGLE_BUFFER_DrawPicture;
+	p_Renderer->DrawPictureAt = SINGLE_BUFFER_DrawPictureAt;
+	p_Renderer->CropDrawPictureAt = SINGLE_BUFFER_CropDrawPictureAt;
+	p_Renderer->DrawEntityMinorVector = SINGLE_BUFFER_DrawEntityMinorVector;
+	p_Renderer->DrawEntityMajorVector = SINGLE_BUFFER_DrawEntityMajorVector;
+	p_Renderer->DrawEntityEllipse = SINGLE_BUFFER_DrawEntityEllipse;
+	p_Renderer->DrawEntity = SINGLE_BUFFER_DrawEntity;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Unused, retained internally in renderer.
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	return p_SingleBuffer;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SINGLE_BUFFER_T* __cdecl SINGLE_BUFFER_Cast(RENDERER_T* p_Renderer) {
-    return (SINGLE_BUFFER_T*)p_Renderer->vp_Implementation;
+	return (SINGLE_BUFFER_T*)p_Renderer->vp_Implementation;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Accessible via Renderer:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SINGLE_BUFFER_Kill(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals) {
-    SINGLE_BUFFER_T* p_SingleBuffer = SINGLE_BUFFER_Cast(p_Renderer);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (p_SingleBuffer) {
-        free(p_SingleBuffer);
-        p_Globals->stAllocations -= sizeof(SINGLE_BUFFER_T);
-    }
+	SINGLE_BUFFER_T* p_SingleBuffer = SINGLE_BUFFER_Cast(p_Renderer);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (p_SingleBuffer) {
+		free(p_SingleBuffer);
+		p_Globals->stAllocations -= sizeof(SINGLE_BUFFER_T);
+	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RECT __cdecl SINGLE_BUFFER_GetClientArea(RENDERER_T* p_Renderer) {
-    return (RECT) { 0, 0, 0 };
+	return (RECT) { .left = 0, .top = 0, .right = 0, .bottom = 0 };
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SINGLE_BUFFER_Resize(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
@@ -122,7 +124,20 @@ void __cdecl SINGLE_BUFFER_HandlePostProcessing(RENDERER_T* p_Renderer, MENU_T* 
 void __cdecl SINGLE_BUFFER_HandlePreProcessing(RENDERER_T* p_Renderer, MENU_T* p_Menu, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl SINGLE_BUFFER_FlipArea(RENDERER_T* p_Renderer, int iX, int iY, int iWidth, int iHeight) {
+FRECT_T __cdecl SINGLE_BUFFER_CaptureDirtyZone(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, SETTINGS_T* p_Settings, CONSTANTS_T* p_Constants) {
+	return (FRECT_T) {
+		.Location = { .fX = 0.0f, .fY = 0.0f },
+			.Size = { .fDx = 0.0f, .fDy = 0.0f }
+	};
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl SINGLE_BUFFER_DrawDirtyZones(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl SINGLE_BUFFER_PrepareDirtyZone(RENDERER_T* p_Renderer, FRECT_T DirtyZone, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl SINGLE_BUFFER_FlipArea(RENDERER_T* p_Renderer, IRECT_T Area) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SINGLE_BUFFER_ApplyWorldTransform(RENDERER_T* p_Renderer, TRANSFORM_TYPE_T eType, CONSTANTS_T* p_Constants, float fValue, FPOINT_T Pin, LOG_T* p_Log) {
@@ -161,7 +176,7 @@ void __cdecl SINGLE_BUFFER_DrawPicture(RENDERER_T* p_Renderer, PICTURE_T* p_Pict
 void __cdecl SINGLE_BUFFER_DrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T Location, UINT8 ubMask) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl SINGLE_BUFFER_CropDrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T CropStart, FDELTA_T CropDelta, UINT8 ubMask) {
+void __cdecl SINGLE_BUFFER_CropDrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T CropDestination, FDELTA_T CropDelta, FPOINT_T CropSource, UINT8 ubMask) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SINGLE_BUFFER_DrawEntityMinorVector(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {

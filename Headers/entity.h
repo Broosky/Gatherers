@@ -21,6 +21,7 @@ typedef struct GLOBALS GLOBALS_T;
 typedef struct PICTURE PICTURE_T;
 typedef struct SETTINGS SETTINGS_T;
 typedef struct RENDERER RENDERER_T;
+typedef struct CONSTANTS CONSTANTS_T;
 typedef struct AI_CLOSEST AI_CLOSEST_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
@@ -79,9 +80,9 @@ typedef struct ENTITY {
 // Prototypes:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void                __cdecl     ENTITY_Zero                                     (ENTITY_T*);
-void                __cdecl     ENTITY_Create                                   (FPOINT_T, ENTITY_TYPE_T, ASSETS_T*, GLOBALS_T*, LOG_T*, RENDERER_T*, SETTINGS_T*);
-UINT8               __cdecl     ENTITY_BuildResourcesCheck                      (ENTITY_TYPE_T, GLOBALS_T*, LOG_T*, SETTINGS_T*);
-UINT8               __cdecl     ENTITY_BuildIntersectionCheck                   (ENTITY_TYPE_T, ASSETS_T*, GLOBALS_T*, LOG_T*, RENDERER_T*);
+void                __cdecl     ENTITY_Create                                   (FPOINT_T, ENTITY_TYPE_T, ASSETS_T*, GLOBALS_T*, LOG_T*, RENDERER_T*, SETTINGS_T*, CONSTANTS_T*);
+UINT8               __cdecl     ENTITY_BuildResourcesCheck                      (ENTITY_TYPE_T, GLOBALS_T*, LOG_T*, SETTINGS_T*, CONSTANTS_T*);
+UINT8               __cdecl     ENTITY_BuildIntersectionCheck                   (ENTITY_TYPE_T, ASSETS_T*, GLOBALS_T*, LOG_T*, RENDERER_T*, CONSTANTS_T*);
 void                __cdecl     ENTITY_Pause                                    (ENTITY_T*, float, SETTINGS_T*);
 UINT8               __cdecl     ENTITY_CollidedWith                             (ENTITY_T*, ENTITY_T*, SETTINGS_T*);
 void                __cdecl     ENTITY_Redefine                                 (ENTITY_TYPE_T, GLOBALS_T*, SETTINGS_T*, LOG_T*);

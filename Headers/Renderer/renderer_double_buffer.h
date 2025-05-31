@@ -54,7 +54,7 @@ typedef struct DOUBLE_BUFFER {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Implementation specific post-processing:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Framebuffer copies
+    // Framebuffer copies:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     POST_PROCESSING_T p_u32Temp;
     POST_PROCESSING_T p_u32Horizontal;
@@ -83,11 +83,13 @@ void                __cdecl     DOUBLE_BUFFER_FlipEntity                        
 void                __cdecl     DOUBLE_BUFFER_PresentFrame                      (RENDERER_T*);
 void                __cdecl     DOUBLE_BUFFER_HandlePostProcessing              (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
 void                __cdecl     DOUBLE_BUFFER_HandlePreProcessing               (RENDERER_T*, MENU_T*, ASSETS_T*, GLOBALS_T*, LOG_T*);
-void                __cdecl     DOUBLE_BUFFER_FlipArea                          (RENDERER_T*, int, int, int, int);
+void                __cdecl     DOUBLE_BUFFER_PrepareDirtyZone                  (RENDERER_T*, FRECT_T, GLOBALS_T*, LOG_T*);
+FRECT_T             __cdecl     DOUBLE_BUFFER_CaptureDirtyZone                  (RENDERER_T*, ENTITY_T*, SETTINGS_T*, CONSTANTS_T*);
+void                __cdecl     DOUBLE_BUFFER_FlipArea                          (RENDERER_T*, IRECT_T);
 RECT                __cdecl     DOUBLE_BUFFER_GetClientArea                     (RENDERER_T*);
 void                __cdecl     DOUBLE_BUFFER_DrawPicture                       (RENDERER_T*, PICTURE_T*, UINT8);
 void                __cdecl     DOUBLE_BUFFER_DrawPictureAt                     (RENDERER_T*, PICTURE_T*, FPOINT_T, UINT8);
-void                __cdecl     DOUBLE_BUFFER_CropDrawPictureAt                 (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, UINT8);
+void                __cdecl     DOUBLE_BUFFER_CropDrawPictureAt                 (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, FPOINT_T, UINT8);
 void                __cdecl     DOUBLE_BUFFER_InitWorldTransform                (RENDERER_T*);
 void                __cdecl     DOUBLE_BUFFER_ApplyWorldTransform               (RENDERER_T*, TRANSFORM_TYPE_T, CONSTANTS_T*, float, FPOINT_T, LOG_T*);
 void                __cdecl     DOUBLE_BUFFER_ResetWorldTransform               (RENDERER_T*);
@@ -104,6 +106,8 @@ void                __cdecl     DOUBLE_BUFFER_HandleBoxBlur                     
 void                __cdecl     DOUBLE_BUFFER_HandleGreenMask                   (DOUBLE_BUFFER_T*, uint8_t);
 void                __cdecl     DOUBLE_BUFFER_HandleDarken                      (DOUBLE_BUFFER_T*, uint8_t);
 void                __cdecl     DOUBLE_BUFFER_KillPostProcessing                (DOUBLE_BUFFER_T*, GLOBALS_T*);
+void                __cdecl     DOUBLE_BUFFER_FillDirtyZones                    (RENDERER_T*, ASSETS_T*, GLOBALS_T*, LOG_T*);
+void                __cdecl     DOUBLE_BUFFER_DrawDirtyZones                    (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -36,11 +36,13 @@ typedef void        (__cdecl* RENDERER_CLEAR)                                   
 typedef void        (__cdecl* RENDERER_CLEAR_ENTITY)                            (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 typedef void        (__cdecl* RENDERER_FLIP_ENTITY)                             (RENDERER_T*, ENTITY_T*);
 typedef void        (__cdecl* RENDERER_HANDLE_PRE_PROCESSING)                   (RENDERER_T*, MENU_T*, ASSETS_T*, GLOBALS_T*, LOG_T*);
+typedef FRECT_T     (__cdecl* RENDERER_CAPTURE_DIRTY_ZONE)                      (RENDERER_T*, ENTITY_T*, SETTINGS_T*, CONSTANTS_T*);
+typedef void        (__cdecl* RENDERER_PREPARE_DIRTY_ZONE)                      (RENDERER_T*, FRECT_T, GLOBALS_T*, LOG_T*);
 typedef void        (__cdecl* RENDERER_PRESENT_FRAME)                           (RENDERER_T*);
 typedef void        (__cdecl* RENDERER_ENABLING_POST_PROCESSING)                (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
 typedef void        (__cdecl* RENDERER_DISABLING_POST_PROCESSING)               (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
 typedef void        (__cdecl* RENDERER_HANDLE_POST_PROCESSING)                  (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
-typedef void        (__cdecl* RENDERER_FLIP_AREA)                               (RENDERER_T*, int, int, int, int);
+typedef void        (__cdecl* RENDERER_FLIP_AREA)                               (RENDERER_T*, IRECT_T);
 typedef void        (__cdecl* RENDERER_APPLY_WORLD_TRANSFORM)                   (RENDERER_T*, TRANSFORM_TYPE_T, CONSTANTS_T*, float, FPOINT_T, LOG_T*);
 typedef void        (__cdecl* RENDERER_RESET_WORLD_TRANSFORM)                   (RENDERER_T*);
 typedef void        (__cdecl* RENDERER_INIT_WORLD_TRANSFORM)                    (RENDERER_T*);
@@ -51,9 +53,10 @@ typedef void        (__cdecl* RENDERER_DRAW_BUILD_LIMITS)                       
 typedef void        (__cdecl* RENDERER_DRAW_BUILD_TYPE)                         (RENDERER_T*, MENU_T*, ASSETS_T*, PICTURE_T*, FPOINT_T, IRECT_T);
 typedef void        (__cdecl* RENDERER_DRAW_SELECTION_AREA)                     (RENDERER_T*, GLOBALS_T*, ASSETS_T*);
 typedef void        (__cdecl* RENDERER_DRAW_TRANSLATION_THRESHOLD)              (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
+typedef void        (__cdecl* RENDERER_DRAW_DIRTY_ZONES)                        (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
 typedef void        (__cdecl* RENDERER_DRAW_PICTURE)                            (RENDERER_T*, PICTURE_T*, UINT8);
 typedef void        (__cdecl* RENDERER_DRAW_PICTURE_AT)                         (RENDERER_T*, PICTURE_T*, FPOINT_T, UINT8);
-typedef void        (__cdecl* RENDERER_CROP_DRAW_PICTURE_AT)                    (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, UINT8);
+typedef void        (__cdecl* RENDERER_CROP_DRAW_PICTURE_AT)                    (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, FPOINT_T, UINT8);
 typedef void        (__cdecl* RENDERER_DRAW_ENTITY_MINOR_VECTOR)                (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 typedef void        (__cdecl* RENDERER_DRAW_ENTITY_MAJOR_VECTOR)                (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 typedef void        (__cdecl* RENDERER_DRAW_ENTITY_ELLIPSE)                     (RENDERER_T*, ENTITY_T*, HPEN, HBRUSH, SETTINGS_T*);
@@ -77,6 +80,8 @@ typedef struct RENDERER {
     RENDERER_FLIP_ENTITY                    FlipEntity;
     RENDERER_PRESENT_FRAME                  PresentFrame;
     RENDERER_HANDLE_PRE_PROCESSING          HandlePreProcessing;
+    RENDERER_CAPTURE_DIRTY_ZONE             CaptureDirtyZone;
+    RENDERER_PREPARE_DIRTY_ZONE             PrepareDirtyZone;
     RENDERER_ENABLING_POST_PROCESSING       EnablingPostProcessing;
     RENDERER_DISABLING_POST_PROCESSING      DisablingPostProcessing;
     RENDERER_HANDLE_POST_PROCESSING         HandlePostProcessing;
@@ -91,6 +96,7 @@ typedef struct RENDERER {
     RENDERER_DRAW_BUILD_TYPE                DrawBuildType;
     RENDERER_DRAW_SELECTION_AREA            DrawSelectionArea;
     RENDERER_DRAW_TRANSLATION_THRESHOLD     DrawTranslationThreshold;
+    RENDERER_DRAW_DIRTY_ZONES               DrawDirtyZones;
     RENDERER_DRAW_PICTURE                   DrawPicture;
     RENDERER_DRAW_PICTURE_AT                DrawPictureAt;
     RENDERER_CROP_DRAW_PICTURE_AT           CropDrawPictureAt;
@@ -104,6 +110,8 @@ typedef struct RENDERER {
     FDELTA_T CapturedTranslationsBorder;
     FDELTA_T CapturedTranslationsKeys;
     FDELTA_T CapturedTranslationsMinimap;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UINT8 ubIsFullFrameRender;
 } RENDERER_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Prototypes:

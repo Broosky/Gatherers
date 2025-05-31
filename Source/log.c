@@ -91,7 +91,7 @@ void __cdecl LOG_Flush(LOG_T* p_Log, UINT8 ubGuarantee) {
         int iDescriptor = _fileno(p_Log->p_LogFile);
         HANDLE hFile = (HANDLE)_get_osfhandle(iDescriptor);
         if (hFile != INVALID_HANDLE_VALUE) {
-            UINT8 _discard = FlushFileBuffers(hFile);
+            UINT8 ubDiscard = FlushFileBuffers(hFile);
         }
     }
 }

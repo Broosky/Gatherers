@@ -32,7 +32,7 @@ void                __cdecl     PROCESS_ResetTranslations                       
 void                __cdecl     PROCESS_UpdateAnimations                        (GLOBALS_T*);
 void                __cdecl     PROCESS_PrepareFrame                            (RENDERER_T*, GLOBALS_T*, ASSETS_T*);
 void                __cdecl     PROCESS_HandlePreProcessing                     (RENDERER_T*, MENU_T*, ASSETS_T*, GLOBALS_T*, LOG_T*);
-void                __cdecl     PROCESS_ProcessEntities                         (RENDERER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*, LOG_T*, SETTINGS_T*);
+void                __cdecl     PROCESS_ProcessEntities                         (RENDERER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*, LOG_T*, SETTINGS_T*, CONSTANTS_T*);
 void                __cdecl     PROCESS_ProcessMessages                         (RENDERER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*, CONSTANTS_T*, LOG_T*);
 void                __cdecl     PROCESS_HandleDiagnostics                       (RENDERER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*, SETTINGS_T*);
 void                __cdecl     PROCESS_HandleResourceBar                       (RENDERER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*);
@@ -71,6 +71,7 @@ void                __cdecl     PROCESS_DrawTranslationThreshold                
 void                __cdecl     PROCESS_DrawHarvestedMinerals                   (RENDERER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*);
 void                __cdecl     PROCESS_DrawHarvestedGas                        (RENDERER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*);
 void                __cdecl     PROCESS_DrawSupplyAmounts                       (RENDERER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*);
+void				__cdecl		PROCESS_DrawDirtyZones							(RENDERER_T*, GLOBALS_T*, ASSETS_T*, MENU_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

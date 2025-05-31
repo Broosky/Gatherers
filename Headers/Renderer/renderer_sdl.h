@@ -48,7 +48,9 @@ void                __cdecl     SDL_EnablingPostProcessing                      
 void                __cdecl     SDL_DisablingPostProcessing                     (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
 void                __cdecl     SDL_HandlePostProcessing                        (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
 void                __cdecl     SDL_HandlePreProcessing                         (RENDERER_T*, MENU_T*, ASSETS_T*, GLOBALS_T*, LOG_T*);
-void                __cdecl     SDL_FlipArea                                    (RENDERER_T*, int, int, int, int);
+FRECT_T             __cdecl     SDL_CaptureDirtyZone                            (RENDERER_T*, ENTITY_T*, SETTINGS_T*, CONSTANTS_T*);
+void                __cdecl     SDL_PrepareDirtyZone                            (RENDERER_T*, FRECT_T, GLOBALS_T*, LOG_T*);
+void                __cdecl     SDL_FlipArea                                    (RENDERER_T*, IRECT_T);
 void                __cdecl     SDL_ApplyWorldTransform                         (RENDERER_T*, TRANSFORM_TYPE_T, CONSTANTS_T*, float, FPOINT_T, LOG_T*);
 void                __cdecl     SDL_ResetWorldTransform                         (RENDERER_T*);
 void                __cdecl     SDL_InitWorldTransform                          (RENDERER_T*);
@@ -61,11 +63,12 @@ void                __cdecl     SDL_DrawSelectionArea                           
 void                __cdecl     SDL_DrawTranslationThreshold                    (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
 void                __cdecl     SDL_DrawPicture                                 (RENDERER_T*, PICTURE_T*, UINT8);
 void                __cdecl     SDL_DrawPictureAt                               (RENDERER_T*, PICTURE_T*, FPOINT_T, UINT8);
-void                __cdecl     SDL_CropDrawPictureAt                           (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, UINT8);
+void                __cdecl     SDL_CropDrawPictureAt                           (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, FPOINT_T, UINT8);
 void                __cdecl     SDL_DrawEntityMinorVector                       (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 void                __cdecl     SDL_DrawEntityMajorVector                       (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 void                __cdecl     SDL_DrawEntityEllipse                           (RENDERER_T*, ENTITY_T*, HPEN, HBRUSH, SETTINGS_T*);
 void                __cdecl     SDL_DrawEntity                                  (RENDERER_T*, ENTITY_T*, UINT8);
+void                __cdecl     SDL_DrawDirtyZones                              (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -17,6 +17,8 @@ typedef struct MENU MENU_T;
 typedef struct ENTITY ENTITY_T;
 typedef struct GLOBALS GLOBALS_T;
 typedef struct SETTINGS SETTINGS_T;
+typedef struct RENDERER RENDERER_T;
+typedef struct CONSTANTS CONSTANT_T;
 typedef struct PATH_NODE PATH_NODE_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
@@ -56,7 +58,8 @@ void                __cdecl     PATH_MoveTo                                     
 void                __cdecl     PATH_MoveToPoint                                (ENTITY_T*, FPOINT_T, GLOBALS_T*, MENU_T*, SETTINGS_T*);
 void                __cdecl     PATH_FindMinorVector                            (ENTITY_T*, GLOBALS_T*, MENU_T*, SETTINGS_T*);
 FPOINT_T            __cdecl     PATH_FindMinorVectorHead                        (ENTITY_T*, ENTITY_T*, GLOBALS_T*, SETTINGS_T*);
-void                __cdecl     PATH_UpdatePosition                             (ENTITY_T*, GLOBALS_T*, MENU_T*, SETTINGS_T*);
+void                __cdecl     PATH_UpdatePosition                             (RENDERER_T*, ENTITY_T*, GLOBALS_T*, MENU_T*, SETTINGS_T*, CONSTANTS_T*, LOG_T*);
+void                __cdecl     PATH_SnapToPoint                                (ENTITY_T*, FPOINT_T);
 float               __cdecl     PATH_CalculateDistance                          (ENTITY_T*, ENTITY_T*);
 UINT8               __cdecl     PATH_IsSufficientlyCloseMinorVector             (ENTITY_T*, SETTINGS_T*);
 UINT8               __cdecl     PATH_IsSufficientlyCloseMajorVector             (ENTITY_T*, SETTINGS_T*);

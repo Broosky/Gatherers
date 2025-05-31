@@ -10,83 +10,85 @@
 #include "../../Headers/Renderer/renderer_sdl.h"
 #include <stdlib.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Local Only:
+// Local only:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SDL_Zero(SDL_T* p_Sdl) {
-    ZeroMemory(p_Sdl, sizeof(SDL_T));
+	ZeroMemory(p_Sdl, sizeof(SDL_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SDL_T* __cdecl SDL_Create(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
-    size_t stAllocation = sizeof(SDL_T);
-    SDL_T* p_Sdl = malloc(stAllocation);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!p_Sdl) {
-        MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "SDL_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
-        return NULL;
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Globals->stAllocations += stAllocation;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SDL_Zero(p_Sdl);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Renderer population.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Renderer->vp_Implementation = p_Sdl;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Renderer->GetClientArea = SDL_GetClientArea;
-    p_Renderer->Resize = SDL_Resize;
-    p_Renderer->Kill = SDL_Kill;
-    p_Renderer->SetBlitter = SDL_SetBlitter;
-    p_Renderer->Blitter = SDL_Blitter;
-    p_Renderer->Clear = SDL_Clear;
-    p_Renderer->ClearEntity = SDL_ClearEntity;
-    p_Renderer->FlipEntity = SDL_FlipEntity;
-    p_Renderer->PresentFrame = SDL_PresentFrame;
-    p_Renderer->HandlePreProcessing = SDL_HandlePreProcessing;
-    p_Renderer->EnablingPostProcessing = SDL_EnablingPostProcessing;
-    p_Renderer->DisablingPostProcessing = SDL_DisablingPostProcessing;
-    p_Renderer->HandlePostProcessing = SDL_HandlePostProcessing;
-    p_Renderer->FlipArea = SDL_FlipArea;
-    p_Renderer->ApplyWorldTransform = SDL_ApplyWorldTransform;
-    p_Renderer->ResetWorldTransform = SDL_ResetWorldTransform;
-    p_Renderer->InitWorldTransform = SDL_InitWorldTransform;
-    p_Renderer->DrawMinimapEntities = SDL_DrawMinimapEntities;
-    p_Renderer->DrawMinimapViewport = SDL_DrawMinimapViewport;
-    p_Renderer->DrawMinimapSelectionArea = SDL_DrawMinimapSelectionArea;
-    p_Renderer->DrawBuildLimits = SDL_DrawBuildLimits;
-    p_Renderer->DrawBuildType = SDL_DrawBuildType;
-    p_Renderer->DrawSelectionArea = SDL_DrawSelectionArea;
-    p_Renderer->DrawTranslationThreshold = SDL_DrawTranslationThreshold;
-    p_Renderer->DrawPicture = SDL_DrawPicture;
-    p_Renderer->DrawPictureAt = SDL_DrawPictureAt;
-    p_Renderer->CropDrawPictureAt = SDL_CropDrawPictureAt;
-    p_Renderer->DrawEntityMinorVector = SDL_DrawEntityMinorVector;
-    p_Renderer->DrawEntityMajorVector = SDL_DrawEntityMajorVector;
-    p_Renderer->DrawEntityEllipse = SDL_DrawEntityEllipse;
-    p_Renderer->DrawEntity = SDL_DrawEntity;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Unused, retained internally in renderer.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    return p_Sdl;
+	size_t stAllocation = sizeof(SDL_T);
+	SDL_T* p_Sdl = malloc(stAllocation);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (!p_Sdl) {
+		MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "SDL_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
+		return NULL;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Globals->stAllocations += stAllocation;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	SDL_Zero(p_Sdl);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Renderer population.
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Renderer->vp_Implementation = p_Sdl;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Renderer->GetClientArea = SDL_GetClientArea;
+	p_Renderer->Resize = SDL_Resize;
+	p_Renderer->Kill = SDL_Kill;
+	p_Renderer->SetBlitter = SDL_SetBlitter;
+	p_Renderer->Blitter = SDL_Blitter;
+	p_Renderer->Clear = SDL_Clear;
+	p_Renderer->ClearEntity = SDL_ClearEntity;
+	p_Renderer->FlipEntity = SDL_FlipEntity;
+	p_Renderer->PresentFrame = SDL_PresentFrame;
+	p_Renderer->HandlePreProcessing = SDL_HandlePreProcessing;
+	p_Renderer->CaptureDirtyZone = SDL_CaptureDirtyZone;
+	p_Renderer->PrepareDirtyZone = SDL_PrepareDirtyZone;
+	p_Renderer->EnablingPostProcessing = SDL_EnablingPostProcessing;
+	p_Renderer->DisablingPostProcessing = SDL_DisablingPostProcessing;
+	p_Renderer->HandlePostProcessing = SDL_HandlePostProcessing;
+	p_Renderer->FlipArea = SDL_FlipArea;
+	p_Renderer->ApplyWorldTransform = SDL_ApplyWorldTransform;
+	p_Renderer->ResetWorldTransform = SDL_ResetWorldTransform;
+	p_Renderer->InitWorldTransform = SDL_InitWorldTransform;
+	p_Renderer->DrawMinimapEntities = SDL_DrawMinimapEntities;
+	p_Renderer->DrawMinimapViewport = SDL_DrawMinimapViewport;
+	p_Renderer->DrawMinimapSelectionArea = SDL_DrawMinimapSelectionArea;
+	p_Renderer->DrawBuildLimits = SDL_DrawBuildLimits;
+	p_Renderer->DrawBuildType = SDL_DrawBuildType;
+	p_Renderer->DrawSelectionArea = SDL_DrawSelectionArea;
+	p_Renderer->DrawTranslationThreshold = SDL_DrawTranslationThreshold;
+	p_Renderer->DrawPicture = SDL_DrawPicture;
+	p_Renderer->DrawPictureAt = SDL_DrawPictureAt;
+	p_Renderer->CropDrawPictureAt = SDL_CropDrawPictureAt;
+	p_Renderer->DrawEntityMinorVector = SDL_DrawEntityMinorVector;
+	p_Renderer->DrawEntityMajorVector = SDL_DrawEntityMajorVector;
+	p_Renderer->DrawEntityEllipse = SDL_DrawEntityEllipse;
+	p_Renderer->DrawEntity = SDL_DrawEntity;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Unused, retained internally in renderer.
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	return p_Sdl;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SDL_T* __cdecl SDL_Cast(RENDERER_T* p_Renderer) {
-    return (SDL_T*)p_Renderer->vp_Implementation;
+	return (SDL_T*)p_Renderer->vp_Implementation;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Accessible via Renderer:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SDL_Kill(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals) {
-    SDL_T* p_Sdl = SDL_Cast(p_Renderer);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (p_Sdl) {
-        free(p_Sdl);
-        p_Globals->stAllocations -= sizeof(SDL_T);
-    }
+	SDL_T* p_Sdl = SDL_Cast(p_Renderer);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (p_Sdl) {
+		free(p_Sdl);
+		p_Globals->stAllocations -= sizeof(SDL_T);
+	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RECT __cdecl SDL_GetClientArea(RENDERER_T* p_Renderer) {
-    return (RECT) { 0, 0, 0 };
+	return (RECT) { .left = 0, .top = 0, .right = 0, .bottom = 0 };
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SDL_Resize(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
@@ -122,7 +124,20 @@ void __cdecl SDL_HandlePostProcessing(RENDERER_T* p_Renderer, MENU_T* p_Menu, GL
 void __cdecl SDL_HandlePreProcessing(RENDERER_T* p_Renderer, MENU_T* p_Menu, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl SDL_FlipArea(RENDERER_T* p_Renderer, int iX, int iY, int iWidth, int iHeight) {
+FRECT_T __cdecl SDL_CaptureDirtyZone(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, SETTINGS_T* p_Settings, CONSTANTS_T* p_Constants) {
+	return (FRECT_T) {
+		.Location = { .fX = 0.0f, .fY = 0.0f },
+			.Size = { .fDx = 0.0f, .fDy = 0.0f }
+	};
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl SDL_DrawDirtyZones(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl SDL_PrepareDirtyZone(RENDERER_T* p_Renderer, FRECT_T DirtyZone, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl SDL_FlipArea(RENDERER_T* p_Renderer, IRECT_T Area) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SDL_ApplyWorldTransform(RENDERER_T* p_Renderer, TRANSFORM_TYPE_T eType, CONSTANTS_T* p_Constants, float fValue, FPOINT_T Pin, LOG_T* p_Log) {
@@ -161,7 +176,7 @@ void __cdecl SDL_DrawPicture(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, UINT8
 void __cdecl SDL_DrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T Location, UINT8 ubMask) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl SDL_CropDrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T CropStart, FDELTA_T CropDelta, UINT8 ubMask) {
+void __cdecl SDL_CropDrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T CropDestination, FDELTA_T CropDelta, FPOINT_T CropSource, UINT8 ubMask) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl SDL_DrawEntityMinorVector(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {

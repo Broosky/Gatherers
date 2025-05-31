@@ -10,83 +10,85 @@
 #include "../../Headers/Renderer/renderer_wireframe.h"
 #include <stdlib.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Local Only:
+// Local only:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl WIREFRAME_Zero(WIREFRAME_T* p_Wireframe) {
-    ZeroMemory(p_Wireframe, sizeof(WIREFRAME_T));
+	ZeroMemory(p_Wireframe, sizeof(WIREFRAME_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 WIREFRAME_T* __cdecl WIREFRAME_Create(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
-    size_t stAllocation = sizeof(WIREFRAME_T);
-    WIREFRAME_T* p_Wireframe = malloc(stAllocation);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (!p_Wireframe) {
-        MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "WIREFRAME_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
-        return NULL;
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Globals->stAllocations += stAllocation;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    WIREFRAME_Zero(p_Wireframe);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Renderer population.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Renderer->vp_Implementation = p_Wireframe;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Renderer->GetClientArea = WIREFRAME_GetClientArea;
-    p_Renderer->Resize = WIREFRAME_Resize;
-    p_Renderer->Kill = WIREFRAME_Kill;
-    p_Renderer->SetBlitter = WIREFRAME_SetBlitter;
-    p_Renderer->Blitter = WIREFRAME_Blitter;
-    p_Renderer->Clear = WIREFRAME_Clear;
-    p_Renderer->ClearEntity = WIREFRAME_ClearEntity;
-    p_Renderer->FlipEntity = WIREFRAME_FlipEntity;
-    p_Renderer->PresentFrame = WIREFRAME_PresentFrame;
-    p_Renderer->HandlePreProcessing = WIREFRAME_HandlePreProcessing;
-    p_Renderer->EnablingPostProcessing = WIREFRAME_EnablingPostProcessing;
-    p_Renderer->DisablingPostProcessing = WIREFRAME_DisablingPostProcessing;
-    p_Renderer->HandlePostProcessing = WIREFRAME_HandlePostProcessing;
-    p_Renderer->FlipArea = WIREFRAME_FlipArea;
-    p_Renderer->ApplyWorldTransform = WIREFRAME_ApplyWorldTransform;
-    p_Renderer->ResetWorldTransform = WIREFRAME_ResetWorldTransform;
-    p_Renderer->InitWorldTransform = WIREFRAME_InitWorldTransform;
-    p_Renderer->DrawMinimapEntities = WIREFRAME_DrawMinimapEntities;
-    p_Renderer->DrawMinimapViewport = WIREFRAME_DrawMinimapViewport;
-    p_Renderer->DrawMinimapSelectionArea = WIREFRAME_DrawMinimapSelectionArea;
-    p_Renderer->DrawBuildLimits = WIREFRAME_DrawBuildLimits;
-    p_Renderer->DrawBuildType = WIREFRAME_DrawBuildType;
-    p_Renderer->DrawSelectionArea = WIREFRAME_DrawSelectionArea;
-    p_Renderer->DrawTranslationThreshold = WIREFRAME_DrawTranslationThreshold;
-    p_Renderer->DrawPicture = WIREFRAME_DrawPicture;
-    p_Renderer->DrawPictureAt = WIREFRAME_DrawPictureAt;
-    p_Renderer->CropDrawPictureAt = WIREFRAME_CropDrawPictureAt;
-    p_Renderer->DrawEntityMinorVector = WIREFRAME_DrawEntityMinorVector;
-    p_Renderer->DrawEntityMajorVector = WIREFRAME_DrawEntityMajorVector;
-    p_Renderer->DrawEntityEllipse = WIREFRAME_DrawEntityEllipse;
-    p_Renderer->DrawEntity = WIREFRAME_DrawEntity;
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Unused, retained internally in renderer.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    return p_Wireframe;
+	size_t stAllocation = sizeof(WIREFRAME_T);
+	WIREFRAME_T* p_Wireframe = malloc(stAllocation);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (!p_Wireframe) {
+		MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "WIREFRAME_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
+		return NULL;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Globals->stAllocations += stAllocation;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	WIREFRAME_Zero(p_Wireframe);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Renderer population.
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Renderer->vp_Implementation = p_Wireframe;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	p_Renderer->GetClientArea = WIREFRAME_GetClientArea;
+	p_Renderer->Resize = WIREFRAME_Resize;
+	p_Renderer->Kill = WIREFRAME_Kill;
+	p_Renderer->SetBlitter = WIREFRAME_SetBlitter;
+	p_Renderer->Blitter = WIREFRAME_Blitter;
+	p_Renderer->Clear = WIREFRAME_Clear;
+	p_Renderer->ClearEntity = WIREFRAME_ClearEntity;
+	p_Renderer->FlipEntity = WIREFRAME_FlipEntity;
+	p_Renderer->PresentFrame = WIREFRAME_PresentFrame;
+	p_Renderer->HandlePreProcessing = WIREFRAME_HandlePreProcessing;
+	p_Renderer->CaptureDirtyZone = WIREFRAME_CaptureDirtyZone;
+	p_Renderer->PrepareDirtyZone = WIREFRAME_PrepareDirtyZone;
+	p_Renderer->EnablingPostProcessing = WIREFRAME_EnablingPostProcessing;
+	p_Renderer->DisablingPostProcessing = WIREFRAME_DisablingPostProcessing;
+	p_Renderer->HandlePostProcessing = WIREFRAME_HandlePostProcessing;
+	p_Renderer->FlipArea = WIREFRAME_FlipArea;
+	p_Renderer->ApplyWorldTransform = WIREFRAME_ApplyWorldTransform;
+	p_Renderer->ResetWorldTransform = WIREFRAME_ResetWorldTransform;
+	p_Renderer->InitWorldTransform = WIREFRAME_InitWorldTransform;
+	p_Renderer->DrawMinimapEntities = WIREFRAME_DrawMinimapEntities;
+	p_Renderer->DrawMinimapViewport = WIREFRAME_DrawMinimapViewport;
+	p_Renderer->DrawMinimapSelectionArea = WIREFRAME_DrawMinimapSelectionArea;
+	p_Renderer->DrawBuildLimits = WIREFRAME_DrawBuildLimits;
+	p_Renderer->DrawBuildType = WIREFRAME_DrawBuildType;
+	p_Renderer->DrawSelectionArea = WIREFRAME_DrawSelectionArea;
+	p_Renderer->DrawTranslationThreshold = WIREFRAME_DrawTranslationThreshold;
+	p_Renderer->DrawPicture = WIREFRAME_DrawPicture;
+	p_Renderer->DrawPictureAt = WIREFRAME_DrawPictureAt;
+	p_Renderer->CropDrawPictureAt = WIREFRAME_CropDrawPictureAt;
+	p_Renderer->DrawEntityMinorVector = WIREFRAME_DrawEntityMinorVector;
+	p_Renderer->DrawEntityMajorVector = WIREFRAME_DrawEntityMajorVector;
+	p_Renderer->DrawEntityEllipse = WIREFRAME_DrawEntityEllipse;
+	p_Renderer->DrawEntity = WIREFRAME_DrawEntity;
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Unused, retained internally in renderer.
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	return p_Wireframe;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 WIREFRAME_T* __cdecl WIREFRAME_Cast(RENDERER_T* p_Renderer) {
-    return (WIREFRAME_T*)p_Renderer->vp_Implementation;
+	return (WIREFRAME_T*)p_Renderer->vp_Implementation;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Accessible via Renderer:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl WIREFRAME_Kill(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals) {
-    WIREFRAME_T* p_Wireframe = WIREFRAME_Cast(p_Renderer);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (p_Wireframe) {
-        free(p_Wireframe);
-        p_Globals->stAllocations -= sizeof(WIREFRAME_T);
-    }
+	WIREFRAME_T* p_Wireframe = WIREFRAME_Cast(p_Renderer);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (p_Wireframe) {
+		free(p_Wireframe);
+		p_Globals->stAllocations -= sizeof(WIREFRAME_T);
+	}
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RECT __cdecl WIREFRAME_GetClientArea(RENDERER_T* p_Renderer) {
-    return (RECT){ 0, 0, 0 };
+	return (RECT) { .left = 0, .top = 0, .right = 0, .bottom = 0 };
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl WIREFRAME_Resize(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
@@ -122,7 +124,20 @@ void __cdecl WIREFRAME_HandlePostProcessing(RENDERER_T* p_Renderer, MENU_T* p_Me
 void __cdecl WIREFRAME_HandlePreProcessing(RENDERER_T* p_Renderer, MENU_T* p_Menu, ASSETS_T* p_Assets, GLOBALS_T* p_Globals, LOG_T* p_Log) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WIREFRAME_FlipArea(RENDERER_T* p_Renderer, int iX, int iY, int iWidth, int iHeight) {
+FRECT_T __cdecl WIREFRAME_CaptureDirtyZone(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, SETTINGS_T* p_Settings, CONSTANTS_T* p_Constants) {
+	return (FRECT_T) {
+		.Location = { .fX = 0.0f, .fY = 0.0f },
+			.Size = { .fDx = 0.0f, .fDy = 0.0f }
+	};
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WIREFRAME_DrawDirtyZones(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WIREFRAME_PrepareDirtyZone(RENDERER_T* p_Renderer, FRECT_T DirtyZone, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl WIREFRAME_FlipArea(RENDERER_T* p_Renderer, IRECT_T Area) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl WIREFRAME_ApplyWorldTransform(RENDERER_T* p_Renderer, TRANSFORM_TYPE_T eType, CONSTANTS_T* p_Constants, float fValue, FPOINT_T Pin, LOG_T* p_Log) {
@@ -161,7 +176,7 @@ void __cdecl WIREFRAME_DrawPicture(RENDERER_T* p_Renderer, PICTURE_T* p_Picture,
 void __cdecl WIREFRAME_DrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T Location, UINT8 ubMask) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl WIREFRAME_CropDrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T CropStart, FDELTA_T CropDelta, UINT8 ubMask) {
+void __cdecl WIREFRAME_CropDrawPictureAt(RENDERER_T* p_Renderer, PICTURE_T* p_Picture, FPOINT_T CropDestination, FDELTA_T CropDelta, FPOINT_T CropSource, UINT8 ubMask) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl WIREFRAME_DrawEntityMinorVector(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, ASSETS_T* p_Assets) {

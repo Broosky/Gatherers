@@ -46,6 +46,9 @@ typedef struct GLOBALS {
     UINT8 ubClickOriginFromMinimap;
     UINT8 ubCreate;
     UINT8 ubIsBorderless;
+    UINT8 ubIsSelecting;
+    UINT8 ubIsFullscreenToggled;
+    UINT8 ubIsBorderlessToggled;
     char szBuffer[128];
     float fEngineTime;
     float fEngineTimeSum;

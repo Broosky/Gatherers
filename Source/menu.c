@@ -50,6 +50,7 @@ void __cdecl MENU_Init(MENU_T* p_Menu) {
     p_Menu->ubDrawStatistics = 1;
     p_Menu->ubEnableMasking = 1;
     p_Menu->ubDrawResources = 1;
+    p_Menu->ubDrawDirtyZones = 1;
     p_Menu->ubDrawIds = 1;
     p_Menu->ubDrawStatuses = 1;
     p_Menu->ubDrawMinorVectors = 1;
@@ -69,6 +70,7 @@ void __cdecl MENU_Init(MENU_T* p_Menu) {
     CheckMenuItem(hMenu, MENU_OPTIONS_STATUSES, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_OPTIONS_RESOURCES, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_OPTIONS_STATISTICS, MF_CHECKED);
+    CheckMenuItem(hMenu, MENU_OPTIONS_DIRTY_ZONES, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_RENDERER_DOUBLE_BUFFER, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_SIMULATION_TOGGLE_SCATTER, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_OPTIONS_SHOW_MINOR_VECTORS, MF_CHECKED);

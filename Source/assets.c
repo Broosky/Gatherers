@@ -190,6 +190,7 @@ void __cdecl ASSETS_CreateBrushes(ASSETS_T* p_Assets) {
     p_Assets->hPenTranslation =     CreatePen(PS_SOLID, 1, RGB(200,     200,    200));
     p_Assets->hPenMinorVector =     CreatePen(PS_SOLID, 1, RGB(255,     165,    0));
     p_Assets->hPenMajorVector =     CreatePen(PS_SOLID, 1, RGB(0,       255,    255));
+    p_Assets->hPenDirtyZone =       CreatePen(PS_SOLID, 1, RGB(255,     0,      255));
     p_Assets->hPenWhite =           CreatePen(PS_SOLID, 1, RGB(255,     255,    255));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,6 +227,7 @@ void __cdecl ASSETS_KillBrushes(ASSETS_T* p_Assets) {
     DeleteObject(p_Assets->hPenTranslation);
     DeleteObject(p_Assets->hPenMinorVector);
     DeleteObject(p_Assets->hPenMajorVector);
+    DeleteObject(p_Assets->hPenDirtyZone);
     DeleteObject(p_Assets->hPenWhite);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

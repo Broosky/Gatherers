@@ -44,8 +44,6 @@ ENTITY_T* __cdecl AI_FindClosest(ENTITY_T* p_Inquirer, ENTITY_TYPE_T eType, GLOB
     return p_Closest;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Allocation adjustments include an extra element to detect a null pointer during enumerations.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 AI_CLOSEST_T* __cdecl AI_FindClosestByDistance(ENTITY_T* p_Inquirer, ENTITY_TYPE_T eType, GLOBALS_T* p_Globals, LOG_T* p_Log) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     AI_CLOSEST_T* p_Head = NULL;
@@ -60,7 +58,7 @@ AI_CLOSEST_T* __cdecl AI_FindClosestByDistance(ENTITY_T* p_Inquirer, ENTITY_TYPE
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (!p_Node) {
                 MISC_WriteOut(p_Log, LOG_SEVERITY_FATAL, "AI_FindClosestByDistance(): Allocation failed.\n");
-                UINT8 _discard = MAIN_FailFast(p_Globals, p_Log);
+                UINT8 ubDiscard = MAIN_FailFast(p_Globals, p_Log);
                 return NULL;
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +87,7 @@ AI_CLOSEST_T* __cdecl AI_FindClosestByDistance(ENTITY_T* p_Inquirer, ENTITY_TYPE
     return p_Head;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals, LOG_T* p_Log, MENU_T* p_Menu, SETTINGS_T* p_Settings) {
+void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals, LOG_T* p_Log, MENU_T* p_Menu, CONSTANTS_T* p_Constants, SETTINGS_T* p_Settings) {
     if (p_Worker->ubIsCarryingMinerals || p_Worker->ubIsCarryingGas) {
         ENTITY_T* p_ComCenter = AI_FindClosest(p_Worker, ENTITY_TYPE_COMMAND, p_Globals, p_Settings);
         if (p_ComCenter) {
@@ -108,7 +106,7 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals, LOG_T* p
                     }
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     snprintf(p_Globals->szBuffer, sizeof(p_Globals->szBuffer), "%d", p_Worker->iMineralCount);
-                    MESSAGE_Create(p_Globals->szBuffer, p_Worker->CenterPoint, eMessageStyle, p_Globals, p_Log);
+                    MESSAGE_Create(p_Globals->szBuffer, p_Worker->CenterPoint, eMessageStyle, p_Globals, p_Constants, p_Log);
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     p_Globals->iMineralCount += p_Worker->iMineralCount;
                     p_ComCenter->iMineralCount += p_Worker->iMineralCount;
@@ -133,7 +131,7 @@ void __cdecl AI_HandleWorkers(ENTITY_T* p_Worker, GLOBALS_T* p_Globals, LOG_T* p
                     }
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     snprintf(p_Globals->szBuffer, sizeof(p_Globals->szBuffer), "%d", p_Worker->iGasCount);
-                    MESSAGE_Create(p_Globals->szBuffer, p_Worker->CenterPoint, usMessageStyle, p_Globals, p_Log);
+                    MESSAGE_Create(p_Globals->szBuffer, p_Worker->CenterPoint, usMessageStyle, p_Globals, p_Constants, p_Log);
                     /////////////////////////////////////////////////////////////////////////////////////////////////////////
                     p_Globals->iGasCount += p_Worker->iGasCount;
                     p_ComCenter->iGasCount += p_Worker->iGasCount;

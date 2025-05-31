@@ -17,16 +17,16 @@ void __cdecl MESSAGE_Zero(MESSAGE_T* p_Message) {
     ZeroMemory(p_Message, sizeof(MESSAGE_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl MESSAGE_Create(char* p_szMessage, FPOINT_T Location, MESSAGE_TYPE_T eType, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+void __cdecl MESSAGE_Create(char* p_szMessage, FPOINT_T Location, MESSAGE_TYPE_T eType, GLOBALS_T* p_Globals, CONSTANTS_T* p_Constants, LOG_T* p_Log) {
     MESSAGE_T* p_Message = (MESSAGE_T*)HEAP_ALLOCATOR_Alloc(p_Globals->p_MessagesAllocator, p_Log);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (!p_Message) {
         MISC_WriteOut(p_Log, LOG_SEVERITY_FATAL, "MESSAGE_Create(): Allocation failed.\n");
-        UINT8 _discard = MAIN_FailFast(p_Globals, p_Log);
+        UINT8 ubDiscard = MAIN_FailFast(p_Globals, p_Log);
         return;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Message->sLifespan = 35;
+    p_Message->sLifespan = p_Constants->sMessageLifespan;
     p_Message->fScale = 1.0f;
     p_Message->fAngle = 0.0f;
     p_Message->Location = Location;

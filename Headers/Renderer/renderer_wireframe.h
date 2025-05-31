@@ -48,7 +48,9 @@ void                __cdecl     WIREFRAME_EnablingPostProcessing                
 void                __cdecl     WIREFRAME_DisablingPostProcessing               (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
 void                __cdecl     WIREFRAME_HandlePostProcessing                  (RENDERER_T*, MENU_T*, GLOBALS_T*, LOG_T*);
 void                __cdecl     WIREFRAME_HandlePreProcessing                   (RENDERER_T*, MENU_T*, ASSETS_T*, GLOBALS_T*, LOG_T*);
-void                __cdecl     WIREFRAME_FlipArea                              (RENDERER_T*, int, int, int, int);
+FRECT_T             __cdecl     WIREFRAME_CaptureDirtyZone                      (RENDERER_T*, ENTITY_T*, SETTINGS_T*, CONSTANTS_T*);
+void                __cdecl     WIREFRAME_PrepareDirtyZone                      (RENDERER_T*, FRECT_T, GLOBALS_T*, LOG_T*);
+void                __cdecl     WIREFRAME_FlipArea                              (RENDERER_T*, IRECT_T);
 void                __cdecl     WIREFRAME_ApplyWorldTransform                   (RENDERER_T*, TRANSFORM_TYPE_T, CONSTANTS_T*, float, FPOINT_T, LOG_T*);
 void                __cdecl     WIREFRAME_ResetWorldTransform                   (RENDERER_T*);
 void                __cdecl     WIREFRAME_InitWorldTransform                    (RENDERER_T*);
@@ -61,11 +63,12 @@ void                __cdecl     WIREFRAME_DrawSelectionArea                     
 void                __cdecl     WIREFRAME_DrawTranslationThreshold              (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
 void                __cdecl     WIREFRAME_DrawPicture                           (RENDERER_T*, PICTURE_T*, UINT8);
 void                __cdecl     WIREFRAME_DrawPictureAt                         (RENDERER_T*, PICTURE_T*, FPOINT_T, UINT8);
-void                __cdecl     WIREFRAME_CropDrawPictureAt                     (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, UINT8);
+void                __cdecl     WIREFRAME_CropDrawPictureAt                     (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, FPOINT_T, UINT8);
 void                __cdecl     WIREFRAME_DrawEntityMinorVector                 (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 void                __cdecl     WIREFRAME_DrawEntityMajorVector                 (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 void                __cdecl     WIREFRAME_DrawEntityEllipse                     (RENDERER_T*, ENTITY_T*, HPEN, HBRUSH, SETTINGS_T*);
 void                __cdecl     WIREFRAME_DrawEntity                            (RENDERER_T*, ENTITY_T*, UINT8);
+void                __cdecl     WIREFRAME_DrawDirtyZones                        (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

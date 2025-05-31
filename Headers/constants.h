@@ -58,6 +58,7 @@
 #define MENU_OPTIONS_ENABLE_TRANSLATIONS                21200
 #define MENU_OPTIONS_TOPMOST                            21300
 #define MENU_OPTIONS_FULLSCREEN                         21400
+#define MENU_OPTIONS_DIRTY_ZONES                        21500
 // Renderer /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define MENU_RENDERER_WIREFRAME                         25000
 #define MENU_RENDERER_SINGLE_BUFFER                     25100
@@ -97,8 +98,10 @@ typedef struct CONSTANTS {
     char szAppName[64];
     char szDefaultSettingsFile[64];
     char szDefaultLogFile[64];
-	char szDefaultSaveFile[64];
+    char szDefaultSaveFile[64];
     float fPi;
+    float fDirtyZoneBuffer;
+    short sMessageLifespan;
     // List sorting constants:
     USHORT usWorkersToFront;
     USHORT usMineralsToFront;
