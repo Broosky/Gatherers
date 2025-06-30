@@ -48,7 +48,7 @@ Active development continues here when time allows. See the legacy repo for earl
 - Blitter index as enum.
 - Directories for the logger.
 - Consolidate TTS.
-- 
+
 ---
 
 ## 🔹 May 2025 Updates
