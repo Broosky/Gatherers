@@ -1,134 +1,134 @@
 {
-  "tasks": [
-    {
-      "label": "Linux i686 - Build Resources (Debug).",
-      "type": "shell",
-      "command": "/usr/bin/i686-w64-mingw32-windres",
-      "args": [
-        "-DDEBUG",
-        "-J",
-        "rc",
-        "-O",
-        "coff",
-        "-i",
-        "${workspaceRoot}/Resources/main.rc",
-        "-o",
-        "${workspaceRoot}/Resources/main.res"
-      ],
-      "options": {
-        "cwd": "${fileDirname}"
-      },
-      "problemMatcher": [
-        "$gcc"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "detail": "Linux i686 - Build Resources (Debug)."
-    },
-    {
-      "label": "Linux i686 - Build Resources (Release).",
-      "type": "shell",
-      "command": "/usr/bin/i686-w64-mingw32-windres",
-      "args": [
-        "-DRELEASE",
-        "-J",
-        "rc",
-        "-O",
-        "coff",
-        "-i",
-        "${workspaceRoot}/Resources/main.rc",
-        "-o",
-        "${workspaceRoot}/Resources/main.res"
-      ],
-      "options": {
-        "cwd": "${fileDirname}"
-      },
-      "problemMatcher": [
-        "$gcc"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "detail": "Linux i686 - Build Resources (Release)."
-    },
-    {
-      "type": "shell",
-      "label": "Linux i686 - Build Application (Debug).",
-      "command": "/usr/bin/i686-w64-mingw32-gcc",
-      "args": [
-        "-DDEBUG",
-        "-g",
-        "-O0",
-        "-ggdb",
-        "-fno-inline",
-        "-fno-omit-frame-pointer",
-        "-Wall",
-        "-mwindows",
-        "${workspaceRoot}/Source/*.c",
-        "${workspaceRoot}/Source/Renderer/*.c",
-        "${workspaceRoot}/Source/Windows/*.c",
-        "${workspaceRoot}/Resources/main.res",
-        "-o",
-        "${workspaceRoot}/bin/Debug/Gatherers.exe"
-      ],
-      "options": {
-        "cwd": "${fileDirname}"
-      },
-      "problemMatcher": [
-        "$gcc"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "dependsOn": [
-        "Linux i686 - Build Resources (Debug)."
-      ],
-      "detail": "Linux i686 - Build Application (Debug)."
-    },
-    {
-      "type": "shell",
-      "label": "Linux i686 - Build Application (Release).",
-      "command": "/usr/bin/i686-w64-mingw32-gcc",
-      "args": [
-        "-DRELEASE",
-        "-DNDEBUG",
-        "-O3",
-        "-march=native",
-        "-flto",
-        "-funroll-loops",
-        "-fomit-frame-pointer",
-        "-fstrict-aliasing",
-        "-ffast-math",
-        "-funroll-all-loops",
-        "-fno-exceptions",
-        "-Wall",
-        "-mwindows",
-        "${workspaceRoot}/Source/*.c",
-        "${workspaceRoot}/Source/Renderer/*.c",
-        "${workspaceRoot}/Source/Windows/*.c",
-        "${workspaceRoot}/Resources/main.res",
-        "-o",
-        "${workspaceRoot}/bin/Release/Gatherers.exe"
-      ],
-      "options": {
-        "cwd": "${fileDirname}"
-      },
-      "problemMatcher": [
-        "$gcc"
-      ],
-      "group": {
-        "kind": "build",
-        "isDefault": true
-      },
-      "dependsOn": [
-        "Linux i686 - Build Resources (Release)."
-      ],
-      "detail": "Linux i686 - Build Application (Release)."
-    }
-  ],
-  "version": "2.0.0"
+    "tasks": [
+        {
+            "label": "Linux i686 - Build Resources (Debug).",
+            "type": "shell",
+            "command": "/usr/bin/i686-w64-mingw32-windres",
+            "args": [
+                "-DDEBUG",
+                "-J",
+                "rc",
+                "-O",
+                "coff",
+                "-i",
+                "${workspaceRoot}/Resources/main.rc",
+                "-o",
+                "${workspaceRoot}/Resources/main.res"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Linux i686 - Build Resources (Debug)."
+        },
+        {
+            "label": "Linux i686 - Build Resources (Release).",
+            "type": "shell",
+            "command": "/usr/bin/i686-w64-mingw32-windres",
+            "args": [
+                "-DRELEASE",
+                "-J",
+                "rc",
+                "-O",
+                "coff",
+                "-i",
+                "${workspaceRoot}/Resources/main.rc",
+                "-o",
+                "${workspaceRoot}/Resources/main.res"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Linux i686 - Build Resources (Release)."
+        },
+        {
+            "type": "shell",
+            "label": "Linux i686 - Build Application (Debug).",
+            "command": "/usr/bin/i686-w64-mingw32-gcc",
+            "args": [
+                "-DDEBUG",
+                "-g",
+                "-O0",
+                "-ggdb",
+                "-fno-inline",
+                "-fno-omit-frame-pointer",
+                "-Wall",
+                "-mwindows",
+                "${workspaceRoot}/Source/*.c",
+                "${workspaceRoot}/Source/Renderer/*.c",
+                "${workspaceRoot}/Source/Windows/*.c",
+                "${workspaceRoot}/Resources/main.res",
+                "-o",
+                "${workspaceRoot}/bin/Debug/Gatherers.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Linux i686 - Build Resources (Debug)."
+            ],
+            "detail": "Linux i686 - Build Application (Debug)."
+        },
+        {
+            "type": "shell",
+            "label": "Linux i686 - Build Application (Release).",
+            "command": "/usr/bin/i686-w64-mingw32-gcc",
+            "args": [
+                "-DRELEASE",
+                "-DNDEBUG",
+                "-O3",
+                "-march=native",
+                "-flto",
+                "-funroll-loops",
+                "-fomit-frame-pointer",
+                "-fstrict-aliasing",
+                "-ffast-math",
+                "-funroll-all-loops",
+                "-fno-exceptions",
+                "-Wall",
+                "-mwindows",
+                "${workspaceRoot}/Source/*.c",
+                "${workspaceRoot}/Source/Renderer/*.c",
+                "${workspaceRoot}/Source/Windows/*.c",
+                "${workspaceRoot}/Resources/main.res",
+                "-o",
+                "${workspaceRoot}/bin/Release/Gatherers.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "Linux i686 - Build Resources (Release)."
+            ],
+            "detail": "Linux i686 - Build Application (Release)."
+        }
+    ],
+    "version": "2.0.0"
 }

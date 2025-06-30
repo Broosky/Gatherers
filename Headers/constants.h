@@ -7,9 +7,10 @@
 #define _CONSTANTS_H_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "common.h"
+#include "common_types.h"
 #include "Windows/windows_minified.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Resource constants
+// Resource constants:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Max: LOWORD(lParam) = WORD = ushort = 0 - 65,535
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +26,7 @@
 #define MENU_SIMULATION_FREE                            5200
 #define MENU_SIMULATION_PRINT                           5300
 #define MENU_SIMULATION_EXIT                            5400
-#define MENU_SIMULATION_SAVE    					    5500
+#define MENU_SIMULATION_SAVE                            5500
 #define MENU_SIMULATION_LOAD                            5600
 // Delete ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define MENU_DELETE_SELECTED                            10000
@@ -59,6 +60,8 @@
 #define MENU_OPTIONS_TOPMOST                            21300
 #define MENU_OPTIONS_FULLSCREEN                         21400
 #define MENU_OPTIONS_DIRTY_ZONES                        21500
+#define MENU_OPTIONS_SHOW_TERRAIN_GRID                  21600
+#define MENU_OPTIONS_SHOW_TRANSLATION_THRESHOLD         21700
 // Renderer /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define MENU_RENDERER_WIREFRAME                         25000
 #define MENU_RENDERER_SINGLE_BUFFER                     25100
@@ -68,7 +71,7 @@
 #define MENU_RENDERER_POST_PROCESSING_ENABLE            25500
 #define MENU_RENDERER_POST_PROCESSING_BOX_BLUR          25600
 #define MENU_RENDERER_POST_PROCESSING_GREEN_MASK        25700    
-#define MENU_RENDERER_POST_PROCESSING_DARKEN            25800    
+#define MENU_RENDERER_POST_PROCESSING_DARKEN            25800
 // Log //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define MENU_LOG_OPEN                                   30000
 // Settings /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +105,10 @@ typedef struct CONSTANTS {
     float fPi;
     float fDirtyZoneBuffer;
     short sMessageLifespan;
+    UIDELTA_T MaxClientSize;
+    UIDELTA_T MinClientSize;
+    UINT uiTerrainTilesX;
+    UINT uiTerrainTilesY;
     // List sorting constants:
     USHORT usWorkersToFront;
     USHORT usMineralsToFront;

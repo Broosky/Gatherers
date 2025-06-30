@@ -14,6 +14,7 @@
 typedef struct LOG LOG_T;
 typedef struct ENTITY ENTITY_T;
 typedef struct GLOBALS GLOBALS_T;
+typedef struct CONSTANTS CONSTANTS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,8 +32,8 @@ typedef struct SETTINGS {
     USHORT usCostOfRefineryMinerals;
     USHORT usCostOfRefineryGas;
     // [AppSettings]
-    float fEngineFPS;
-    float fAnimateFPS;
+    float fEngineFpsTarget;
+    float fAnimateFpsTarget;
     float fMaintenanceTimebase;
     USHORT usInitialClientWidth;
     USHORT usInitialClientHeight;
@@ -79,10 +80,10 @@ typedef struct SETTINGS {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void                __cdecl     SETTINGS_Zero                                   (SETTINGS_T*);
 SETTINGS_T*         __cdecl     SETTINGS_Create                                 (GLOBALS_T*, LOG_T*);
-UINT8               __cdecl     SETTINGS_InitFromFile                           (SETTINGS_T*, LOG_T*, const char* const);
+UINT8               __cdecl     SETTINGS_InitFromFile                           (SETTINGS_T*, CONSTANTS_T*, LOG_T*, const char* const);
 UINT8               __cdecl     SETTINGS_Match                                  (const char* const, const char* const);
 void                __cdecl     SETTINGS_Print                                  (SETTINGS_T*, LOG_T*);
-void                __cdecl     SETTINGS_PropagateHotReload                     (SETTINGS_T*, LOG_T*, char*, GLOBALS_T*);
+void                __cdecl     SETTINGS_PropagateHotReload                     (SETTINGS_T*, CONSTANTS_T*, LOG_T*, char*, GLOBALS_T*);
 void                __cdecl     SETTINGS_Kill                                   (SETTINGS_T**, GLOBALS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif

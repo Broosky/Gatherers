@@ -7,6 +7,8 @@
 #define _ASSETS_H_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "common.h"
+#include "constants.h"
+#include "enums.h"
 #include "picture.h"
 #include "Windows/windows_minified.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,22 +16,43 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct LOG LOG_T;
 typedef struct GLOBALS GLOBALS_T;
+typedef struct SETTINGS SETTINGS_T;
+typedef struct CONSTANTS CONSTANTS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 typedef struct ASSETS {
-    PICTURE_T Blitter[9],
-        Worker[3],
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Viewport entities:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_T Blitter[BLITTER_COLOR_COUNT],
+        Card[4],
         Command[26],
-        Mineral[5],
-        Supply[6],
-        Refinery[1],
-        HUD[5],
-        Minimap[1],
         Gas[1],
-        Terrain[1],
-        Card[5];
-
+        HUD[2],
+        Mineral[5],
+        Minimap[1],
+        Refinery[1],
+        Supply[6],
+        Worker[3];
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Minimap entities:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_T CommandMini,
+        MineralMini,
+        RefineryMini,
+        SupplyMini,
+        WorkerMini;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Dynamic terrain:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_T* Terrain;
+    PICTURE_T* TerrainMini;
+    size_t stAllocationsTerrain;
+    size_t stAllocationsTerrainMini;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Brushes:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     HBRUSH hBrushSelected,
         hBrushHighlighted,
         hBrushWorker,
@@ -47,7 +70,9 @@ typedef struct ASSETS {
         hBrush100r0g100b,
         hBrush100r100g100b,
         hBrushWhite;
-    
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Pens:
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     HPEN hPenSelected,
         hPenHighlighted,
         hPenWorker,
@@ -63,6 +88,7 @@ typedef struct ASSETS {
         hPenMinorVector,
         hPenMajorVector,
         hPenDirtyZone,
+        hPenTerrainGrid,
         hPenWhite;
 } ASSETS_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,11 +96,23 @@ typedef struct ASSETS {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void                __cdecl     ASSETS_Zero                                     (ASSETS_T*);
 ASSETS_T*           __cdecl     ASSETS_Create                                   (GLOBALS_T*, LOG_T*);
-void                __cdecl     ASSETS_LoadBitmaps                              (ASSETS_T*, HWND, LOG_T*);
+void                __cdecl     ASSETS_HandleBitmaps                            (ASSETS_T*, HWND, CONSTANTS_T*, SETTINGS_T*, GLOBALS_T*, LOG_T*);
+void                __cdecl     ASSETS_LoadBlitter                              (ASSETS_T*, FPOINT_T, HWND, LOG_T*);
+void                __cdecl     ASSETS_LoadCommandCard                          (ASSETS_T*, FPOINT_T, HWND, LOG_T*);
+void                __cdecl     ASSETS_LoadCommandCenter                        (ASSETS_T*, FPOINT_T, HWND, SETTINGS_T*, GLOBALS_T*, LOG_T*);
+void                __cdecl     ASSETS_LoadGas                                  (ASSETS_T*, FPOINT_T, HWND, LOG_T*);
+void                __cdecl     ASSETS_LoadHud                                  (ASSETS_T*, FPOINT_T, HWND, LOG_T*);
+void                __cdecl     ASSETS_LoadMineralField                         (ASSETS_T*, FPOINT_T, HWND, SETTINGS_T*, GLOBALS_T*, LOG_T*);
+void                __cdecl     ASSETS_LoadRefinery                             (ASSETS_T*, FPOINT_T, HWND, SETTINGS_T*, GLOBALS_T*, LOG_T*);
+void                __cdecl     ASSETS_LoadSupplyDepot                          (ASSETS_T*, FPOINT_T, HWND, SETTINGS_T*, GLOBALS_T*, LOG_T*);
+void                __cdecl     ASSETS_LoadTerrain                              (ASSETS_T*, FPOINT_T, GLOBALS_T*, CONSTANTS_T*, HWND, SETTINGS_T*, LOG_T*);
+void                __cdecl     ASSETS_LoadWorker                               (ASSETS_T*, FPOINT_T, HWND, SETTINGS_T*, GLOBALS_T*, LOG_T*);
 void                __cdecl     ASSETS_CreateBrushes                            (ASSETS_T*);
+void                __cdecl     ASSETS_CreatePens                               (ASSETS_T*);
 void                __cdecl     ASSETS_KillBrushes                              (ASSETS_T*);
-void                __cdecl     ASSETS_KillBitmaps                              (ASSETS_T*);
-void                __cdecl     ASSETS_Kill                                     (ASSETS_T**, GLOBALS_T*);
+void                __cdecl     ASSETS_KillPens                                 (ASSETS_T*);
+void                __cdecl     ASSETS_KillBitmaps                              (ASSETS_T*, GLOBALS_T*, CONSTANTS_T*);
+void                __cdecl     ASSETS_Kill                                     (ASSETS_T**, GLOBALS_T*, CONSTANTS_T*);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

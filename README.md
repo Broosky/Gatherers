@@ -1,7 +1,7 @@
 ﻿# 💡 **Gatherers**
 
 A continuation of the [Gatherers-Legacy](https://github.com/Broosky/Gatherers-Legacy) StarCraft-style simulation.  
-Active development continues here when time allows — see the legacy repo for early progress and design context.
+Active development continues here when time allows. See the legacy repo for early progress and design context.
 
 ---
 
@@ -12,17 +12,17 @@ Active development continues here when time allows — see the legacy repo for e
   - Memoize pathfinding points, or compute full path + memoize.
   - For main pathfinding points, curve the transitions such that the movement is not jagged.
 - Move entity resource diagnostic rendering out of entity rendering logic.
-- Draw scaled down versions of entities in the minimap instead of coloured blocks.
 - Selectable renderer: Direct3D.
 - Engine:
   - Homebrew renderer (DIBSECTION)...
-  - Pre-processing...
-  - Post-processing... 
   - Networking...
   - Sound...
   - 3D spectator mode...
 - Crossplatform support: Refactor IO, clock, etc...
 - Mouse wheel zoom in or out.
+- Asset consolidation and compression.
+- Save/load sim...
+  - Drop save file onto exe to quick load.
 - Replace classic `char` buffer copying with modern safer alternatives.
 - Double check and update `const` parameters.
 - Use stack allocations instead of repetitive pointer dereferences for tight loops.
@@ -30,12 +30,25 @@ Active development continues here when time allows — see the legacy repo for e
 - Doxygen documentation.
 - Don't allow workers to move inside an entity.
 - Check include paths for Linux toolchain.
-- Unit movement acceleration/deceleration.
-- Framerate independent unit movement.
-- Tiled backdrop for very large maps.
+- Unit movement acceleration/deceleration + framerate independent unit movement.
+- Decompose blur algorithm from SIMD to non-SIMD for better compatibility at the cost of performance.
 - Fixed point arithmetic?
 - New assets...
 
+---
+
+## 🔹 June 2025 Updates
+
+- Tiled terrain + minimap.
+- Engine pre/post-processing.
+- Draw scaled down versions of entities in the minimap instead of coloured blocks w/optional transparency.
+- Instant FPS meter alongside the long-term average.
+- Pretty print signed numbers.
+- Min & max client size.
+- Blitter index as enum.
+- Directories for the logger.
+- Consolidate TTS.
+- 
 ---
 
 ## 🔹 May 2025 Updates

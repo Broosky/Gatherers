@@ -43,6 +43,8 @@ typedef struct MENU {
     UINT8 ubEnableGreenMask;
     UINT8 ubEnableDarken;
     UINT8 ubDrawDirtyZones;
+    UINT8 ubDrawTranslationThreshold;
+    UINT8 ubDrawTerrainGrid;
     HMENU hMenu;
 } MENU_T;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

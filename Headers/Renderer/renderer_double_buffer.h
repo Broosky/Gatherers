@@ -95,7 +95,7 @@ void                __cdecl     DOUBLE_BUFFER_ApplyWorldTransform               
 void                __cdecl     DOUBLE_BUFFER_ResetWorldTransform               (RENDERER_T*);
 void                __cdecl     DOUBLE_BUFFER_DrawSelectionArea                 (RENDERER_T*, GLOBALS_T*, ASSETS_T*);
 void                __cdecl     DOUBLE_BUFFER_DrawTranslationThreshold          (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
-void                __cdecl     DOUBLE_BUFFER_DrawMinimapEntities               (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, LOG_T*);
+void                __cdecl     DOUBLE_BUFFER_DrawMinimapEntities               (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, MENU_T*, LOG_T*);
 void                __cdecl     DOUBLE_BUFFER_DrawMinimapViewport               (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 void                __cdecl     DOUBLE_BUFFER_DrawMinimapSelectionArea          (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 void                __cdecl     DOUBLE_BUFFER_DrawBuildType                     (RENDERER_T*, MENU_T*, ASSETS_T*, PICTURE_T*, FPOINT_T, IRECT_T);
@@ -108,6 +108,8 @@ void                __cdecl     DOUBLE_BUFFER_HandleDarken                      
 void                __cdecl     DOUBLE_BUFFER_KillPostProcessing                (DOUBLE_BUFFER_T*, GLOBALS_T*);
 void                __cdecl     DOUBLE_BUFFER_FillDirtyZones                    (RENDERER_T*, ASSETS_T*, GLOBALS_T*, LOG_T*);
 void                __cdecl     DOUBLE_BUFFER_DrawDirtyZones                    (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
+void                __cdecl     DOUBLE_BUFFER_DrawTerrainGrid                   (RENDERER_T*, FPOINT_T, FPOINT_T, ASSETS_T*, GLOBALS_T*);
+void                __cdecl     DOUBLE_BUFFER_DrawLine                          (RENDERER_T*, FPOINT_T, FPOINT_T, HPEN);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

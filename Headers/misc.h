@@ -30,7 +30,8 @@ int                 __cdecl     MISC_RandomNumber                               
 float               __cdecl     MISC_CalculateRadians                           (CONSTANTS_T*, float);
 void                __cdecl     MISC_ResizeWindow                               (HWND, UINT, UINT, GLOBALS_T*);
 void                __cdecl     MISC_FormatTime                                 (ULONG, char*, size_t);
-void                __cdecl     MISC_FormatWithCommas                           (char*, size_t, unsigned long long);
+void                __cdecl     MISC_FormatUnsignedWithCommas                   (char*, size_t, unsigned long long);
+void                __cdecl     MISC_FormatSignedWithCommas                     (char*, size_t, long long);
 USHORT              __cdecl     MISC_ClampU16                                   (USHORT, USHORT, USHORT);
 ULONG               __cdecl     MISC_ClampU32                                   (ULONG, ULONG, ULONG);
 float               __cdecl     MISC_ClampF32                                   (float, float, float);

@@ -3,13 +3,6 @@
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Development notes:
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// - Windows XP does not like the progress bar control created by WinAsm studio. I replaced it with a general label system.
-// - Put simple variables that are accessed via dereferencing onto the stack.
-// - I no longer use the original taskbar image. Remove it from the loading process.
-// - When the process terminates, the operating system will destroy the image objects automatically.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../../Headers/ai.h"
 #include "../../Headers/assets.h"
 #include "../../Headers/card.h"
@@ -105,9 +98,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     RegisterClassEx(&WndClassEx);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    DialogBoxParam(hInstance, MAKEINTRESOURCE(DLG_LOAD), NULL, LOAD_LoadAssets, (LPARAM)WndClassEx.hIcon);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Menu->hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(MAIN_MENU));
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!SETTINGS_InitFromFile(p_Settings, p_Constants, p_Log, p_Constants->szDefaultSettingsFile)) {
+        MAIN_FailFast(p_Globals, p_Log);
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     GLOBALS_Init(p_Globals, hInstance, p_Settings);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,11 +123,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         NULL
     );
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DialogBoxParam(hInstance, MAKEINTRESOURCE(DLG_LOAD), p_Globals->hWnd, LOAD_LoadAssets, (LPARAM)WndClassEx.hIcon);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     MISC_ResizeWindow(p_Globals->hWnd, p_Settings->usInitialClientWidth, p_Settings->usInitialClientHeight, p_Globals);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Globals->p_ActiveRenderer = MAIN_CreateRenderers(p_Globals, p_Log);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    float fEngineTimebase = p_Settings->fEngineFPS;
+    float fEngineTimebase = p_Settings->fEngineFpsTarget;
     p_Globals->p_Engine = TIMEBASE_Create(&fEngineTimebase, p_Globals, p_Log);
     if (!p_Globals->p_Engine) {
         return MAIN_FailFast(p_Globals, p_Log);
@@ -272,8 +269,7 @@ void __cdecl MAIN_ConsiderEngine(RENDERER_T* p_Renderer,
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (TIMEBASE_Tick(p_Globals->p_Seconds)) {
         p_Globals->ulSecondsTick++;
-        p_Globals->fFramesPerSecond = (float)p_Globals->ulFrameCount / p_Globals->ulSecondsTick;
-        p_Globals->fEngineTimeAverage = p_Globals->fEngineTimeSum * 1000.0f / p_Globals->ulSecondsTick;
+        p_Globals->fFpsLongTermAverage = (float)p_Globals->ulFrameCount / p_Globals->ulSecondsTick;
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -307,7 +303,7 @@ void __cdecl MAIN_HandleQuit(RENDERER_T* p_Renderer,
     ENTITY_DeleteAll(p_Globals, p_Settings, p_Log);
     MESSAGE_DeleteAll(p_Globals);
     MAIN_KillRenderers(p_Globals);
-    ASSETS_Kill(&p_Assets, p_Globals);
+    ASSETS_Kill(&p_Assets, p_Globals, p_Constants);
     TIMEBASE_Kill(&p_Globals->p_Engine, p_Globals);
     TIMEBASE_Kill(&p_Globals->p_Seconds, p_Globals);
     TIMEBASE_Kill(&p_Globals->p_FrameTime, p_Globals);
@@ -315,7 +311,6 @@ void __cdecl MAIN_HandleQuit(RENDERER_T* p_Renderer,
     CARD_Kill(&p_Card, p_Globals);
     SETTINGS_Kill(&p_Settings, p_Globals);
     MENU_Kill(&p_Menu, p_Globals);
-    CONSTANTS_Kill(&p_Constants, p_Globals);
     HEAP_ALLOCATOR_Kill(&p_Globals->p_EntityAllocator, p_Globals);
     HEAP_ALLOCATOR_Kill(&p_Globals->p_PathPointAllocator, p_Globals);
     HEAP_ALLOCATOR_Kill(&p_Globals->p_PathObstacleAllocator, p_Globals);
@@ -323,6 +318,7 @@ void __cdecl MAIN_HandleQuit(RENDERER_T* p_Renderer,
     HEAP_ALLOCATOR_Kill(&p_Globals->p_AiClosestAllocator, p_Globals);
     HEAP_ALLOCATOR_Kill(&p_Globals->p_fPointAllocator, p_Globals);
     HEAP_ALLOCATOR_Kill(&p_Globals->p_fRectAllocator, p_Globals);
+    CONSTANTS_Kill(&p_Constants, p_Globals);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Last for flushing.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,7 +360,7 @@ RENDERER_T* __cdecl MAIN_CreateRenderers(GLOBALS_T* p_Globals, LOG_T* p_Log) {
             return NULL;
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        p_Renderer->SetBlitter(p_Renderer, &p_Assets->Blitter[0]);
+        p_Renderer->SetBlitter(p_Renderer, &p_Assets->Blitter[BLITTER_COLOR_LIGHT_BLUE]);
         p_Renderer->Clear(p_Renderer, p_Assets);
         p_Renderer->InitWorldTransform(p_Renderer);
     }

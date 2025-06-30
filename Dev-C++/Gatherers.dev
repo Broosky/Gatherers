@@ -24,12 +24,12 @@ HostApplication=
 UseCustomMakefile=1
 CustomMakefile=Makefile.win
 CommandLine=
-Folders=Headers,Headers/Renderer,Headers/Windows,Others,Others/.vscode,Others/.vscode/Ubuntu,Others/.vscode/Ubuntu/i686,Others/.vscode/Ubuntu/x64,Others/.vscode/Windows,Others/.vscode/Windows/x64,Others/Assets,Others/Assets/BL,Others/Assets/CA,Others/Assets/CC,Others/Assets/GA,Others/Assets/HU,Others/Assets/MF,Others/Assets/MI,Others/Assets/RE,Others/Assets/SU,Others/Assets/TE,Others/Assets/WO,Others/CodeBlocks,Others/Dev-C++,"Others/Visual Studio","Others/Visual Studio/Gatherers",Resources,Source,Source/Renderer,Source/Windows
+Folders=Headers,Headers/Renderer,Headers/Windows,Others,Others/.vscode,Others/.vscode/Ubuntu,Others/.vscode/Ubuntu/i686,Others/.vscode/Ubuntu/x64,Others/.vscode/Windows,Others/.vscode/Windows/x64,Others/Assets,Others/Assets/BL,Others/Assets/CA,Others/Assets/CA/Icons,Others/Assets/CC,Others/Assets/GA,Others/Assets/HU,Others/Assets/HU/Template,Others/Assets/II,Others/Assets/MF,Others/Assets/RE,Others/Assets/SU,Others/Assets/TE,Others/Assets/WO,Others/CodeBlocks,Others/Dev-C++,"Others/Visual Studio","Others/Visual Studio/Gatherers",Resources,Source,Source/Renderer,Source/Windows
 IncludeVersionInfo=1
 SupportXPThemes=0
 CompilerSet=3
 CompilerSettings=0000000100000000000000000
-UnitCount=175
+UnitCount=171
 
 [VersionInfo]
 Major=12
@@ -736,42 +736,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit74]
-FileName=..\Assets\CA\CC0.bmp
-Folder=Others/Assets/CA
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit75]
-FileName=..\Assets\CA\MO0.bmp
-Folder=Others/Assets/CA
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit76]
-FileName=..\Assets\CA\ST0.bmp
-Folder=Others/Assets/CA
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit77]
-FileName=..\Assets\CA\WO0.bmp
-Folder=Others/Assets/CA
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit78]
 FileName=..\Assets\CC\CC0.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -780,7 +744,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit79]
+[Unit75]
 FileName=..\Assets\CC\CC0_M.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -789,7 +753,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit80]
+[Unit76]
 FileName=..\Assets\CC\CC1.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -798,7 +762,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit81]
+[Unit77]
 FileName=..\Assets\CC\CC2.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -807,7 +771,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit82]
+[Unit78]
 FileName=..\Assets\CC\CC3.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -816,7 +780,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit83]
+[Unit79]
 FileName=..\Assets\CC\CC4.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -825,7 +789,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit84]
+[Unit80]
 FileName=..\Assets\CC\CC5.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -834,7 +798,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit85]
+[Unit81]
 FileName=..\Assets\CC\CC6.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -843,7 +807,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit86]
+[Unit82]
 FileName=..\Assets\CC\CC7.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -852,7 +816,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit87]
+[Unit83]
 FileName=..\Assets\CC\CC8.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -861,7 +825,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit88]
+[Unit84]
 FileName=..\Assets\CC\CC9.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -870,7 +834,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit89]
+[Unit85]
 FileName=..\Assets\CC\CC10.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -879,7 +843,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit90]
+[Unit86]
 FileName=..\Assets\CC\CC11.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -888,7 +852,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit91]
+[Unit87]
 FileName=..\Assets\CC\CC12.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -897,7 +861,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit92]
+[Unit88]
 FileName=..\Assets\CC\CC13.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -906,7 +870,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit93]
+[Unit89]
 FileName=..\Assets\CC\CC14.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -915,7 +879,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit94]
+[Unit90]
 FileName=..\Assets\CC\CC15.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -924,7 +888,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit95]
+[Unit91]
 FileName=..\Assets\CC\CC16.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -933,7 +897,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit96]
+[Unit92]
 FileName=..\Assets\CC\CC17.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -942,7 +906,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit97]
+[Unit93]
 FileName=..\Assets\CC\CC18.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -951,7 +915,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit98]
+[Unit94]
 FileName=..\Assets\CC\CC19.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -960,7 +924,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit99]
+[Unit95]
 FileName=..\Assets\CC\CC20.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -969,7 +933,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit100]
+[Unit96]
 FileName=..\Assets\CC\CC21.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -978,7 +942,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit101]
+[Unit97]
 FileName=..\Assets\CC\CC22.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -987,7 +951,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit102]
+[Unit98]
 FileName=..\Assets\CC\CC23.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -996,7 +960,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit103]
+[Unit99]
 FileName=..\Assets\CC\CC24.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -1005,7 +969,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit104]
+[Unit100]
 FileName=..\Assets\CC\CC25.bmp
 Folder=Others/Assets/CC
 Compile=0
@@ -1014,7 +978,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit105]
+[Unit101]
 FileName=..\Assets\GA\GA0.bmp
 Folder=Others/Assets/GA
 Compile=0
@@ -1023,16 +987,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit106]
-FileName=..\Assets\HU\DI0.bmp
-Folder=Others/Assets/HU
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit107]
+[Unit102]
 FileName=..\Assets\HU\HU0.bmp
 Folder=Others/Assets/HU
 Compile=0
@@ -1041,7 +996,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit108]
+[Unit103]
 FileName=..\Assets\HU\HU0_M.bmp
 Folder=Others/Assets/HU
 Compile=0
@@ -1050,7 +1005,16 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit110]
+[Unit104]
+FileName=..\Assets\HU\HU1.bmp
+Folder=Others/Assets/HU
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit105]
 FileName=..\Assets\MF\MF0.bmp
 Folder=Others/Assets/MF
 Compile=0
@@ -1059,8 +1023,44 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit111]
+[Unit106]
 FileName=..\Assets\MF\MF0_M.bmp
+Folder=Others/Assets/MF
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit107]
+FileName=..\Assets\MF\MF1.bmp
+Folder=Others/Assets/MF
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit108]
+FileName=..\Assets\MF\MF1_M.bmp
+Folder=Others/Assets/MF
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit110]
+FileName=..\Assets\MF\MF2_M.bmp
+Folder=Others/Assets/MF
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit111]
+FileName=..\Assets\MF\MF3.bmp
 Folder=Others/Assets/MF
 Compile=0
 Link=0
@@ -1070,34 +1070,6 @@ BuildCmd=
 CompileCpp=0
 
 [Unit109]
-FileName=..\Assets\HU\HU1.bmp
-Folder=Others/Assets/HU
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit113]
-FileName=..\Assets\MF\MF1_M.bmp
-Folder=Others/Assets/MF
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit112]
-FileName=..\Assets\MF\MF1.bmp
-CompileCpp=0
-Folder=Others/Assets/MF
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit114]
 FileName=..\Assets\MF\MF2.bmp
 Folder=Others/Assets/MF
 Compile=0
@@ -1106,19 +1078,8 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit115]
-FileName=..\Assets\MF\MF2_M.bmp
-Folder=Others/Assets/MF
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-CompileCpp=0
-
-[Unit116]
-FileName=..\Assets\MF\MF3.bmp
-CompileCpp=0
+[Unit113]
+FileName=..\Assets\MF\MF4.bmp
 Folder=Others/Assets/MF
 Compile=0
 Link=0
@@ -1126,7 +1087,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit117]
+[Unit112]
 FileName=..\Assets\MF\MF3_M.bmp
 CompileCpp=0
 Folder=Others/Assets/MF
@@ -1136,16 +1097,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit118]
-FileName=..\Assets\MF\MF4.bmp
-Folder=Others/Assets/MF
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit119]
+[Unit114]
 FileName=..\Assets\MF\MF4_M.bmp
 Folder=Others/Assets/MF
 Compile=0
@@ -1154,26 +1106,8 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit120]
-FileName=..\Assets\MI\MI0.bmp
-Folder=Others/Assets/MI
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit121]
+[Unit115]
 FileName=..\Assets\RE\RE0.bmp
-Folder=Others/Assets/RE
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit122]
-FileName=..\Assets\RE\RE0_M.bmp
 Folder=Others/Assets/RE
 Compile=0
 Link=0
@@ -1182,7 +1116,17 @@ OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
-[Unit123]
+[Unit116]
+FileName=..\Assets\RE\RE0_M.bmp
+CompileCpp=0
+Folder=Others/Assets/RE
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit117]
 FileName=..\Assets\SU\SU0.bmp
 CompileCpp=0
 Folder=Others/Assets/SU
@@ -1192,9 +1136,8 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit124]
+[Unit118]
 FileName=..\Assets\SU\SU0_M.bmp
-CompileCpp=0
 Folder=Others/Assets/SU
 Compile=0
 Link=0
@@ -1202,9 +1145,8 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit125]
+[Unit119]
 FileName=..\Assets\SU\SU1.bmp
-CompileCpp=0
 Folder=Others/Assets/SU
 Compile=0
 Link=0
@@ -1212,7 +1154,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit126]
+[Unit120]
 FileName=..\Assets\SU\SU2.bmp
 Folder=Others/Assets/SU
 Compile=0
@@ -1221,7 +1163,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit127]
+[Unit121]
 FileName=..\Assets\SU\SU3.bmp
 Folder=Others/Assets/SU
 Compile=0
@@ -1230,7 +1172,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit128]
+[Unit122]
 FileName=..\Assets\SU\SU4.bmp
 Folder=Others/Assets/SU
 Compile=0
@@ -1238,9 +1180,11 @@ Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=0
 
-[Unit129]
+[Unit123]
 FileName=..\Assets\SU\SU5.bmp
+CompileCpp=0
 Folder=Others/Assets/SU
 Compile=0
 Link=0
@@ -1248,8 +1192,9 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit130]
+[Unit124]
 FileName=..\Assets\TE\TE0.bmp
+CompileCpp=0
 Folder=Others/Assets/TE
 Compile=0
 Link=0
@@ -1257,8 +1202,9 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit131]
+[Unit125]
 FileName=..\Assets\WO\WO0.bmp
+CompileCpp=0
 Folder=Others/Assets/WO
 Compile=0
 Link=0
@@ -1266,7 +1212,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit132]
+[Unit126]
 FileName=..\Assets\WO\WO0_M.bmp
 Folder=Others/Assets/WO
 Compile=0
@@ -1275,7 +1221,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit133]
+[Unit127]
 FileName=..\Assets\WO\WO1.bmp
 Folder=Others/Assets/WO
 Compile=0
@@ -1284,7 +1230,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit134]
+[Unit128]
 FileName=..\Assets\WO\WO2.bmp
 Folder=Others/Assets/WO
 Compile=0
@@ -1293,7 +1239,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit135]
+[Unit129]
 FileName=..\Source\assets.c
 Folder=Source
 Compile=1
@@ -1303,7 +1249,7 @@ OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
-[Unit136]
+[Unit130]
 FileName=..\Source\benchmark.c
 Folder=Source
 Compile=1
@@ -1313,7 +1259,7 @@ OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
-[Unit137]
+[Unit131]
 FileName=..\Headers\heap_allocator.h
 Folder=Headers
 Compile=1
@@ -1323,7 +1269,7 @@ OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
-[Unit138]
+[Unit132]
 FileName=..\Headers\network.h
 Folder=Headers
 Compile=1
@@ -1333,7 +1279,7 @@ OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
-[Unit139]
+[Unit133]
 FileName=..\Headers\path_finding.h
 Folder=Headers
 Compile=1
@@ -1343,7 +1289,7 @@ OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
-[Unit140]
+[Unit134]
 FileName=..\Headers\sound.h
 Folder=Headers
 Compile=1
@@ -1353,57 +1299,67 @@ OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
-[Unit141]
+[Unit135]
 FileName=..\Resources\Gatherers.cfg
-CompileCpp=0
 Folder=Resources
 Compile=0
 Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=0
 
-[Unit142]
+[Unit136]
 FileName=..\Source\heap_allocator.c
-CompileCpp=0
 Folder=Source
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=0
 
-[Unit144]
+[Unit137]
+FileName=..\Source\network.c
+Folder=Source
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+CompileCpp=0
+
+[Unit138]
 FileName=..\Source\path_finding.c
-CompileCpp=0
 Folder=Source
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=0
 
-[Unit145]
+[Unit139]
 FileName=..\Source\sound.c
-CompileCpp=0
 Folder=Source
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=0
 
-[Unit146]
+[Unit140]
 FileName=..\Source\constants.c
-CompileCpp=0
 Folder=Source
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=0
 
-[Unit147]
+[Unit141]
 FileName=..\Headers\enums.h
 CompileCpp=0
 Folder=Headers
@@ -1413,77 +1369,17 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit148]
-FileName=..\Assets\HU\HU2.bmp
+[Unit142]
+FileName=..\Headers\Renderer\renderer.h
 CompileCpp=0
-Folder=Others/Assets/HU
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit149]
-FileName=..\Assets\HU\HU2_M.bmp
-CompileCpp=0
-Folder=Others/Assets/HU
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit150]
-FileName=..\Assets\HU\HU3.bmp
-CompileCpp=0
-Folder=Others/Assets/HU
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit151]
-FileName=..\Assets\HU\HU3_M.bmp
-CompileCpp=0
-Folder=Others/Assets/HU
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit152]
-FileName=..\Assets\HU\HU4.bmp
-CompileCpp=0
-Folder=Others/Assets/HU
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit153]
-FileName=..\Assets\HU\HU4_M.bmp
-CompileCpp=0
-Folder=Others/Assets/HU
-Compile=0
-Link=0
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit155]
-FileName=..\Headers\Renderer\renderer_direct_2d.h
 Folder=Headers/Renderer
 Compile=1
 Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
-CompileCpp=0
 
-[Unit156]
+[Unit144]
 FileName=..\Headers\Renderer\renderer_double_buffer.h
 CompileCpp=0
 Folder=Headers/Renderer
@@ -1493,7 +1389,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit157]
+[Unit145]
 FileName=..\Headers\Renderer\renderer_sdl.h
 CompileCpp=0
 Folder=Headers/Renderer
@@ -1503,7 +1399,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit158]
+[Unit146]
 FileName=..\Headers\Renderer\renderer_single_buffer.h
 CompileCpp=0
 Folder=Headers/Renderer
@@ -1513,7 +1409,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit159]
+[Unit147]
 FileName=..\Headers\Renderer\renderer_wireframe.h
 CompileCpp=0
 Folder=Headers/Renderer
@@ -1523,7 +1419,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit160]
+[Unit148]
 FileName=..\Headers\Windows\windows_macros.h
 CompileCpp=0
 Folder=Headers/Windows
@@ -1533,7 +1429,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit161]
+[Unit149]
 FileName=..\Headers\Windows\windows_main.h
 CompileCpp=0
 Folder=Headers/Windows
@@ -1543,7 +1439,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit162]
+[Unit150]
 FileName=..\Headers\Windows\windows_minified.h
 CompileCpp=0
 Folder=Headers/Windows
@@ -1553,7 +1449,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit163]
+[Unit151]
 FileName=..\Headers\Windows\windows_procedure.h
 CompileCpp=0
 Folder=Headers/Windows
@@ -1563,7 +1459,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit164]
+[Unit152]
 FileName=..\Headers\save.h
 CompileCpp=0
 Folder=Headers
@@ -1573,7 +1469,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit165]
+[Unit153]
 FileName=..\Resources\renderer_template.c
 CompileCpp=0
 Folder=Resources
@@ -1583,17 +1479,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit166]
-FileName=..\Source\Renderer\renderer.c
-CompileCpp=0
-Folder=Source/Renderer
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit167]
+[Unit155]
 FileName=..\Source\Renderer\renderer_direct_2d.c
 Folder=Source/Renderer
 Compile=1
@@ -1603,41 +1489,161 @@ OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
-[Unit168]
+[Unit156]
 FileName=..\Source\Renderer\renderer_double_buffer.c
+CompileCpp=0
 Folder=Source/Renderer
 Compile=1
 Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit157]
+FileName=..\Source\Renderer\renderer_sdl.c
+CompileCpp=0
+Folder=Source/Renderer
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit158]
+FileName=..\Source\Renderer\renderer_single_buffer.c
+CompileCpp=0
+Folder=Source/Renderer
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit159]
+FileName=..\Source\Renderer\renderer_wireframe.c
+CompileCpp=0
+Folder=Source/Renderer
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit160]
+FileName=..\Source\Windows\windows_main.c
+CompileCpp=0
+Folder=Source/Windows
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit161]
+FileName=..\Source\Windows\windows_procedure.c
+CompileCpp=0
+Folder=Source/Windows
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit162]
+FileName=..\Source\save.c
+CompileCpp=0
+Folder=Source
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit163]
+FileName=..\Assets\CA\Icons\CC0.bmp
+CompileCpp=0
+Folder=Others/Assets/CA/Icons
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit164]
+FileName=..\Assets\CA\Icons\MO0.bmp
+CompileCpp=0
+Folder=Others/Assets/CA/Icons
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit165]
+FileName=..\Assets\CA\Icons\ST0.bmp
+CompileCpp=0
+Folder=Others/Assets/CA/Icons
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit166]
+FileName=..\Assets\CA\Icons\WO0.bmp
+CompileCpp=0
+Folder=Others/Assets/CA/Icons
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit167]
+FileName=..\Assets\HU\Template\HUT0.bmp
+Folder=Others/Assets/HU/Template
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+CompileCpp=0
+
+[Unit168]
+FileName=..\Assets\II\Illusion Interactive.bmp
+Folder=Others/Assets/II
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
 [Unit169]
-FileName=..\Source\Renderer\renderer_sdl.c
-Folder=Source/Renderer
-Compile=1
-Link=1
+FileName=..\Assets\TE\TE3.bmp
+Folder=Others/Assets/TE
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
 [Unit170]
-FileName=..\Source\Renderer\renderer_single_buffer.c
-Folder=Source/Renderer
-Compile=1
-Link=1
+FileName=..\Assets\TE\TE4.bmp
+Folder=Others/Assets/TE
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 CompileCpp=0
 
 [Unit171]
-FileName=..\Source\Renderer\renderer_wireframe.c
-Folder=Source/Renderer
-Compile=1
-Link=1
+FileName=..\Assets\TE\TE5.bmp
+Folder=Others/Assets/TE
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
@@ -1664,9 +1670,9 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit143]
-FileName=..\Source\network.c
+FileName=..\Headers\Renderer\renderer_direct_2d.h
 CompileCpp=0
-Folder=Source
+Folder=Headers/Renderer
 Compile=1
 Link=1
 Priority=1000
@@ -1683,9 +1689,9 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit154]
-FileName=..\Headers\Renderer\renderer.h
+FileName=..\Source\Renderer\renderer.c
 CompileCpp=0
-Folder=Headers/Renderer
+Folder=Source/Renderer
 Compile=1
 Link=1
 Priority=1000

@@ -59,19 +59,49 @@ void __cdecl MISC_FormatTime(ULONG ulSecondsTick, char* p_szBuffer, size_t p_szB
     snprintf(p_szBuffer, p_szBufferSize, "%02lu d %02lu h %02lu m %02lu s", ulDays, ulHours, ulMinutes, ulSeconds);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl MISC_FormatWithCommas(char* p_szFormatted, size_t stFormattedSize, unsigned long long ullNumber) {
+void __cdecl MISC_FormatUnsignedWithCommas(char* p_szFormatted, size_t stFormattedSize, unsigned long long ullNumber) {
     char szTemp[32];
     snprintf(szTemp, sizeof(szTemp), "%llu", ullNumber);
-    int szLength = strlen(szTemp);
+    int iSzLength = strlen(szTemp);
     int iFormattedIndex = 0;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     int i;
-    for (i = 0; i < szLength && iFormattedIndex < (int)stFormattedSize - 1; ++i) {
+    for (i = 0; i < iSzLength && iFormattedIndex < (int)stFormattedSize - 1; ++i) {
         p_szFormatted[iFormattedIndex++] = szTemp[i];
-        if ((szLength - i - 1) % 3 == 0 && i != szLength - 1 && iFormattedIndex < (int)stFormattedSize - 1) {
+        if ((iSzLength - i - 1) % 3 == 0 && i != iSzLength - 1 && iFormattedIndex < (int)stFormattedSize - 1) {
             p_szFormatted[iFormattedIndex++] = ',';
         }
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_szFormatted[iFormattedIndex] = '\0';
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl MISC_FormatSignedWithCommas(char* p_szFormatted, size_t stFormattedSize, long long llNumber) {
+    char szTemp[32];
+    UINT8 ubIsNegative = llNumber < 0;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Safe bounds for LLONG_MIN.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    unsigned long long ullAbsValue = ubIsNegative
+        ? (unsigned long long)(-(llNumber + 1)) + 1
+        : (unsigned long long)llNumber;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    snprintf(szTemp, sizeof(szTemp), "%llu", ullAbsValue);
+    int iSzLength = strlen(szTemp);
+    int iFormattedIndex = 0;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (ubIsNegative && iFormattedIndex < (int)stFormattedSize - 1) {
+        p_szFormatted[iFormattedIndex++] = '-';
+    }
+    int i;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    for (i = 0; i < iSzLength && iFormattedIndex < (int)stFormattedSize - 1; ++i) {
+        p_szFormatted[iFormattedIndex++] = szTemp[i];
+        if ((iSzLength - i - 1) % 3 == 0 && i != iSzLength - 1 && iFormattedIndex < (int)stFormattedSize - 1) {
+            p_szFormatted[iFormattedIndex++] = ',';
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_szFormatted[iFormattedIndex] = '\0';
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

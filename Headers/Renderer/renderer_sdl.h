@@ -54,7 +54,7 @@ void                __cdecl     SDL_FlipArea                                    
 void                __cdecl     SDL_ApplyWorldTransform                         (RENDERER_T*, TRANSFORM_TYPE_T, CONSTANTS_T*, float, FPOINT_T, LOG_T*);
 void                __cdecl     SDL_ResetWorldTransform                         (RENDERER_T*);
 void                __cdecl     SDL_InitWorldTransform                          (RENDERER_T*);
-void                __cdecl     SDL_DrawMinimapEntities                         (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, LOG_T*);
+void                __cdecl     SDL_DrawMinimapEntities                         (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, MENU_T*, LOG_T*);
 void                __cdecl     SDL_DrawMinimapViewport                         (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 void                __cdecl     SDL_DrawMinimapSelectionArea                    (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 void                __cdecl     SDL_DrawBuildLimits                             (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
@@ -69,6 +69,8 @@ void                __cdecl     SDL_DrawEntityMajorVector                       
 void                __cdecl     SDL_DrawEntityEllipse                           (RENDERER_T*, ENTITY_T*, HPEN, HBRUSH, SETTINGS_T*);
 void                __cdecl     SDL_DrawEntity                                  (RENDERER_T*, ENTITY_T*, UINT8);
 void                __cdecl     SDL_DrawDirtyZones                              (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
+void                __cdecl     SDL_DrawTerrainGrid                             (RENDERER_T*, FPOINT_T, FPOINT_T, ASSETS_T*, GLOBALS_T*);
+void                __cdecl     SDL_DrawLine                                    (RENDERER_T*, FPOINT_T, FPOINT_T, HPEN);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

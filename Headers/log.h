@@ -34,6 +34,7 @@ void                __cdecl     LOG_PopulateTimestamp                           
 void                __cdecl     LOG_Kill                                        (LOG_T**, GLOBALS_T*);
 void                __cdecl     LOG_HandleBookending                            (LOG_T**, CONSTANTS_T*, GLOBALS_T*);
 void                __cdecl     LOG_AppendDayOfYear                             (LOG_T*, const char* const);
+int                 __cdecl     LOG_MakeDirectories                             (const char* const);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

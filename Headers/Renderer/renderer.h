@@ -46,7 +46,7 @@ typedef void        (__cdecl* RENDERER_FLIP_AREA)                               
 typedef void        (__cdecl* RENDERER_APPLY_WORLD_TRANSFORM)                   (RENDERER_T*, TRANSFORM_TYPE_T, CONSTANTS_T*, float, FPOINT_T, LOG_T*);
 typedef void        (__cdecl* RENDERER_RESET_WORLD_TRANSFORM)                   (RENDERER_T*);
 typedef void        (__cdecl* RENDERER_INIT_WORLD_TRANSFORM)                    (RENDERER_T*);
-typedef void        (__cdecl* RENDERER_DRAW_MINIMAP_ENTITIES)                   (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, LOG_T*);
+typedef void        (__cdecl* RENDERER_DRAW_MINIMAP_ENTITIES)                   (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, MENU_T*, LOG_T*);
 typedef void        (__cdecl* RENDERER_DRAW_MINIMAP_VIEWPORT)                   (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 typedef void        (__cdecl* RENDERER_DRAW_MINIMAP_SELECTION_AREA)             (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 typedef void        (__cdecl* RENDERER_DRAW_BUILD_LIMITS)                       (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
@@ -54,6 +54,7 @@ typedef void        (__cdecl* RENDERER_DRAW_BUILD_TYPE)                         
 typedef void        (__cdecl* RENDERER_DRAW_SELECTION_AREA)                     (RENDERER_T*, GLOBALS_T*, ASSETS_T*);
 typedef void        (__cdecl* RENDERER_DRAW_TRANSLATION_THRESHOLD)              (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
 typedef void        (__cdecl* RENDERER_DRAW_DIRTY_ZONES)                        (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
+typedef void        (__cdecl* RENDERER_DRAW_TERRAIN_GRID)                       (RENDERER_T*, FPOINT_T, FPOINT_T, ASSETS_T*, GLOBALS_T*);
 typedef void        (__cdecl* RENDERER_DRAW_PICTURE)                            (RENDERER_T*, PICTURE_T*, UINT8);
 typedef void        (__cdecl* RENDERER_DRAW_PICTURE_AT)                         (RENDERER_T*, PICTURE_T*, FPOINT_T, UINT8);
 typedef void        (__cdecl* RENDERER_CROP_DRAW_PICTURE_AT)                    (RENDERER_T*, PICTURE_T*, FPOINT_T, FDELTA_T, FPOINT_T, UINT8);
@@ -61,6 +62,7 @@ typedef void        (__cdecl* RENDERER_DRAW_ENTITY_MINOR_VECTOR)                
 typedef void        (__cdecl* RENDERER_DRAW_ENTITY_MAJOR_VECTOR)                (RENDERER_T*, ENTITY_T*, ASSETS_T*);
 typedef void        (__cdecl* RENDERER_DRAW_ENTITY_ELLIPSE)                     (RENDERER_T*, ENTITY_T*, HPEN, HBRUSH, SETTINGS_T*);
 typedef void        (__cdecl* RENDERER_DRAW_ENTITY)                             (RENDERER_T*, ENTITY_T*, UINT8);
+typedef void        (__cdecl* RENDERER_DRAW_LINE)                               (RENDERER_T*, FPOINT_T, FPOINT_T, HPEN);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Types:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,6 +99,7 @@ typedef struct RENDERER {
     RENDERER_DRAW_SELECTION_AREA            DrawSelectionArea;
     RENDERER_DRAW_TRANSLATION_THRESHOLD     DrawTranslationThreshold;
     RENDERER_DRAW_DIRTY_ZONES               DrawDirtyZones;
+    RENDERER_DRAW_TERRAIN_GRID              DrawTerrainGrid;
     RENDERER_DRAW_PICTURE                   DrawPicture;
     RENDERER_DRAW_PICTURE_AT                DrawPictureAt;
     RENDERER_CROP_DRAW_PICTURE_AT           CropDrawPictureAt;
@@ -104,6 +107,7 @@ typedef struct RENDERER {
     RENDERER_DRAW_ENTITY_MAJOR_VECTOR       DrawEntityMajorVector;
     RENDERER_DRAW_ENTITY_ELLIPSE            DrawEntityEllipse;
     RENDERER_DRAW_ENTITY                    DrawEntity;
+    RENDERER_DRAW_LINE                      DrawLine;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     char szBlitter[128];
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

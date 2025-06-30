@@ -8,6 +8,7 @@
 #include "../Headers/globals.h"
 #include "../Headers/log.h"
 #include "../Headers/misc.h"
+#include "../Headers/settings.h"
 #include <stdlib.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ASSETS_Zero(ASSETS_T* p_Assets) {
@@ -30,168 +31,285 @@ ASSETS_T* __cdecl ASSETS_Create(GLOBALS_T* p_Globals, LOG_T* p_Log) {
     return p_Assets;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Dialog window handle only.
+void __cdecl ASSETS_LoadBlitter(ASSETS_T* p_Assets, FPOINT_T Location, HWND hWnd, LOG_T* p_Log) {
+    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading blitter...");
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    char* p_szSharedMask = "../../Assets/BL/B_M.bmp";
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Blitter[BLITTER_COLOR_LIGHT_BLUE], Location, "../../Assets/BL/BB0.bmp", p_szSharedMask, p_Log);
+    PICTURE_Load(&p_Assets->Blitter[BLITTER_COLOR_BLUE], Location, "../../Assets/BL/BB1.bmp", p_szSharedMask, p_Log);
+    PICTURE_Load(&p_Assets->Blitter[BLITTER_COLOR_GREEN], Location, "../../Assets/BL/BG0.bmp", p_szSharedMask, p_Log);
+    PICTURE_Load(&p_Assets->Blitter[BLITTER_COLOR_ORANGE], Location, "../../Assets/BL/BO0.bmp", p_szSharedMask, p_Log);
+    PICTURE_Load(&p_Assets->Blitter[BLITTER_COLOR_PURPLE], Location, "../../Assets/BL/BP0.bmp", p_szSharedMask, p_Log);
+    PICTURE_Load(&p_Assets->Blitter[BLITTER_COLOR_PINK], Location, "../../Assets/BL/BP1.bmp", p_szSharedMask, p_Log);
+    PICTURE_Load(&p_Assets->Blitter[BLITTER_COLOR_RED], Location, "../../Assets/BL/BR0.bmp", p_szSharedMask, p_Log);
+    PICTURE_Load(&p_Assets->Blitter[BLITTER_COLOR_WHITE], Location, "../../Assets/BL/BW0.bmp", p_szSharedMask, p_Log);
+    PICTURE_Load(&p_Assets->Blitter[BLITTER_COLOR_YELLOW], Location, "../../Assets/BL/BY0.bmp", p_szSharedMask, p_Log);
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ASSETS_LoadBitmaps(ASSETS_T* p_Assets, HWND hWnd, LOG_T* p_Log) {
+void __cdecl ASSETS_LoadCommandCard(ASSETS_T* p_Assets, FPOINT_T Location, HWND hWnd, LOG_T* p_Log) {
+    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading command card...");
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Blitter images.
+    PICTURE_Load(&p_Assets->Card[0], Location, "../../Assets/CA/CA0.bmp", NULL, p_Log); // Blank card.
+    PICTURE_Load(&p_Assets->Card[1], Location, "../../Assets/CA/CA1.bmp", NULL, p_Log); // Stop and move card.
+    PICTURE_Load(&p_Assets->Card[2], Location, "../../Assets/CA/CA2.bmp", NULL, p_Log); // Specific structure.
+    PICTURE_Load(&p_Assets->Card[3], Location, "../../Assets/CA/CA3.bmp", NULL, p_Log); // Specific worker.
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_LoadCommandCenter(ASSETS_T* p_Assets, FPOINT_T Location, HWND hWnd, SETTINGS_T* p_Settings, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading command center...");
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading blitter image(s)...");
-    PICTURE_Load(&p_Assets->Blitter[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/BL/BB0.bmp", "../../Assets/BL/B_M.bmp", p_Log); // Light blue.
-    PICTURE_Load(&p_Assets->Blitter[1], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/BL/BB1.bmp", "../../Assets/BL/B_M.bmp", p_Log); // Dark blue.
-    PICTURE_Load(&p_Assets->Blitter[2], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/BL/BG0.bmp", "../../Assets/BL/B_M.bmp", p_Log); // Green.
-    PICTURE_Load(&p_Assets->Blitter[3], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/BL/BP0.bmp", "../../Assets/BL/B_M.bmp", p_Log); // Purple.
-    PICTURE_Load(&p_Assets->Blitter[4], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/BL/BR0.bmp", "../../Assets/BL/B_M.bmp", p_Log); // Red.
-    PICTURE_Load(&p_Assets->Blitter[5], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/BL/BW0.bmp", "../../Assets/BL/B_M.bmp", p_Log); // White.
-    PICTURE_Load(&p_Assets->Blitter[6], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/BL/BY0.bmp", "../../Assets/BL/B_M.bmp", p_Log); // Yellow.
-    PICTURE_Load(&p_Assets->Blitter[7], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/BL/BO0.bmp", "../../Assets/BL/B_M.bmp", p_Log); // Orange.
-    PICTURE_Load(&p_Assets->Blitter[8], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/BL/BP1.bmp", "../../Assets/BL/B_M.bmp", p_Log); // Pink.
+    char* p_szSharedMask = "../../Assets/CC/CC0_M.bmp";
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Worker images.
+    // White lighting.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Command[0], Location, "../../Assets/CC/CC0.bmp", p_szSharedMask, p_Log); // Original.
+    PICTURE_Load(&p_Assets->Command[1], Location, "../../Assets/CC/CC1.bmp", p_szSharedMask, p_Log); // Bright.
+    PICTURE_Load(&p_Assets->Command[2], Location, "../../Assets/CC/CC2.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[3], Location, "../../Assets/CC/CC3.bmp", p_szSharedMask, p_Log); // Brightest.
+    PICTURE_Load(&p_Assets->Command[4], Location, "../../Assets/CC/CC4.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[5], Location, "../../Assets/CC/CC5.bmp", p_szSharedMask, p_Log); // Bright.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Green lighting.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Command[6], Location, "../../Assets/CC/CC6.bmp", p_szSharedMask, p_Log); // Bright.
+    PICTURE_Load(&p_Assets->Command[7], Location, "../../Assets/CC/CC7.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[8], Location, "../../Assets/CC/CC8.bmp", p_szSharedMask, p_Log); // Brightest.
+    PICTURE_Load(&p_Assets->Command[9], Location, "../../Assets/CC/CC9.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[10], Location, "../../Assets/CC/CC10.bmp", p_szSharedMask, p_Log); // Bright.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Command[11], Location, "../../Assets/CC/CC11.bmp", p_szSharedMask, p_Log); // Bright.
+    PICTURE_Load(&p_Assets->Command[12], Location, "../../Assets/CC/CC12.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[13], Location, "../../Assets/CC/CC13.bmp", p_szSharedMask, p_Log); // Brightest.
+    PICTURE_Load(&p_Assets->Command[14], Location, "../../Assets/CC/CC14.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[15], Location, "../../Assets/CC/CC15.bmp", p_szSharedMask, p_Log); // Bright.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Command[16], Location, "../../Assets/CC/CC16.bmp", p_szSharedMask, p_Log); // Bright.
+    PICTURE_Load(&p_Assets->Command[17], Location, "../../Assets/CC/CC17.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[18], Location, "../../Assets/CC/CC18.bmp", p_szSharedMask, p_Log); // Brightest.
+    PICTURE_Load(&p_Assets->Command[19], Location, "../../Assets/CC/CC19.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[20], Location, "../../Assets/CC/CC20.bmp", p_szSharedMask, p_Log); // Bright.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Command[21], Location, "../../Assets/CC/CC21.bmp", p_szSharedMask, p_Log); // Bright.
+    PICTURE_Load(&p_Assets->Command[22], Location, "../../Assets/CC/CC22.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[23], Location, "../../Assets/CC/CC23.bmp", p_szSharedMask, p_Log); // Brightest.
+    PICTURE_Load(&p_Assets->Command[24], Location, "../../Assets/CC/CC24.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Command[25], Location, "../../Assets/CC/CC25.bmp", p_szSharedMask, p_Log); // Bright.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_T ScaleFrom = p_Assets->Command[0];
+    FDELTA_T ScaledSize = {
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmWidth / (float)p_Globals->TerrainCombinedSize.ulDx),
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmHeight / (float)p_Globals->TerrainCombinedSize.ulDy)
+    };
+    PICTURE_Scale(&ScaleFrom, &p_Assets->CommandMini, hWnd, ScaledSize, p_Log);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_LoadGas(ASSETS_T* p_Assets, FPOINT_T Location, HWND hWnd, LOG_T* p_Log) {
+    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading gas...");
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Gas[0], Location, "../../Assets/GA/GA0.bmp", NULL, p_Log);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_LoadHud(ASSETS_T* p_Assets, FPOINT_T Location, HWND hWnd, LOG_T* p_Log) {
+    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading HUD...");
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->HUD[0], Location, "../../Assets/HU/HU0.bmp", "../../Assets/HU/HU0_M.bmp", p_Log); // Resource background.
+    PICTURE_Load(&p_Assets->HUD[1], Location, "../../Assets/HU/HU1.bmp", NULL, p_Log); // Taskbar and minimap background.
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_LoadMineralField(ASSETS_T* p_Assets, FPOINT_T Location, HWND hWnd, SETTINGS_T* p_Settings, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading mineral field...");
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Mineral[0], Location, "../../Assets/MF/MF0.bmp", "../../Assets/MF/MF0_M.bmp", p_Log); // 100%
+    PICTURE_Load(&p_Assets->Mineral[1], Location, "../../Assets/MF/MF1.bmp", "../../Assets/MF/MF1_M.bmp", p_Log); // 75%
+    PICTURE_Load(&p_Assets->Mineral[2], Location, "../../Assets/MF/MF2.bmp", "../../Assets/MF/MF2_M.bmp", p_Log); // 50%
+    PICTURE_Load(&p_Assets->Mineral[3], Location, "../../Assets/MF/MF3.bmp", "../../Assets/MF/MF3_M.bmp", p_Log); // 25%
+    PICTURE_Load(&p_Assets->Mineral[4], Location, "../../Assets/MF/MF4.bmp", "../../Assets/MF/MF4_M.bmp", p_Log); // 0%
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_T ScaleFrom = p_Assets->Mineral[0];
+    FDELTA_T ScaledSize = {
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmWidth / (float)p_Globals->TerrainCombinedSize.ulDx),
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmHeight / (float)p_Globals->TerrainCombinedSize.ulDy)
+    };
+    PICTURE_Scale(&ScaleFrom, &p_Assets->MineralMini, hWnd, ScaledSize, p_Log);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_LoadRefinery(ASSETS_T* p_Assets, FPOINT_T Location, HWND hWnd, SETTINGS_T* p_Settings, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading refinery...");
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Refinery[0], Location, "../../Assets/RE/RE0.bmp", "../../Assets/RE/RE0_M.bmp", p_Log);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_T ScaleFrom = p_Assets->Refinery[0];
+    FDELTA_T ScaledSize = {
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmWidth / (float)p_Globals->TerrainCombinedSize.ulDx),
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmHeight / (float)p_Globals->TerrainCombinedSize.ulDy)
+    };
+    PICTURE_Scale(&ScaleFrom, &p_Assets->RefineryMini, hWnd, ScaledSize, p_Log);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_LoadSupplyDepot(ASSETS_T* p_Assets, FPOINT_T Location, HWND hWnd, SETTINGS_T* p_Settings, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading supply depot...");
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    char* p_szSharedMask = "../../Assets/SU/SU0_M.bmp";
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Load(&p_Assets->Supply[0], Location, "../../Assets/SU/SU0.bmp", p_szSharedMask, p_Log); // Original.
+    PICTURE_Load(&p_Assets->Supply[1], Location, "../../Assets/SU/SU1.bmp", p_szSharedMask, p_Log); // Bright.
+    PICTURE_Load(&p_Assets->Supply[2], Location, "../../Assets/SU/SU2.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Supply[3], Location, "../../Assets/SU/SU3.bmp", p_szSharedMask, p_Log); // Brightest.
+    PICTURE_Load(&p_Assets->Supply[4], Location, "../../Assets/SU/SU4.bmp", p_szSharedMask, p_Log); // Brighter.
+    PICTURE_Load(&p_Assets->Supply[5], Location, "../../Assets/SU/SU5.bmp", p_szSharedMask, p_Log); // Bright.
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_T ScaleFrom = p_Assets->Supply[0];
+    FDELTA_T ScaledSize = {
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmWidth / (float)p_Globals->TerrainCombinedSize.ulDx),
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmHeight / (float)p_Globals->TerrainCombinedSize.ulDy)
+    };
+    PICTURE_Scale(&ScaleFrom, &p_Assets->SupplyMini, hWnd, ScaledSize, p_Log);
+
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_LoadTerrain(ASSETS_T* p_Assets, FPOINT_T Location, GLOBALS_T* p_Globals, CONSTANTS_T* p_Constants, HWND hWnd, SETTINGS_T* p_Settings, LOG_T* p_Log) {
+    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading terrain...");
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UINT uiAllocations = p_Constants->uiTerrainTilesX * p_Constants->uiTerrainTilesY * sizeof(PICTURE_T);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Assets->stAllocationsTerrain = uiAllocations;
+    p_Assets->Terrain = (PICTURE_T*)malloc(p_Assets->stAllocationsTerrain);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!p_Assets->Terrain) {
+        MISC_WriteOutParams(p_Log, LOG_SEVERITY_ERROR, "ASSETS_LoadTerrain(): Malloc failed for size: %zu bytes\n", p_Assets->stAllocationsTerrain);
+        return;
+    }
+    p_Globals->stAllocations += p_Assets->stAllocationsTerrain;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Assets->stAllocationsTerrainMini = uiAllocations;
+    p_Assets->TerrainMini = (PICTURE_T*)malloc(p_Assets->stAllocationsTerrainMini);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!p_Assets->TerrainMini) {
+        MISC_WriteOutParams(p_Log, LOG_SEVERITY_ERROR, "ASSETS_LoadTerrain(): Malloc failed for size: %zu bytes\n", p_Assets->stAllocationsTerrainMini);
+        return;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->stAllocations += p_Assets->stAllocationsTerrainMini;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UINT uiX, uiY, uiRowOffset;
+    for (uiY = 0; uiY < p_Constants->uiTerrainTilesY; uiY++) {
+        uiRowOffset = uiY * p_Constants->uiTerrainTilesX;
+        for (uiX = 0; uiX < p_Constants->uiTerrainTilesX; uiX++) {
+            PICTURE_Load(&p_Assets->Terrain[uiRowOffset + uiX], Location, "../../Assets/TE/TE0.bmp", NULL, p_Log);
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Common main terrain tile size.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BITMAP Tile = p_Assets->Terrain[0].Bitmap;
+    p_Globals->TerrainTileSize.uiDx = Tile.bmWidth;
+    p_Globals->TerrainTileSize.uiDy = Tile.bmHeight;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->TerrainCombinedSize.ulDx = p_Constants->uiTerrainTilesX * Tile.bmWidth;
+    p_Globals->TerrainCombinedSize.ulDy = p_Constants->uiTerrainTilesY * Tile.bmHeight;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // These terrain loading loops can be combined but it's clearer to have the tile sizes and full map size present at this time.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UINT uiIndex;
+    for (uiY = 0; uiY < p_Constants->uiTerrainTilesY; uiY++) {
+        uiRowOffset = uiY * p_Constants->uiTerrainTilesX;
+        for (uiX = 0; uiX < p_Constants->uiTerrainTilesX; uiX++) {
+            uiIndex = uiRowOffset + uiX;
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            PICTURE_T* p_ScaleFrom = &p_Assets->Terrain[uiIndex];
+            FDELTA_T MinimapRelativeSize = {
+                p_Settings->fMinimapSize * (p_ScaleFrom->Bitmap.bmWidth / (float)p_Globals->TerrainCombinedSize.ulDx),
+                p_Settings->fMinimapSize * (p_ScaleFrom->Bitmap.bmHeight / (float)p_Globals->TerrainCombinedSize.ulDy)
+            };
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            PICTURE_Scale(p_ScaleFrom, &p_Assets->TerrainMini[uiIndex], hWnd, MinimapRelativeSize, p_Log);
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Common mini terrain tile size.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    BITMAP MinimapTile = p_Assets->TerrainMini[0].Bitmap;
+    p_Globals->TerrainMinimapTileSize.uiDx = MinimapTile.bmWidth;
+    p_Globals->TerrainMinimapTileSize.uiDy = MinimapTile.bmHeight;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_LoadWorker(ASSETS_T* p_Assets, FPOINT_T Location, HWND hWnd, SETTINGS_T* p_Settings, GLOBALS_T* p_Globals, LOG_T* p_Log) {
     SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading worker image(s)...");
-    PICTURE_Load(&p_Assets->Worker[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/WO/WO0.bmp", "../../Assets/WO/WO0_M.bmp", p_Log); // Not carrying.
-    PICTURE_Load(&p_Assets->Worker[1], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/WO/WO1.bmp", "../../Assets/WO/WO0_M.bmp", p_Log); // Carrying minerals.
-    PICTURE_Load(&p_Assets->Worker[2], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/WO/WO2.bmp", "../../Assets/WO/WO0_M.bmp", p_Log); // Carrying gas.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Command center images.
+    char* p_szSharedMask = "../../Assets/WO/WO0_M.bmp";
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Receiving minerals.
+    PICTURE_Load(&p_Assets->Worker[0], Location, "../../Assets/WO/WO0.bmp", p_szSharedMask, p_Log); // Not carrying.
+    PICTURE_Load(&p_Assets->Worker[1], Location, "../../Assets/WO/WO1.bmp", p_szSharedMask, p_Log); // Carrying minerals.
+    PICTURE_Load(&p_Assets->Worker[2], Location, "../../Assets/WO/WO2.bmp", p_szSharedMask, p_Log); // Carrying gas.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading command center image(s)...");
-    PICTURE_Load(&p_Assets->Command[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC0.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Original.
-    PICTURE_Load(&p_Assets->Command[1], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC1.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
-    PICTURE_Load(&p_Assets->Command[2], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC2.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[3], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC3.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brightest.
-    PICTURE_Load(&p_Assets->Command[4], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC4.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[5], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC5.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
+    PICTURE_T ScaleFrom = p_Assets->Worker[0];
+    FDELTA_T ScaledSize = {
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmWidth / (float)p_Globals->TerrainCombinedSize.ulDx),
+        p_Settings->fMinimapSize * (ScaleFrom.Bitmap.bmHeight / (float)p_Globals->TerrainCombinedSize.ulDy)
+    };
+    PICTURE_Scale(&ScaleFrom, &p_Assets->WorkerMini, hWnd, ScaledSize, p_Log);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HWND is the main window handle.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_HandleBitmaps(ASSETS_T* p_Assets, HWND hWnd, CONSTANTS_T* p_Constants, SETTINGS_T* p_Settings, GLOBALS_T* p_Globals, LOG_T* p_Log) {
+    FPOINT_T Location = { 0.0f };
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Building a unit.
+    // First.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // East corner green.
+    ASSETS_LoadTerrain(p_Assets, Location, p_Globals, p_Constants, hWnd, p_Settings, p_Log);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PICTURE_Load(&p_Assets->Command[6], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC6.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
-    PICTURE_Load(&p_Assets->Command[7], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC7.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[8], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC8.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brightest.
-    PICTURE_Load(&p_Assets->Command[9], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC9.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[10], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC10.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // South corner green.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PICTURE_Load(&p_Assets->Command[11], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC11.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
-    PICTURE_Load(&p_Assets->Command[12], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC12.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[13], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC13.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brightest.
-    PICTURE_Load(&p_Assets->Command[14], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC14.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[15], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC15.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // West corner green.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PICTURE_Load(&p_Assets->Command[16], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC16.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
-    PICTURE_Load(&p_Assets->Command[17], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC17.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[18], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC18.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brightest.
-    PICTURE_Load(&p_Assets->Command[19], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC19.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[20], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC20.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Center lights green.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    PICTURE_Load(&p_Assets->Command[21], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC21.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
-    PICTURE_Load(&p_Assets->Command[22], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC22.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[23], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC23.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brightest.
-    PICTURE_Load(&p_Assets->Command[24], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC24.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Command[25], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CC/CC25.bmp", "../../Assets/CC/CC0_M.bmp", p_Log); // Bright.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Mineral field images.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading mineral field image(s)...");
-    PICTURE_Load(&p_Assets->Mineral[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/MF/MF0.bmp", "../../Assets/MF/MF0_M.bmp", p_Log); // 100%
-    PICTURE_Load(&p_Assets->Mineral[1], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/MF/MF1.bmp", "../../Assets/MF/MF1_M.bmp", p_Log); // 75%
-    PICTURE_Load(&p_Assets->Mineral[2], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/MF/MF2.bmp", "../../Assets/MF/MF2_M.bmp", p_Log); // 50%
-    PICTURE_Load(&p_Assets->Mineral[3], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/MF/MF3.bmp", "../../Assets/MF/MF3_M.bmp", p_Log); // 25%
-    PICTURE_Load(&p_Assets->Mineral[4], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/MF/MF4.bmp", "../../Assets/MF/MF4_M.bmp", p_Log); // 0%
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Supply depot images.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading supply depot image(s)...");
-    PICTURE_Load(&p_Assets->Supply[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/SU/SU0.bmp", "../../Assets/SU/SU0_M.bmp", p_Log); // Original.
-    PICTURE_Load(&p_Assets->Supply[1], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/SU/SU1.bmp", "../../Assets/SU/SU0_M.bmp", p_Log); // Bright.
-    PICTURE_Load(&p_Assets->Supply[2], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/SU/SU2.bmp", "../../Assets/SU/SU0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Supply[3], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/SU/SU3.bmp", "../../Assets/SU/SU0_M.bmp", p_Log); // Brightest.
-    PICTURE_Load(&p_Assets->Supply[4], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/SU/SU4.bmp", "../../Assets/SU/SU0_M.bmp", p_Log); // Brighter.
-    PICTURE_Load(&p_Assets->Supply[5], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/SU/SU5.bmp", "../../Assets/SU/SU0_M.bmp", p_Log); // Bright.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Refinery images.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading refinery image(s)...");
-    PICTURE_Load(&p_Assets->Refinery[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/RE/RE0.bmp", "../../Assets/RE/RE0_M.bmp", p_Log); // Original.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // HUD images.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading HUD image(s)...");
-    PICTURE_Load(&p_Assets->HUD[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/HU/HU0.bmp", "../../Assets/HU/HU0_M.bmp", p_Log); // Resource background.
-    PICTURE_Load(&p_Assets->HUD[1], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/HU/HU1.bmp", "../../Assets/HU/HU1.bmp", p_Log); // Taskbar and minimap background.
-    PICTURE_Load(&p_Assets->HUD[2], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/HU/HU2.bmp", "../../Assets/HU/HU2_M.bmp", p_Log); // Resource background.
-    PICTURE_Load(&p_Assets->HUD[3], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/HU/HU3.bmp", "../../Assets/HU/HU3_M.bmp", p_Log); // Resource background.
-    PICTURE_Load(&p_Assets->HUD[4], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/HU/HU4.bmp", "../../Assets/HU/HU4_M.bmp", p_Log); // Resource background.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Minimap images.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading minimap image(s)...");
-    PICTURE_Load(&p_Assets->Minimap[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/MI/MI0.bmp", "../../Assets/MI/MI0.bmp", p_Log); // Regular sized grass.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Gas images.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading gas image(s)...");
-    PICTURE_Load(&p_Assets->Gas[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/GA/GA0.bmp", "../../Assets/GA/GA0.bmp", p_Log); // Original.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Terrain images.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading terrain image(s)...");
-    PICTURE_Load(&p_Assets->Terrain[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/TE/TE0.bmp", "../../Assets/TE/TE0.bmp", p_Log); // Regular sized grass.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Command card images.
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    SetDlgItemText(hWnd, DLG_LOAD_STATUS, "Loading command card image(s)...");
-    PICTURE_Load(&p_Assets->Card[0], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CA/CA0.bmp", "../../Assets/CA/CA0.bmp", p_Log); // Blank card.
-    PICTURE_Load(&p_Assets->Card[1], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CA/CA1.bmp", "../../Assets/CA/CA1.bmp", p_Log); // Stop and move card.
-    PICTURE_Load(&p_Assets->Card[2], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CA/CA2.bmp", "../../Assets/CA/CA2.bmp", p_Log); // Specific structure.
-    PICTURE_Load(&p_Assets->Card[3], (FPOINT_T) { 0.0f, 0.0f }, "../../Assets/CA/CA3.bmp", "../../Assets/CA/CA3.bmp", p_Log); // Specific worker.
+    ASSETS_LoadBlitter(p_Assets, Location, hWnd, p_Log);
+    ASSETS_LoadCommandCard(p_Assets, Location, hWnd, p_Log);
+    ASSETS_LoadCommandCenter(p_Assets, Location, hWnd, p_Settings, p_Globals, p_Log);
+    ASSETS_LoadGas(p_Assets, Location, hWnd, p_Log);
+    ASSETS_LoadHud(p_Assets, Location, hWnd, p_Log);
+    ASSETS_LoadMineralField(p_Assets, Location, hWnd, p_Settings, p_Globals, p_Log);
+    ASSETS_LoadRefinery(p_Assets, Location, hWnd, p_Settings, p_Globals, p_Log);
+    ASSETS_LoadSupplyDepot(p_Assets, Location, hWnd, p_Settings, p_Globals, p_Log);
+    ASSETS_LoadWorker(p_Assets, Location, hWnd, p_Settings, p_Globals, p_Log);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ASSETS_CreateBrushes(ASSETS_T* p_Assets) {
-    p_Assets->hBrushSelected =      CreateSolidBrush(RGB(0,     255,    0));
-    p_Assets->hBrushHighlighted =   CreateSolidBrush(RGB(100,   0,      100));
-    p_Assets->hBrushWorker =        CreateSolidBrush(RGB(255,   255,    255));
-    p_Assets->hBrushCommand =       CreateSolidBrush(RGB(255,   0,      0));
-    p_Assets->hBrushMineral =       CreateSolidBrush(RGB(110,   175,    225));
-    p_Assets->hBrushSupply =        CreateSolidBrush(RGB(255,   255,    0));
-    p_Assets->hBrushRefinery =      CreateSolidBrush(RGB(0,     175,    0));
-    p_Assets->hBrushBufferClear =   CreateSolidBrush(RGB(0,     0,      0));
-    p_Assets->hBrushClear =         CreateSolidBrush(RGB(0,     0,      0));
-    p_Assets->hBrush100r0g0b =      CreateSolidBrush(RGB(100,   0,      0));
-    p_Assets->hBrush0r100g0b =      CreateSolidBrush(RGB(0,     100,    0));
-    p_Assets->hBrush0r0g100b =      CreateSolidBrush(RGB(0,     0,      100));
-    p_Assets->hBrush100r100g0b =    CreateSolidBrush(RGB(100,   100,    0));
-    p_Assets->hBrush0r100g100b =    CreateSolidBrush(RGB(0,     100,    100));
-    p_Assets->hBrush100r0g100b =    CreateSolidBrush(RGB(100,   0,      100));
-    p_Assets->hBrush100r100g100b =  CreateSolidBrush(RGB(100,   100,    100));
-    p_Assets->hBrushWhite =         CreateSolidBrush(RGB(255,   255,    255));
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    p_Assets->hPenSelected =        CreatePen(PS_SOLID, 1, RGB(0,       255,    0));
-    p_Assets->hPenHighlighted =     CreatePen(PS_SOLID, 1, RGB(100,     0,      100));
-    p_Assets->hPenWorker =          CreatePen(PS_SOLID, 1, RGB(255,     255,    255));
-    p_Assets->hPenCommand =         CreatePen(PS_SOLID, 1, RGB(255,     0,      0));
-    p_Assets->hPenMineral =         CreatePen(PS_SOLID, 1, RGB(110,     175,    225));
-    p_Assets->hPenSupply =          CreatePen(PS_SOLID, 1, RGB(255,     255,    0));
-    p_Assets->hPenRefinery =        CreatePen(PS_SOLID, 1, RGB(0,       175,    0));
-    p_Assets->hPenViewport =        CreatePen(PS_SOLID, 1, RGB(200,     200,    200));
-    p_Assets->hPenSelectionArea =   CreatePen(PS_SOLID, 1, RGB(0,       255,    0));
-    p_Assets->hPenBuildLimits =     CreatePen(PS_SOLID, 1, RGB(255,     0,      0));
-    p_Assets->hPenBuildType =       CreatePen(PS_SOLID, 1, RGB(255,     0,      0));
-    p_Assets->hPenTranslation =     CreatePen(PS_SOLID, 1, RGB(200,     200,    200));
-    p_Assets->hPenMinorVector =     CreatePen(PS_SOLID, 1, RGB(255,     165,    0));
-    p_Assets->hPenMajorVector =     CreatePen(PS_SOLID, 1, RGB(0,       255,    255));
-    p_Assets->hPenDirtyZone =       CreatePen(PS_SOLID, 1, RGB(255,     0,      255));
-    p_Assets->hPenWhite =           CreatePen(PS_SOLID, 1, RGB(255,     255,    255));
+    p_Assets->hBrushSelected = CreateSolidBrush(RGB(0, 255, 0));
+    p_Assets->hBrushHighlighted = CreateSolidBrush(RGB(100, 0, 100));
+    p_Assets->hBrushWorker = CreateSolidBrush(RGB(255, 255, 255));
+    p_Assets->hBrushCommand = CreateSolidBrush(RGB(255, 0, 0));
+    p_Assets->hBrushMineral = CreateSolidBrush(RGB(110, 175, 225));
+    p_Assets->hBrushSupply = CreateSolidBrush(RGB(255, 255, 0));
+    p_Assets->hBrushRefinery = CreateSolidBrush(RGB(0, 175, 0));
+    p_Assets->hBrushBufferClear = CreateSolidBrush(RGB(0, 0, 0));
+    p_Assets->hBrushClear = CreateSolidBrush(RGB(0, 0, 0));
+    p_Assets->hBrush100r0g0b = CreateSolidBrush(RGB(100, 0, 0));
+    p_Assets->hBrush0r100g0b = CreateSolidBrush(RGB(0, 100, 0));
+    p_Assets->hBrush0r0g100b = CreateSolidBrush(RGB(0, 0, 100));
+    p_Assets->hBrush100r100g0b = CreateSolidBrush(RGB(100, 100, 0));
+    p_Assets->hBrush0r100g100b = CreateSolidBrush(RGB(0, 100, 100));
+    p_Assets->hBrush100r0g100b = CreateSolidBrush(RGB(100, 0, 100));
+    p_Assets->hBrush100r100g100b = CreateSolidBrush(RGB(100, 100, 100));
+    p_Assets->hBrushWhite = CreateSolidBrush(RGB(255, 255, 255));
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_CreatePens(ASSETS_T* p_Assets) {
+    p_Assets->hPenSelected = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+    p_Assets->hPenHighlighted = CreatePen(PS_SOLID, 1, RGB(100, 0, 100));
+    p_Assets->hPenWorker = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+    p_Assets->hPenCommand = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+    p_Assets->hPenMineral = CreatePen(PS_SOLID, 1, RGB(110, 175, 225));
+    p_Assets->hPenSupply = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
+    p_Assets->hPenRefinery = CreatePen(PS_SOLID, 1, RGB(0, 175, 0));
+    p_Assets->hPenViewport = CreatePen(PS_SOLID, 1, RGB(200, 200, 200));
+    p_Assets->hPenSelectionArea = CreatePen(PS_SOLID, 1, RGB(0, 255, 0));
+    p_Assets->hPenBuildLimits = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+    p_Assets->hPenBuildType = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+    p_Assets->hPenTranslation = CreatePen(PS_SOLID, 1, RGB(200, 200, 200));
+    p_Assets->hPenMinorVector = CreatePen(PS_SOLID, 1, RGB(255, 165, 0));
+    p_Assets->hPenMajorVector = CreatePen(PS_SOLID, 1, RGB(0, 255, 255));
+    p_Assets->hPenDirtyZone = CreatePen(PS_SOLID, 1, RGB(255, 0, 255));
+    p_Assets->hPenTerrainGrid = CreatePen(PS_SOLID, 1, RGB(255, 255, 0));
+    p_Assets->hPenWhite = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl ASSETS_KillBrushes(ASSETS_T* p_Assets) {
@@ -212,7 +330,9 @@ void __cdecl ASSETS_KillBrushes(ASSETS_T* p_Assets) {
     DeleteObject(p_Assets->hBrush100r0g100b);
     DeleteObject(p_Assets->hBrush100r100g100b);
     DeleteObject(p_Assets->hBrushWhite);
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl ASSETS_KillPens(ASSETS_T* p_Assets) {
     DeleteObject(p_Assets->hPenSelected);
     DeleteObject(p_Assets->hPenHighlighted);
     DeleteObject(p_Assets->hPenWorker);
@@ -228,38 +348,38 @@ void __cdecl ASSETS_KillBrushes(ASSETS_T* p_Assets) {
     DeleteObject(p_Assets->hPenMinorVector);
     DeleteObject(p_Assets->hPenMajorVector);
     DeleteObject(p_Assets->hPenDirtyZone);
+    DeleteObject(p_Assets->hPenTerrainGrid);
     DeleteObject(p_Assets->hPenWhite);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ASSETS_KillBitmaps(ASSETS_T* p_Assets) {
+void __cdecl ASSETS_KillBitmaps(ASSETS_T* p_Assets, GLOBALS_T* p_Globals, CONSTANTS_T* p_Constants) {
     UINT8 ubI;
+    UINT uiX, uiY, uiRowOffset, uiIndex;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for (ubI = 0; ubI < 9; ubI++) {
+    // Main images.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    for (ubI = 0; ubI < BLITTER_COLOR_COUNT; ubI++) {
         PICTURE_Kill(&p_Assets->Blitter[ubI]);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for (ubI = 0; ubI < 3; ubI++) {
-        PICTURE_Kill(&p_Assets->Worker[ubI]);
+    for (ubI = 0; ubI < 5; ubI++) {
+        PICTURE_Kill(&p_Assets->Card[ubI]);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     for (ubI = 0; ubI < 26; ubI++) {
         PICTURE_Kill(&p_Assets->Command[ubI]);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    for (ubI = 0; ubI < 1; ubI++) {
+        PICTURE_Kill(&p_Assets->Gas[ubI]);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    for (ubI = 0; ubI < 2; ubI++) {
+        PICTURE_Kill(&p_Assets->HUD[ubI]);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     for (ubI = 0; ubI < 5; ubI++) {
         PICTURE_Kill(&p_Assets->Mineral[ubI]);
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for (ubI = 0; ubI < 6; ubI++) {
-        PICTURE_Kill(&p_Assets->Supply[ubI]);
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for (ubI = 0; ubI < 1; ubI++) {
-        PICTURE_Kill(&p_Assets->Refinery[ubI]);
-    }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for (ubI = 0; ubI < 5; ubI++) {
-        PICTURE_Kill(&p_Assets->HUD[ubI]);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     for (ubI = 0; ubI < 1; ubI++) {
@@ -267,24 +387,47 @@ void __cdecl ASSETS_KillBitmaps(ASSETS_T* p_Assets) {
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     for (ubI = 0; ubI < 1; ubI++) {
-        PICTURE_Kill(&p_Assets->Gas[ubI]);
+        PICTURE_Kill(&p_Assets->Refinery[ubI]);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for (ubI = 0; ubI < 1; ubI++) {
-        PICTURE_Kill(&p_Assets->Terrain[ubI]);
+    for (ubI = 0; ubI < 6; ubI++) {
+        PICTURE_Kill(&p_Assets->Supply[ubI]);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    for (ubI = 0; ubI < 5; ubI++) {
-        PICTURE_Kill(&p_Assets->Card[ubI]);
+    for (uiY = 0; uiY < p_Constants->uiTerrainTilesY; uiY++) {
+        uiRowOffset = uiY * p_Constants->uiTerrainTilesX;
+        for (uiX = 0; uiX < p_Constants->uiTerrainTilesX; uiX++) {
+            uiIndex = uiRowOffset + uiX;
+            PICTURE_Kill(&p_Assets->Terrain[uiIndex]);
+            PICTURE_Kill(&p_Assets->TerrainMini[uiIndex]);
+        }
     }
+    free(p_Assets->Terrain);
+    p_Globals->stAllocations -= p_Assets->stAllocationsTerrain;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    free(p_Assets->TerrainMini);
+    p_Globals->stAllocations -= p_Assets->stAllocationsTerrain;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    for (ubI = 0; ubI < 3; ubI++) {
+        PICTURE_Kill(&p_Assets->Worker[ubI]);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Minimap images.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    PICTURE_Kill(&p_Assets->CommandMini);
+    PICTURE_Kill(&p_Assets->SupplyMini);
+    PICTURE_Kill(&p_Assets->WorkerMini);
+    PICTURE_Kill(&p_Assets->MineralMini);
+    PICTURE_Kill(&p_Assets->RefineryMini);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl ASSETS_Kill(ASSETS_T** pp_Assets, GLOBALS_T* p_Globals) {
+void __cdecl ASSETS_Kill(ASSETS_T** pp_Assets, GLOBALS_T* p_Globals, CONSTANTS_T* p_Constants) {
     ASSETS_T* p_Assets = *pp_Assets;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if (p_Assets) {
         ASSETS_KillBrushes(p_Assets);
-        ASSETS_KillBitmaps(p_Assets);
+        ASSETS_KillPens(p_Assets);
+        ASSETS_KillBitmaps(p_Assets, p_Globals, p_Constants);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         free(p_Assets);
         p_Globals->stAllocations -= sizeof(ASSETS_T);

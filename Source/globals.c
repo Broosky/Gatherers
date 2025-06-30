@@ -62,7 +62,7 @@ void __cdecl GLOBALS_Init(GLOBALS_T* p_Globals, HINSTANCE hInstance, SETTINGS_T*
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl GLOBALS_ApplyAnimationRate(GLOBALS_T* p_Globals, SETTINGS_T* p_Settings) {
-    p_Globals->fAnimationTick = 1000.0f * (1.0f / p_Settings->fAnimateFPS) * p_Settings->fEngineFPS / 1000.0f;
+    p_Globals->fAnimationTick = 1000.0f * (1.0f / p_Settings->fAnimateFpsTarget) * p_Settings->fEngineFpsTarget / 1000.0f;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl GLOBALS_ReceiveHotReload(SETTINGS_T* p_Settings, GLOBALS_T* p_Globals) {

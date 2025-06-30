@@ -53,7 +53,7 @@ void                __cdecl     RENDERER_IMPL_FlipArea                          
 void                __cdecl     RENDERER_IMPL_ApplyWorldTransform               (RENDERER_T*, TRANSFORM_TYPE_T, CONSTANTS_T*, float, FPOINT_T, LOG_T*);
 void                __cdecl     RENDERER_IMPL_ResetWorldTransform               (RENDERER_T*);
 void                __cdecl     RENDERER_IMPL_InitWorldTransform                (RENDERER_T*);
-void                __cdecl     RENDERER_IMPL_DrawMinimapEntities               (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, LOG_T*);
+void                __cdecl     RENDERER_IMPL_DrawMinimapEntities               (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, MENU_T*, LOG_T*);
 void                __cdecl     RENDERER_IMPL_DrawMinimapViewport               (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 void                __cdecl     RENDERER_IMPL_DrawMinimapSelectionArea          (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 void                __cdecl     RENDERER_IMPL_DrawBuildLimits                   (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
@@ -68,6 +68,8 @@ void                __cdecl     RENDERER_IMPL_DrawEntityMajorVector             
 void                __cdecl     RENDERER_IMPL_DrawEntityEllipse                 (RENDERER_T*, ENTITY_T*, HPEN, HBRUSH, SETTINGS_T*);
 void                __cdecl     RENDERER_IMPL_DrawEntity                        (RENDERER_T*, ENTITY_T*, UINT8);
 void                __cdecl     RENDERER_IMPL_DrawDirtyZones                    (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
+void                __cdecl     RENDERER_IMPL_DrawTerrainGrid                   (RENDERER_T*, FPOINT_T, FPOINT_T, ASSETS_T*, GLOBALS_T*);
+void                __cdecl     RENDERER_IMPL_DrawLine                          (RENDERER_T*, FPOINT_T, FPOINT_T, HPEN);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Local only:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +128,8 @@ RENDERER_IMPL_T* __cdecl RENDERER_IMPL_Create(RENDERER_T* p_Renderer, GLOBALS_T*
     p_Renderer->DrawEntityEllipse = RENDERER_IMPL_DrawEntityEllipse;
     p_Renderer->DrawEntity = RENDERER_IMPL_DrawEntity;
     p_Renderer->DrawDirtyZones = RENDERER_IMPL_DrawDirtyZones;
+    p_Renderer->DrawTerrainGrid = RENDERER_IMPL_DrawTerrainGrid;
+    p_Renderer->DrawLine = RENDERER_IMPL_DrawLine;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Unused, retained internally in renderer.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,6 +198,12 @@ FRECT_T __cdecl RENDERER_IMPL_CaptureDirtyZone(RENDERER_T* p_Renderer, ENTITY_T*
 void __cdecl RENDERER_IMPL_DrawDirtyZones(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl RENDERER_IMPL_DrawTerrainGrid(RENDERER_T* p_Renderer, FPOINT_T From, FPOINT_T To, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl RENDERER_IMPL_DrawLine(RENDERER_T* p_Renderer, FPOINT_T From, FPOINT_T To, HPEN hPen) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl RENDERER_IMPL_PrepareDirtyZone(RENDERER_T* p_Renderer, FRECT_T DirtyZone, GLOBALS_T* p_Globals, LOG_T* p_Log) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,7 +219,7 @@ void __cdecl RENDERER_IMPL_ResetWorldTransform(RENDERER_T* p_Renderer) {
 void __cdecl RENDERER_IMPL_InitWorldTransform(RENDERER_T* p_Renderer) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl RENDERER_IMPL_DrawMinimapEntities(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, FPOINT_T MinimapOrigin, ASSETS_T* p_Assets, SETTINGS_T* p_Settings, LOG_T* p_Log) {
+void __cdecl RENDERER_IMPL_DrawMinimapEntities(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, FPOINT_T MinimapOrigin, ASSETS_T* p_Assets, SETTINGS_T* p_Settings, MENU_T* p_Menu, LOG_T* p_Log) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl RENDERER_IMPL_DrawMinimapViewport(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, FPOINT_T TopLeft, FPOINT_T TopRight, FPOINT_T BottomRight, FPOINT_T BottomLeft) {

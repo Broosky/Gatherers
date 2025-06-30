@@ -7,16 +7,19 @@
 #include "../Headers/globals.h"
 #include "../Headers/log.h"
 #include "../Headers/misc.h"
+#include <direct.h>
+#include <errno.h>
 #include <io.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl LOG_Zero(LOG_T* p_Log) {
     ZeroMemory(p_Log, sizeof(LOG_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-LOG_T* __cdecl LOG_Create(const char* const p_szFileName, GLOBALS_T* p_Globals) {
+LOG_T* __cdecl LOG_Create(const char* const p_szFilePath, GLOBALS_T* p_Globals) {
     size_t stAllocation = sizeof(LOG_T);
     LOG_T* p_Log = malloc(stAllocation);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,15 +34,22 @@ LOG_T* __cdecl LOG_Create(const char* const p_szFileName, GLOBALS_T* p_Globals) 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Begin log.
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        LOG_AppendDayOfYear(p_Log, p_szFileName);
+        LOG_AppendDayOfYear(p_Log, p_szFilePath);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        p_Log->p_LogFile = fopen(p_Log->szAppendedFileName, "a");
-        if (p_Log->p_LogFile) {
-            MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "Log starting ===================================\n");
-            return p_Log;
+        if (LOG_MakeDirectories(p_Log->szAppendedFileName) >= 0) {
+            p_Log->p_LogFile = fopen(p_Log->szAppendedFileName, "a");
+            if (p_Log->p_LogFile) {
+                MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "Log starting ===================================\n");
+                return p_Log;
+            }
+            else {
+                MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "LOG_Create(): Fopen failed: %s", strerror(errno));
+                return NULL;
+            }
         }
-        else {
-            MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "LOG_Create(): Fopen failed: %s", strerror(errno));
+        else
+        {
+            MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "LOG_Create(): Log could not be created: %s", strerror(errno));
             return NULL;
         }
     }
@@ -53,6 +63,69 @@ void __cdecl LOG_Append(LOG_T* p_Log, const char* p_szMessage) {
         fprintf(p_Log->p_LogFile, "[%s] %s", szTimestamp, p_szMessage);
         LOG_Flush(p_Log, 1);
     }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Returns 0 if no directories are in the file path or the full directory was made successfully. Returns negative on error.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int __cdecl LOG_MakeDirectories(const char* const p_szFilePath) {
+    if (!p_szFilePath) {
+        return -1;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    char szTemp[512];
+    size_t stPathLength = strlen(p_szFilePath);
+    if (stPathLength >= sizeof(szTemp)) {
+        return -1;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    strcpy(szTemp, p_szFilePath);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Find last slash to separate the directory portion from the filename.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    char* cLastSlash = strrchr(szTemp, '/');
+    if (!cLastSlash) {
+        return 0;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Trim off the filename, keep only the path.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    *cLastSlash = '\0';
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Start after the drive letter if present, e.g., "C:/..."
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    char* cStart = szTemp;
+    if (szTemp[1] == ':' && szTemp[2] == '/') {
+        cStart = szTemp + 3;
+    }
+    else if (szTemp[0] == '/') {
+        cStart = szTemp + 1;
+    }
+    else {
+        cStart = szTemp + 1;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Walk through the path and create directories one by one.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    char* cCurrent;	
+	for (cCurrent = cStart; *cCurrent; cCurrent++) {
+        if (*cCurrent == '/') {
+            *cCurrent = '\0';
+            errno = 0;
+            if (_mkdir(szTemp) != 0 && errno != EEXIST) {
+                return -1;
+            }
+            *cCurrent = '/';
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Create the final directory if necessary.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    errno = 0;
+    if (_mkdir(szTemp) != 0 && errno != EEXIST) {
+        return -1;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl LOG_HandleBookending(LOG_T** pp_Log, CONSTANTS_T* p_Constants, GLOBALS_T* p_Globals) {
@@ -103,16 +176,16 @@ void __cdecl LOG_PopulateTimestamp(char* p_szBuffer, size_t stBufferSize) {
     strftime(p_szBuffer, stBufferSize, "%Y-%m-%d %H:%M:%S", LocalTime);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl LOG_AppendDayOfYear(LOG_T* p_Log, const char* const p_szBaseFilename) {
+void __cdecl LOG_AppendDayOfYear(LOG_T* p_Log, const char* const p_szBaseFilePath) {
     time_t Now = time(NULL);
     struct tm* LocalTime = localtime(&Now);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     char szDate[11];
     strftime(szDate, sizeof(szDate), "%Y-%m-%d", LocalTime);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* p_szExtension = strrchr(p_szBaseFilename, '.');
-    size_t stPostfix = p_szExtension - p_szBaseFilename;
-    snprintf(p_Log->szAppendedFileName, sizeof(p_Log->szAppendedFileName),"%.*s_%s%s", (int)stPostfix, p_szBaseFilename, szDate, p_szExtension);
+    const char* p_szExtension = strrchr(p_szBaseFilePath, '.');
+    size_t stPostfix = p_szExtension - p_szBaseFilePath;
+    snprintf(p_Log->szAppendedFileName, sizeof(p_Log->szAppendedFileName), "%.*s_%s%s", (int)stPostfix, p_szBaseFilePath, szDate, p_szExtension);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Log->usDayOfYearCreated = LocalTime->tm_yday;
 }

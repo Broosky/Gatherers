@@ -1,7 +1,7 @@
 #############################################################################################################################
-# Makefile initially created by Dev-C++ 5.11, manually modified thereafter. 												#
+# Makefile initially created by Dev-C++ 5.11, manually modified thereafter.                                                 #
 #############################################################################################################################
-# Release mode only.																										#
+# Release mode only.                                                                                                        #
 #############################################################################################################################
 
 CPP      = g++.exe
@@ -81,42 +81,42 @@ $(BIN): $(OBJ)
 
 ../obj/Release/Renderer/renderer_double_buffer.o: ../Source/Renderer/renderer_double_buffer.c
 	$(CC) -c ../Source/Renderer/renderer_double_buffer.c -o ../obj/Release/Renderer/renderer_double_buffer.o $(CFLAGS)
-	
+    
 ../obj/Release/Windows/windows_procedure.o: ../Source/Windows/windows_procedure.c
 	$(CC) -c ../Source/Windows/windows_procedure.c -o ../obj/Release/Windows/windows_procedure.o $(CFLAGS)
-	
+    
 ../obj/Release/Renderer/renderer_direct_2d.o: ../Source/Renderer/renderer_direct_2d.c
 	$(CC) -c ../Source/Renderer/renderer_direct_2d.c -o ../obj/Release/Renderer/renderer_direct_2d.o $(CFLAGS)
-	
+    
 ../obj/Release/heap_allocator.o: ../Source/heap_allocator.c
 	$(CC) -c ../Source/heap_allocator.c -o ../obj/Release/heap_allocator.o $(CFLAGS)
-	
+    
 ../obj/Release/save.o: ../Source/save.c
 	$(CC) -c ../Source/save.c -o ../obj/Release/save.o $(CFLAGS)
-	
+    
 ../obj/Release/network.o: ../Source/network.c
 	$(CC) -c ../Source/network.c -o ../obj/Release/network.o $(CFLAGS)
-	
+    
 ../obj/Release/path_finding.o: ../Source/path_finding.c
 	$(CC) -c ../Source/path_finding.c -o ../obj/Release/path_finding.o $(CFLAGS)
 
 ../obj/Release/Renderer/renderer.o: ../Source/Renderer/renderer.c
 	$(CC) -c ../Source/Renderer/renderer.c -o ../obj/Release/Renderer/renderer.o $(CFLAGS)
-	
+    
 ../obj/Release/Renderer/renderer_sdl.o: ../Source/Renderer/renderer_sdl.c
 	$(CC) -c ../Source/Renderer/renderer_sdl.c -o ../obj/Release/Renderer/renderer_sdl.o $(CFLAGS)
-	
+    
 ../obj/Release/Renderer/renderer_single_buffer.o: ../Source/Renderer/renderer_single_buffer.c
 	$(CC) -c ../Source/Renderer/renderer_single_buffer.c -o ../obj/Release/Renderer/renderer_single_buffer.o $(CFLAGS)
-	
+    
 ../obj/Release/sound.o: ../Source/sound.c
 	$(CC) -c ../Source/sound.c -o ../obj/Release/sound.o $(CFLAGS)
-	
+    
 ../obj/Release/Renderer/renderer_wireframe.o: ../Source/Renderer/renderer_wireframe.c
 	$(CC) -c ../Source/Renderer/renderer_wireframe.c -o ../obj/Release/Renderer/renderer_wireframe.o $(CFLAGS)
-	
+    
 ../obj/Release/constants.o: ../Source/constants.c
 	$(CC) -c ../Source/constants.c -o ../obj/Release/constants.o $(CFLAGS)
-	
+    
 ../Resources/main.res: ../Resources/main.rc 
 	$(WINDRES) -i ../Resources/main.rc  -F pe-i386 --input-format=rc -o ../Resources/main.res -O coff

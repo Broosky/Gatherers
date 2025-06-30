@@ -206,9 +206,6 @@
     <ClInclude Include="..\..\Headers\Renderer\renderer_single_buffer.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Headers\Renderer\renderer_wireframe.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Headers\Windows\windows_macros.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
@@ -226,6 +223,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Headers\save.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Headers\Renderer\renderer_wireframe.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

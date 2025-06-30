@@ -14,82 +14,85 @@
 // Local only:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DIRECT_2D_Zero(DIRECT_2D_T* p_D2d) {
-	ZeroMemory(p_D2d, sizeof(DIRECT_2D_T));
+    ZeroMemory(p_D2d, sizeof(DIRECT_2D_T));
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 DIRECT_2D_T* __cdecl DIRECT_2D_Create(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
-	size_t stAllocation = sizeof(DIRECT_2D_T);
-	DIRECT_2D_T* p_D2d = malloc(stAllocation);
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if (!p_D2d) {
-		MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "DIRECT_2D_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
-		return NULL;
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	p_Globals->stAllocations += stAllocation;
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	DIRECT_2D_Zero(p_D2d);
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Renderer population.
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	p_Renderer->vp_Implementation = p_D2d;
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	p_Renderer->GetClientArea = DIRECT_2D_GetClientArea;
-	p_Renderer->Resize = DIRECT_2D_Resize;
-	p_Renderer->Kill = DIRECT_2D_Kill;
-	p_Renderer->SetBlitter = DIRECT_2D_SetBlitter;
-	p_Renderer->Blitter = DIRECT_2D_Blitter;
-	p_Renderer->Clear = DIRECT_2D_Clear;
-	p_Renderer->ClearEntity = DIRECT_2D_ClearEntity;
-	p_Renderer->FlipEntity = DIRECT_2D_FlipEntity;
-	p_Renderer->PresentFrame = DIRECT_2D_PresentFrame;
-	p_Renderer->HandlePreProcessing = DIRECT_2D_HandlePreProcessing;
-	p_Renderer->CaptureDirtyZone = DIRECT_2D_CaptureDirtyZone;
-	p_Renderer->PrepareDirtyZone = DIRECT_2D_PrepareDirtyZone;
-	p_Renderer->EnablingPostProcessing = DIRECT_2D_EnablingPostProcessing;
-	p_Renderer->DisablingPostProcessing = DIRECT_2D_DisablingPostProcessing;
-	p_Renderer->HandlePostProcessing = DIRECT_2D_HandlePostProcessing;
-	p_Renderer->FlipArea = DIRECT_2D_FlipArea;
-	p_Renderer->ApplyWorldTransform = DIRECT_2D_ApplyWorldTransform;
-	p_Renderer->ResetWorldTransform = DIRECT_2D_ResetWorldTransform;
-	p_Renderer->InitWorldTransform = DIRECT_2D_InitWorldTransform;
-	p_Renderer->DrawMinimapEntities = DIRECT_2D_DrawMinimapEntities;
-	p_Renderer->DrawMinimapViewport = DIRECT_2D_DrawMinimapViewport;
-	p_Renderer->DrawMinimapSelectionArea = DIRECT_2D_DrawMinimapSelectionArea;
-	p_Renderer->DrawBuildLimits = DIRECT_2D_DrawBuildLimits;
-	p_Renderer->DrawBuildType = DIRECT_2D_DrawBuildType;
-	p_Renderer->DrawSelectionArea = DIRECT_2D_DrawSelectionArea;
-	p_Renderer->DrawTranslationThreshold = DIRECT_2D_DrawTranslationThreshold;
-	p_Renderer->DrawPicture = DIRECT_2D_DrawPicture;
-	p_Renderer->DrawPictureAt = DIRECT_2D_DrawPictureAt;
-	p_Renderer->CropDrawPictureAt = DIRECT_2D_CropDrawPictureAt;
-	p_Renderer->DrawEntityMinorVector = DIRECT_2D_DrawEntityMinorVector;
-	p_Renderer->DrawEntityMajorVector = DIRECT_2D_DrawEntityMajorVector;
-	p_Renderer->DrawEntityEllipse = DIRECT_2D_DrawEntityEllipse;
-	p_Renderer->DrawEntity = DIRECT_2D_DrawEntity;
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Unused, retained internally in renderer.
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	return p_D2d;
+    size_t stAllocation = sizeof(DIRECT_2D_T);
+    DIRECT_2D_T* p_D2d = malloc(stAllocation);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (!p_D2d) {
+        MISC_WriteOutParams(p_Log, LOG_SEVERITY_FATAL, "DIRECT_2D_Create(): Malloc failed for size: %zu bytes\n", stAllocation);
+        return NULL;
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Globals->stAllocations += stAllocation;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    DIRECT_2D_Zero(p_D2d);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Renderer population.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Renderer->vp_Implementation = p_D2d;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    p_Renderer->GetClientArea = DIRECT_2D_GetClientArea;
+    p_Renderer->Resize = DIRECT_2D_Resize;
+    p_Renderer->Kill = DIRECT_2D_Kill;
+    p_Renderer->SetBlitter = DIRECT_2D_SetBlitter;
+    p_Renderer->Blitter = DIRECT_2D_Blitter;
+    p_Renderer->Clear = DIRECT_2D_Clear;
+    p_Renderer->ClearEntity = DIRECT_2D_ClearEntity;
+    p_Renderer->FlipEntity = DIRECT_2D_FlipEntity;
+    p_Renderer->PresentFrame = DIRECT_2D_PresentFrame;
+    p_Renderer->HandlePreProcessing = DIRECT_2D_HandlePreProcessing;
+    p_Renderer->CaptureDirtyZone = DIRECT_2D_CaptureDirtyZone;
+    p_Renderer->PrepareDirtyZone = DIRECT_2D_PrepareDirtyZone;
+    p_Renderer->EnablingPostProcessing = DIRECT_2D_EnablingPostProcessing;
+    p_Renderer->DisablingPostProcessing = DIRECT_2D_DisablingPostProcessing;
+    p_Renderer->HandlePostProcessing = DIRECT_2D_HandlePostProcessing;
+    p_Renderer->FlipArea = DIRECT_2D_FlipArea;
+    p_Renderer->ApplyWorldTransform = DIRECT_2D_ApplyWorldTransform;
+    p_Renderer->ResetWorldTransform = DIRECT_2D_ResetWorldTransform;
+    p_Renderer->InitWorldTransform = DIRECT_2D_InitWorldTransform;
+    p_Renderer->DrawMinimapEntities = DIRECT_2D_DrawMinimapEntities;
+    p_Renderer->DrawMinimapViewport = DIRECT_2D_DrawMinimapViewport;
+    p_Renderer->DrawMinimapSelectionArea = DIRECT_2D_DrawMinimapSelectionArea;
+    p_Renderer->DrawBuildLimits = DIRECT_2D_DrawBuildLimits;
+    p_Renderer->DrawBuildType = DIRECT_2D_DrawBuildType;
+    p_Renderer->DrawSelectionArea = DIRECT_2D_DrawSelectionArea;
+    p_Renderer->DrawTranslationThreshold = DIRECT_2D_DrawTranslationThreshold;
+    p_Renderer->DrawPicture = DIRECT_2D_DrawPicture;
+    p_Renderer->DrawPictureAt = DIRECT_2D_DrawPictureAt;
+    p_Renderer->CropDrawPictureAt = DIRECT_2D_CropDrawPictureAt;
+    p_Renderer->DrawEntityMinorVector = DIRECT_2D_DrawEntityMinorVector;
+    p_Renderer->DrawEntityMajorVector = DIRECT_2D_DrawEntityMajorVector;
+    p_Renderer->DrawEntityEllipse = DIRECT_2D_DrawEntityEllipse;
+    p_Renderer->DrawEntity = DIRECT_2D_DrawEntity;
+    p_Renderer->DrawDirtyZones = DIRECT_2D_DrawDirtyZones;
+    p_Renderer->DrawTerrainGrid = DIRECT_2D_DrawTerrainGrid;
+    p_Renderer->DrawLine = DIRECT_2D_DrawLine;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Unused, retained internally in renderer.
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return p_D2d;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 DIRECT_2D_T* __cdecl DIRECT_2D_Cast(RENDERER_T* p_Renderer) {
-	return (DIRECT_2D_T*)p_Renderer->vp_Implementation;
+    return (DIRECT_2D_T*)p_Renderer->vp_Implementation;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Accessible via Renderer:
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DIRECT_2D_Kill(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals) {
-	DIRECT_2D_T* p_D2d = DIRECT_2D_Cast(p_Renderer);
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if (p_D2d) {
-		free(p_D2d);
-		p_Globals->stAllocations -= sizeof(DIRECT_2D_T);
-	}
+    DIRECT_2D_T* p_D2d = DIRECT_2D_Cast(p_Renderer);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    if (p_D2d) {
+        free(p_D2d);
+        p_Globals->stAllocations -= sizeof(DIRECT_2D_T);
+    }
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 RECT __cdecl DIRECT_2D_GetClientArea(RENDERER_T* p_Renderer) {
-	return (RECT) { .left = 0, .top = 0, .right = 0, .bottom = 0 };
+    return (RECT) { .left = 0, .top = 0, .right = 0, .bottom = 0 };
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DIRECT_2D_Resize(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, LOG_T* p_Log) {
@@ -117,13 +120,19 @@ void __cdecl DIRECT_2D_HandlePreProcessing(RENDERER_T* p_Renderer, MENU_T* p_Men
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 FRECT_T __cdecl DIRECT_2D_CaptureDirtyZone(RENDERER_T* p_Renderer, ENTITY_T* p_Entity, SETTINGS_T* p_Settings, CONSTANTS_T* p_Constants) {
-	return (FRECT_T) {
-		.Location = { .fX = 0.0f, .fY = 0.0f },
-			.Size = { .fDx = 0.0f, .fDy = 0.0f }
-	};
+    return (FRECT_T) {
+        .Location = { .fX = 0.0f, .fY = 0.0f },
+            .Size = { .fDx = 0.0f, .fDy = 0.0f }
+    };
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DIRECT_2D_DrawDirtyZones(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DIRECT_2D_DrawTerrainGrid(RENDERER_T* p_Renderer, FPOINT_T From, FPOINT_T To, ASSETS_T* p_Assets, GLOBALS_T* p_Globals) {
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void __cdecl DIRECT_2D_DrawLine(RENDERER_T* p_Renderer, FPOINT_T From, FPOINT_T To, HPEN hPen) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DIRECT_2D_PrepareDirtyZone(RENDERER_T* p_Renderer, FRECT_T DirtyZone, GLOBALS_T* p_Globals, LOG_T* p_Log) {
@@ -150,7 +159,7 @@ void __cdecl DIRECT_2D_ResetWorldTransform(RENDERER_T* p_Renderer) {
 void __cdecl DIRECT_2D_InitWorldTransform(RENDERER_T* p_Renderer) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl DIRECT_2D_DrawMinimapEntities(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, FPOINT_T MinimapOrigin, ASSETS_T* p_Assets, SETTINGS_T* p_Settings, LOG_T* p_Log) {
+void __cdecl DIRECT_2D_DrawMinimapEntities(RENDERER_T* p_Renderer, GLOBALS_T* p_Globals, FPOINT_T MinimapOrigin, ASSETS_T* p_Assets, SETTINGS_T* p_Settings, MENU_T* p_Menu, LOG_T* p_Log) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void __cdecl DIRECT_2D_DrawMinimapViewport(RENDERER_T* p_Renderer, ASSETS_T* p_Assets, FPOINT_T TopLeft, FPOINT_T TopRight, FPOINT_T BottomRight, FPOINT_T BottomLeft) {

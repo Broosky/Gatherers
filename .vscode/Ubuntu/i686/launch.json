@@ -1,95 +1,95 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Linux i686 - Build & Launch Debug Application (Wine).",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "/usr/bin/wine",
-      "args": [
-        "${workspaceRoot}/bin/Debug/Gatherers.exe"
-      ],
-      "stopAtEntry": false,
-      "cwd": "${workspaceRoot}/bin/Debug/",
-      "environment": [],
-      "externalConsole": true,
-      "MIMode": "gdb",
-      "setupCommands": [
+    "version": "0.2.0",
+    "configurations": [
         {
-          "description": "Enable pretty-printing for gdb.",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ],
-      "preLaunchTask": "Linux i686 - Build Application (Debug).",
-      "miDebuggerPath": "/usr/bin/gdb"
-    },
-    {
-      "name": "Linux i686 - Launch Debug Application (Wine).",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "/usr/bin/wine",
-      "args": [
-        "${workspaceRoot}/bin/Debug/Gatherers.exe"
-      ],
-      "stopAtEntry": false,
-      "cwd": "${workspaceRoot}/bin/Debug/",
-      "environment": [],
-      "externalConsole": true,
-      "MIMode": "gdb",
-      "setupCommands": [
+            "name": "Linux i686 - Build & Launch Debug Application (Wine).",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/wine",
+            "args": [
+                "${workspaceRoot}/bin/Debug/Gatherers.exe"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/bin/Debug/",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb.",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Linux i686 - Build Application (Debug).",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
         {
-          "description": "Enable pretty-printing for gdb.",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ],
-      "miDebuggerPath": "/usr/bin/gdb"
-    },
-    {
-      "name": "Linux i686 - Build & Launch Release Application (Wine).",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "/usr/bin/wine",
-      "args": [
-        "${workspaceRoot}/bin/Release/Gatherers.exe"
-      ],
-      "stopAtEntry": false,
-      "cwd": "${workspaceRoot}/bin/Release/",
-      "environment": [],
-      "externalConsole": true,
-      "MIMode": "gdb",
-      "setupCommands": [
+            "name": "Linux i686 - Launch Debug Application (Wine).",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/wine",
+            "args": [
+                "${workspaceRoot}/bin/Debug/Gatherers.exe"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/bin/Debug/",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb.",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
         {
-          "description": "Enable pretty-printing for gdb.",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ],
-      "preLaunchTask": "Linux i686 - Build Application (Release).",
-      "miDebuggerPath": "/usr/bin/gdb"
-    },
-    {
-      "name": "Linux i686 - Launch Release Application (Wine).",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "/usr/bin/wine",
-      "args": [
-        "${workspaceRoot}/bin/Release/Gatherers.exe"
-      ],
-      "stopAtEntry": false,
-      "cwd": "${workspaceRoot}/bin/Release/",
-      "environment": [],
-      "externalConsole": true,
-      "MIMode": "gdb",
-      "setupCommands": [
+            "name": "Linux i686 - Build & Launch Release Application (Wine).",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/wine",
+            "args": [
+                "${workspaceRoot}/bin/Release/Gatherers.exe"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/bin/Release/",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb.",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Linux i686 - Build Application (Release).",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
         {
-          "description": "Enable pretty-printing for gdb.",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
+            "name": "Linux i686 - Launch Release Application (Wine).",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/wine",
+            "args": [
+                "${workspaceRoot}/bin/Release/Gatherers.exe"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}/bin/Release/",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb.",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "/usr/bin/gdb"
         }
-      ],
-      "miDebuggerPath": "/usr/bin/gdb"
-    }
-  ]
+    ]
 }

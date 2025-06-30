@@ -59,9 +59,9 @@ void __cdecl MENU_Init(MENU_T* p_Menu) {
     p_Menu->ubEnablePathFinding = 1;
     p_Menu->ubUseRaycast = 1;
     p_Menu->ubInterpolateCurves = 1;
-    p_Menu->ubEnableBoxBlur = 1;
-    p_Menu->ubEnableGreenMask = 1;
     p_Menu->ubIsDoubleBuffer = 1;
+    p_Menu->ubDrawTerrainGrid = 1;
+    p_Menu->ubDrawTranslationThreshold = 1;
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Align settings from above.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,13 +73,13 @@ void __cdecl MENU_Init(MENU_T* p_Menu) {
     CheckMenuItem(hMenu, MENU_OPTIONS_DIRTY_ZONES, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_RENDERER_DOUBLE_BUFFER, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_SIMULATION_TOGGLE_SCATTER, MF_CHECKED);
+    CheckMenuItem(hMenu, MENU_OPTIONS_SHOW_TERRAIN_GRID, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_OPTIONS_SHOW_MINOR_VECTORS, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_OPTIONS_SHOW_MAJOR_VECTORS, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_OPTIONS_PATH_FINDING_ENABLE, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_OPTIONS_PATH_FINDING_RAYCAST, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_SIMULATION_TOGGLE_SIMULATION, MF_CHECKED);
-    CheckMenuItem(hMenu, MENU_RENDERER_POST_PROCESSING_BOX_BLUR, MF_CHECKED);
-    CheckMenuItem(hMenu, MENU_RENDERER_POST_PROCESSING_GREEN_MASK, MF_CHECKED);
+    CheckMenuItem(hMenu, MENU_OPTIONS_SHOW_TRANSLATION_THRESHOLD, MF_CHECKED);
     CheckMenuItem(hMenu, MENU_OPTIONS_PATH_FINDING_INTERPOLATE_CURVES, MF_CHECKED);
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Initially disabled.

@@ -58,8 +58,8 @@ MAIN_MENU MENU {
         MENUITEM SEPARATOR
         MENUITEM "&Print Entity List", MENU_SIMULATION_PRINT
         MENUITEM SEPARATOR
-        MENUITEM "&Save", MENU_SIMULATION_SAVE
-        MENUITEM "&Load", MENU_SIMULATION_LOAD
+        MENUITEM "&Save...", MENU_SIMULATION_SAVE
+        MENUITEM "&Load...", MENU_SIMULATION_LOAD
         MENUITEM SEPARATOR
         MENUITEM "&Exit", MENU_SIMULATION_EXIT
     }
@@ -98,6 +98,8 @@ MAIN_MENU MENU {
             MENUITEM "&Draw Minor Vectors", MENU_OPTIONS_SHOW_MINOR_VECTORS
             MENUITEM "&Draw Major Vectors", MENU_OPTIONS_SHOW_MAJOR_VECTORS
             MENUITEM "&Draw Dirty Zones", MENU_OPTIONS_DIRTY_ZONES
+            MENUITEM "&Draw Terrain Grid", MENU_OPTIONS_SHOW_TERRAIN_GRID
+            MENUITEM "&Draw Translation Threshold", MENU_OPTIONS_SHOW_TRANSLATION_THRESHOLD
         END
         POPUP "&Pathfinding..."
         BEGIN

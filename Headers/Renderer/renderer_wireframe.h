@@ -54,7 +54,7 @@ void                __cdecl     WIREFRAME_FlipArea                              
 void                __cdecl     WIREFRAME_ApplyWorldTransform                   (RENDERER_T*, TRANSFORM_TYPE_T, CONSTANTS_T*, float, FPOINT_T, LOG_T*);
 void                __cdecl     WIREFRAME_ResetWorldTransform                   (RENDERER_T*);
 void                __cdecl     WIREFRAME_InitWorldTransform                    (RENDERER_T*);
-void                __cdecl     WIREFRAME_DrawMinimapEntities                   (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, LOG_T*);
+void                __cdecl     WIREFRAME_DrawMinimapEntities                   (RENDERER_T*, GLOBALS_T*, FPOINT_T, ASSETS_T*, SETTINGS_T*, MENU_T*, LOG_T*);
 void                __cdecl     WIREFRAME_DrawMinimapViewport                   (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 void                __cdecl     WIREFRAME_DrawMinimapSelectionArea              (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
 void                __cdecl     WIREFRAME_DrawBuildLimits                       (RENDERER_T*, ASSETS_T*, FPOINT_T, FPOINT_T, FPOINT_T, FPOINT_T);
@@ -69,6 +69,8 @@ void                __cdecl     WIREFRAME_DrawEntityMajorVector                 
 void                __cdecl     WIREFRAME_DrawEntityEllipse                     (RENDERER_T*, ENTITY_T*, HPEN, HBRUSH, SETTINGS_T*);
 void                __cdecl     WIREFRAME_DrawEntity                            (RENDERER_T*, ENTITY_T*, UINT8);
 void                __cdecl     WIREFRAME_DrawDirtyZones                        (RENDERER_T*, ASSETS_T*, GLOBALS_T*);
+void                __cdecl     WIREFRAME_DrawTerrainGrid                       (RENDERER_T*, FPOINT_T, FPOINT_T, ASSETS_T*, GLOBALS_T*);
+void                __cdecl     WIREFRAME_DrawLine                              (RENDERER_T*, FPOINT_T, FPOINT_T, HPEN);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #endif
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -3,6 +3,7 @@
 // Author: Jeffrey Bednar                                                                                                  //
 // Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "../Headers/constants.h"
 #include "../Headers/entity.h"
 #include "../Headers/globals.h"
 #include "../Headers/log.h"
@@ -34,7 +35,7 @@ SETTINGS_T* __cdecl SETTINGS_Create(GLOBALS_T* p_Globals, LOG_T* p_Log) {
     return p_Settings;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-UINT8 __cdecl SETTINGS_InitFromFile(SETTINGS_T* p_Settings, LOG_T* p_Log, const char* const p_szFileName) {
+UINT8 __cdecl SETTINGS_InitFromFile(SETTINGS_T* p_Settings, CONSTANTS_T* p_Constants, LOG_T* p_Log, const char* const p_szFileName) {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     FILE* p_SettingsFile = fopen(p_szFileName, "r");
     if (!p_SettingsFile) {
@@ -90,11 +91,11 @@ UINT8 __cdecl SETTINGS_InitFromFile(SETTINGS_T* p_Settings, LOG_T* p_Log, const 
         else if (SETTINGS_Match(p_szKey, "COST_OF_REFINERY_MINERALS"))              p_Settings->usCostOfRefineryMinerals = MISC_ClampU16(atoi(p_szValue), 1, 100);
         else if (SETTINGS_Match(p_szKey, "COST_OF_REFINERY_GAS"))                   p_Settings->usCostOfRefineryGas = MISC_ClampU16(atoi(p_szValue), 0, 100);
         // [AppSettings]
-        else if (SETTINGS_Match(p_szKey, "ENGINE_FPS"))                             p_Settings->fEngineFPS = MISC_ClampF32(strtof(p_szValue, NULL), 1.0f, 240.0f);
-        else if (SETTINGS_Match(p_szKey, "ANIMATION_STATE_FPS"))                    p_Settings->fAnimateFPS = MISC_ClampF32(strtof(p_szValue, NULL), 1.0f, 60.0f);
+        else if (SETTINGS_Match(p_szKey, "ENGINE_FPS_TARGET"))                      p_Settings->fEngineFpsTarget = MISC_ClampF32(strtof(p_szValue, NULL), 1.0f, 240.0f);
+        else if (SETTINGS_Match(p_szKey, "ANIMATION_FPS_TARGET"))                   p_Settings->fAnimateFpsTarget = MISC_ClampF32(strtof(p_szValue, NULL), 1.0f, 60.0f);
         else if (SETTINGS_Match(p_szKey, "MAINTENANCE_TIMEBASE"))                   p_Settings->fMaintenanceTimebase = MISC_ClampF32(strtof(p_szValue, NULL), 0.1f, 1.0f);
-        else if (SETTINGS_Match(p_szKey, "INITIAL_CLIENT_WIDTH"))                   p_Settings->usInitialClientWidth = MISC_ClampU16(atoi(p_szValue), 640, 1650);
-        else if (SETTINGS_Match(p_szKey, "INITIAL_CLIENT_HEIGHT"))                  p_Settings->usInitialClientHeight = MISC_ClampU16(atoi(p_szValue), 480, 850);
+        else if (SETTINGS_Match(p_szKey, "INITIAL_CLIENT_WIDTH"))                   p_Settings->usInitialClientWidth = MISC_ClampU16(atoi(p_szValue), p_Constants->MinClientSize.uiDx, p_Constants->MaxClientSize.uiDx);
+        else if (SETTINGS_Match(p_szKey, "INITIAL_CLIENT_HEIGHT"))                  p_Settings->usInitialClientHeight = MISC_ClampU16(atoi(p_szValue), p_Constants->MinClientSize.uiDy, p_Constants->MaxClientSize.uiDy);
         else if (SETTINGS_Match(p_szKey, "TRANSLATION_STEP_AMOUNT"))                p_Settings->fTranslationStepAmount = MISC_ClampF32(strtof(p_szValue, NULL), 1.0f, 50.0f);
         else if (SETTINGS_Match(p_szKey, "MINIMAP_SIZE"))                           p_Settings->fMinimapSize = MISC_ClampF32(strtof(p_szValue, NULL), 220.0f, 220.0f);
         else if (SETTINGS_Match(p_szKey, "MAP_SIZE"))                               p_Settings->fMapSize = MISC_ClampF32(strtof(p_szValue, NULL), 2048.0, 5120.0f);
@@ -162,8 +163,8 @@ void __cdecl SETTINGS_Print(SETTINGS_T* p_Settings, LOG_T* p_Log) {
         "    COST_OF_REFINERY_MINERALS=%u\n"
         "    COST_OF_REFINERY_GAS=%u\n\n"
         "[AppSettings]\n"
-        "    ENGINE_FPS=%.2f\n"
-        "    ANIMATION_STATE_FPS=%.2f\n"
+        "    ENGINE_FPS_TARGET=%.2f\n"
+        "    ANIMATION_FPS_TARGET=%.2f\n"
         "    MAINTENANCE_TIMEBASE=%.2f\n"
         "    INITIAL_CLIENT_WIDTH=%u\n"
         "    INITIAL_CLIENT_HEIGHT=%u\n"
@@ -217,8 +218,8 @@ void __cdecl SETTINGS_Print(SETTINGS_T* p_Settings, LOG_T* p_Log) {
         p_Settings->usCostOfRefineryMinerals,
         p_Settings->usCostOfRefineryGas,
         // [AppSettings]
-        p_Settings->fEngineFPS,
-        p_Settings->fAnimateFPS,
+        p_Settings->fEngineFpsTarget,
+        p_Settings->fAnimateFpsTarget,
         p_Settings->fMaintenanceTimebase,
         p_Settings->usInitialClientWidth,
         p_Settings->usInitialClientHeight,
@@ -262,13 +263,15 @@ void __cdecl SETTINGS_Print(SETTINGS_T* p_Settings, LOG_T* p_Log) {
     MISC_WriteOut(p_Log, LOG_SEVERITY_TRACE, "--------------------\n");
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void __cdecl SETTINGS_PropagateHotReload(SETTINGS_T* p_Settings, LOG_T* p_Log, char* p_szFileName, GLOBALS_T* p_Globals) {
-    if (SETTINGS_InitFromFile(p_Settings, p_Log, p_szFileName)) {
+void __cdecl SETTINGS_PropagateHotReload(SETTINGS_T* p_Settings, CONSTANTS_T* p_Constants, LOG_T* p_Log, char* p_szFileName, GLOBALS_T* p_Globals) {
+    if (SETTINGS_InitFromFile(p_Settings, p_Constants, p_Log, p_szFileName)) {
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Propagate to existing static properties in other systems:
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ENTITY_ReceiveHotReload(p_Settings, p_Globals, p_Log);
         GLOBALS_ReceiveHotReload(p_Settings, p_Globals);
         MISC_ReceiveHotReload(p_Settings, p_Globals);
-        TIMEBASE_ReceiveHotReload(p_Globals->p_Engine, p_Settings->fEngineFPS);
+        TIMEBASE_ReceiveHotReload(p_Globals->p_Engine, p_Settings->fEngineFpsTarget);
         TIMEBASE_ReceiveHotReload(p_Globals->p_Maintenance, p_Settings->fMaintenanceTimebase);
     }
     else {
