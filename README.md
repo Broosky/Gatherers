@@ -3,7 +3,8 @@
 A continuation of the [Gatherers-Legacy](https://github.com/Broosky/Gatherers-Legacy) StarCraft-style simulation.  
 Active development continues here when time allows. See the legacy repo for early progress and design context.
 
----
+> If you found this project useful, interesting, or worth keeping an eye on, consider giving it a ⭐️.
+> It helps others discover the project and motivates me to keep building and sharing more.
 
 ## 🔹 Ideas & Upcoming Changes
 
@@ -35,8 +36,6 @@ Active development continues here when time allows. See the legacy repo for earl
 - Fixed point arithmetic?
 - New assets...
 
----
-
 ## 🔹 June 2025 Updates
 
 - Tiled terrain + minimap.
@@ -48,8 +47,6 @@ Active development continues here when time allows. See the legacy repo for earl
 - Blitter index as enum.
 - Directories for the logger.
 - Consolidate TTS.
-
----
 
 ## 🔹 May 2025 Updates
 
@@ -71,8 +68,6 @@ Active development continues here when time allows. See the legacy repo for earl
 - Restructured menu items.
 - Split large functions into smaller ones.
 - Other architectural and miscellaneous changes + toolchain updates.
-
----
 
 ## 🔹 April 2025 Updates
 
@@ -102,9 +97,7 @@ Active development continues here when time allows. See the legacy repo for earl
 - Comma print large positive numbers.
 - Clean up sorting.
 - Render + slight pathfinding optimizations.
-
----
-
+  
 ## 🔹 March 2025 Updates
 
 - Output current working directory.
