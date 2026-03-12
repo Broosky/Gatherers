@@ -1,7 +1,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Program Name: Gatherers (C)                                                                                             //
+// Project: Gatherers                                                                                                      //
 // Author: Jeffrey Bednar                                                                                                  //
-// Copyright (c) Illusion Interactive, 2011 - 2025.                                                                        //
+// Copyright (c) Illusion Interactive, 2011 - 2026.                                                                        //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Educational Use Notice:                                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// This project is provided for educational and learning purposes only. You are welcome to read, study, and experiment     //
+// with this software and/or hardware. It is not intended for commercial use. This software and/or hardware is provided    //
+// "as is", without warranty of any kind. The author assumes no responsibility for any damages or issues resulting from    //
+// its use.                     																						   //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../../Headers/ai.h"
 #include "../../Headers/assets.h"
@@ -375,7 +382,7 @@ void __cdecl MAIN_KillRenderers(GLOBALS_T* p_Globals) {
     for (ubI = 0; ubI < RENDERER_TYPE_COUNT; ubI++) {
         RENDERER_Kill(&p_Globals->p_Renderers[(RENDERER_TYPE_T)ubI], p_Globals);
     }
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     p_Globals->eActiveRendererType = RENDERER_TYPE_UNKNOWN;
     p_Globals->p_ActiveRenderer = NULL;
 }

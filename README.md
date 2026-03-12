@@ -1,4 +1,4 @@
-﻿# 💡 **Gatherers**
+﻿# 💡 Gatherers
 
 A continuation of the [Gatherers-Legacy](https://github.com/Broosky/Gatherers-Legacy) StarCraft-style simulation. Active development continues here when time allows. See the legacy repo for early progress and design context.
 
@@ -33,6 +33,7 @@ A continuation of the [Gatherers-Legacy](https://github.com/Broosky/Gatherers-Le
 - Unit movement acceleration/deceleration + framerate independent unit movement.
 - Decompose blur algorithm from SIMD to non-SIMD for better compatibility at the cost of performance.
 - Fixed point arithmetic?
+- CTRL + entity click to select all entities of the same type.
 - New assets...
 
 ## 🔹 June 2025 Updates
@@ -122,3 +123,9 @@ A continuation of the [Gatherers-Legacy](https://github.com/Broosky/Gatherers-Le
 - Reviewed and updated typedefs, code, and comments.
 - General code review and distance calculations.
 - Note: Dev-C++ generates `_private.h`/`.rc` files by default — aligned these with `main.rc` where applicable.
+
+##
+
+> Educational Use Notice: This project is provided for educational and learning purposes only. You are welcome to read, study, and experiment
+> with this software and/or hardware. It is not intended for commercial use. This software and/or hardware is provided "as is", without warranty
+> of any kind. The author assumes no responsibility for any damages or issues resulting from its use.
