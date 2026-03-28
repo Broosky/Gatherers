@@ -5,6 +5,10 @@ A continuation of the [Gatherers-Legacy](https://github.com/Broosky/Gatherers-Le
 > If you found this project useful, interesting, or worth keeping an eye on, consider giving it a ⭐️.
 > It helps others discover the project and motivates me to keep building and sharing more.
 
+## 🔹 In Action
+
+[![Demo 1](Demo/Gatherers%201.gif)](Demo/Gatherers%201.webm)
+
 ## 🔹 Ideas & Upcoming Changes
 
 - Optimize pathfinding...

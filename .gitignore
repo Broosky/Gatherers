@@ -8,10 +8,8 @@
 *.pdb
 *.tlog
 *.lastbuildstate
-*.obj
 *.log
 *.recipe
-*.iobj
 *.ilk
 *.idb
 *.ipdb
@@ -23,3 +21,7 @@
 *.opendb
 *.aps
 **/.vs
+**/bin
+**/obj
+*.obj
+*.iobj
