@@ -4,11 +4,11 @@ A continuation of [Gatherers-Legacy](https://github.com/Broosky/Gatherers-Legacy
 
 This project is an active development branch where experimentation and iteration continue when time allows. The original repository contains early prototypes, foundational systems, and initial design decisions.
 
-## About the Project
+## 🔹 About the Project
 
 Gatherers is a simulation inspired by resource collection mechanics found in real-time strategy games like StarCraft. It focuses on building a flexible, expandable system for workers, resources, and world interactions.
 
-## Motivation
+## 🔹 Motivation
 
 This project exists primarily as a creative and technical sandbox. It’s used to:
 
@@ -18,7 +18,7 @@ This project exists primarily as a creative and technical sandbox. It’s used t
 - Revisit and modernize earlier design work from the legacy version.
 - Have fun and spend a few hours coding.
 
-## Status
+## 🔹 Status
 
 Active but intermittent development. Features are added and refactored as time permits.
 
