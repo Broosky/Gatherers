@@ -1,6 +1,26 @@
 ﻿# 💡 Gatherers
 
-A continuation of the [Gatherers-Legacy](https://github.com/Broosky/Gatherers-Legacy) StarCraft-style simulation. Active development continues here when time allows. See the legacy repo for early progress and design context.
+A continuation of [Gatherers-Legacy](https://github.com/Broosky/Gatherers-Legacy), a StarCraft-inspired resource-gathering simulation.
+
+This project is an active development branch where experimentation and iteration continue when time allows. The original repository contains early prototypes, foundational systems, and initial design decisions.
+
+## About the Project
+
+Gatherers is a simulation inspired by resource collection mechanics found in real-time strategy games like StarCraft. It focuses on building a flexible, expandable system for workers, resources, and world interactions.
+
+## Motivation
+
+This project exists primarily as a creative and technical sandbox. It’s used to:
+
+- Experiment with performance improvements.
+- Refine simulation logic.
+- Prototype new gameplay or system ideas.
+- Revisit and modernize earlier design work from the legacy version.
+- Have fun and spend a few hours coding.
+
+## Status
+
+Active but intermittent development. Features are added and refactored as time permits.
 
 > If you found this project useful, interesting, or worth keeping an eye on, consider giving it a ⭐️.
 > It helps others discover the project and motivates me to keep building and sharing more.
